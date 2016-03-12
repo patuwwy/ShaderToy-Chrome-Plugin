@@ -1,0 +1,26 @@
+{
+    "manifest_version": 2,
+    "name": "Shadertoy unofficial plugin.",
+    "version": "0.2.1",
+    "description": "Shadertoy.com unofficial plugin.",
+    "permissions": [
+
+    ],
+    "icons": {
+        "128": "assets/icon_active_128.png"
+    },
+    "browser_action": {
+        "default_icon": "assets/icon_off_128.png",
+        "default_popup": "window.html"
+    },
+    "content_scripts": [
+        {
+          "matches": ["https://www.shadertoy.com/*"],
+          "js": ["myscript.js"]
+        }
+    ],
+    "web_accessible_resources": [
+        "style.css",
+        "shadertoy-plugin.js"
+    ]
+}

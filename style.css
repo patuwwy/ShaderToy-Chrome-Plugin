@@ -1,0 +1,194 @@
+body.dark-toy {
+	background: #000;
+	color: #aaa;
+}
+
+body.dark-toy:before {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	content: "";
+	display: block;
+	background-image: url("/img/topbackground.png");
+	opacity: .3;
+}
+
+.dark-toy a {
+	color: #f92;
+}
+
+.dark-toy ::-webkit-scrollbar-thumb {
+	background: #222;
+}
+
+.dark-toy ::-webkit-scrollbar {
+	background: #000;
+}
+
+.dark-toy .playerBar,
+.dark-toy #editorHeader,
+.dark-toy #toolBar,
+.dark-toy .tab.selected:not(.selected),
+.dark-toy #shaderStats img,
+.dark-toy #shaderButtons img,
+.dark-toy .previewStats img,
+.dark-toy input,
+.dark-toy textarea {
+	-webkit-filter: invert(1);
+}
+
+.dark-toy input,
+.dark-toy textarea {
+	border-radius: 0 !important;
+	border: none !important;
+}
+
+.dark-toy .previewText,
+.dark-toy .previewStats {
+	color: #666 ;
+}
+
+.dark-toy .tab:not(.selected) {
+	background: #fff;
+	color: #000;
+}
+
+.dark-toy .inputSelectorControls {
+	background: #000;
+}
+
+.dark-toy .inputSelectorControls img {
+	-webkit-filter: invert(1);
+}
+
+.dark-toy .tableRowEven {
+	background: #111;
+}
+
+.dark-toy .tableRowOdd {
+	background: #222;
+}
+
+.dark-toy .likesIcon {
+	opacity: .3;
+}
+
+/* Editor */
+
+.dark-toy #editorHeader {
+	color: #000;
+}
+
+.dark-toy canvas,
+.dark-toy canvas.playerCanvas,
+.dark-toy .inputForm,
+.dark-toy .formButton {
+	border-radius: 0 !important;
+}
+
+.uiButton {
+	color: #aaa;
+}
+
+.dark-toy .cm-s-twilight.CodeMirror { background: #141414; color: #f7f7f7; } /**/
+.dark-toy .dark-toy .cm-s-twilight div.CodeMirror-selected { background: #323232; } /**/
+.dark-toy .cm-s-twilight .CodeMirror-line::selection, .dark-toy .cm-s-twilight .CodeMirror-line > span::selection, .dark-toy .cm-s-twilight .CodeMirror-line > span > span::selection { background: rgba(50, 50, 50, 0.99); }
+.dark-toy .cm-s-twilight .CodeMirror-line::-moz-selection, .dark-toy .cm-s-twilight .CodeMirror-line > span::-moz-selection, .dark-toy .cm-s-twilight .CodeMirror-line > span > span::-moz-selection { background: rgba(50, 50, 50, 0.99); }
+
+.dark-toy .cm-s-twilight .CodeMirror-gutters { background: #222; border-right: 1px solid #aaa; }
+.dark-toy .cm-s-twilight .CodeMirror-guttermarker { color: white; }
+.dark-toy .cm-s-twilight .CodeMirror-guttermarker-subtle { color: #aaa; }
+.dark-toy .cm-s-twilight .CodeMirror-linenumber { color: #aaa; }
+.dark-toy .cm-s-twilight .CodeMirror-cursor { border-left: 1px solid white; }
+
+.dark-toy .cm-s-twilight .cm-keyword { color: #f9ee98; } /**/
+.dark-toy .cm-s-twilight .cm-atom { color: #FC0; }
+.dark-toy .cm-s-twilight .cm-number { color:  #ca7841; } /**/
+.dark-toy .cm-s-twilight .cm-def { color: #8DA6CE; }
+.dark-toy .cm-s-twilight span.cm-variable-2, .dark-toy .cm-s-twilight span.cm-tag { color: #607392; } /**/
+.dark-toy .cm-s-twilight span.cm-variable-3, .dark-toy .cm-s-twilight span.cm-def { color: #607392; } /**/
+.dark-toy .cm-s-twilight .cm-operator { color: #cda869; } /**/
+.dark-toy .cm-s-twilight .cm-comment { color:#777; font-style:italic; font-weight:normal; } /**/
+.dark-toy .cm-s-twilight .cm-string { color:#8f9d6a; font-style:italic; } /**/
+.dark-toy .cm-s-twilight .cm-string-2 { color:#bd6b18; } /*?*/
+.dark-toy .cm-s-twilight .cm-meta { background-color:#141414; color:#f7f7f7; } /*?*/
+.dark-toy .cm-s-twilight .cm-builtin { color: #cda869; } /*?*/
+.dark-toy .cm-s-twilight .cm-tag { color: #997643; } /**/
+.dark-toy .cm-s-twilight .cm-attribute { color: #d6bb6d; } /*?*/
+.dark-toy .cm-s-twilight .cm-header { color: #FF6400; }
+.dark-toy .cm-s-twilight .cm-hr { color: #AEAEAE; }
+.dark-toy .cm-s-twilight .cm-link { color:#ad9361; font-style:italic; text-decoration:none; } /**/
+.dark-toy .cm-s-twilight .cm-error { border-bottom: 1px solid red; }
+
+.dark-toy .cm-s-twilight .CodeMirror-activeline-background { background: #27282E; }
+.dark-toy .cm-s-twilight .CodeMirror-matchingbracket { outline:1px solid grey; color:white !important; }
+
+.dark-toy div#editor {
+	font-weight: normal;
+	color: #ccc;
+}
+
+.dark-toy .cm-s-twilight .cm-meta {
+	color: orange;
+}
+
+.dark-toy .cm-s-twilight .cm-comment {
+	color: #666;
+	font-style: normal;
+}
+
+.dark-toy .cm-s-twilight .cm-keyword {
+	color: #6699cc;
+}
+
+.dark-toy .cm-s-twilight .cm-number {
+	color: #f99157;
+}
+
+.dark-toy .cm-s-twilight .cm-build-in {
+	color: #26FF37;
+}
+
+.dark-toy .CodeMirror div.CodeMirror-cursor {
+	border-left: 1px solid white;
+	background: #fff;
+	widht: .5em;
+}
+
+.dark-toy #sentence .boldText{
+	color: #FF9922;
+}
+
+.fullscreen-edit .playerCanvas {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 9;
+}
+
+.fullscreen-edit div#editorWrapper.noFullScreen {
+	position: fixed;
+	right: 2.5%;
+	top: 2.5%;
+	width: 40%;
+	height: 90%;
+	left: auto;
+	z-index: 10;
+}
+
+.fullscreen-edit.dark-toy .cm-s-twilight.CodeMirror {
+	background: rgba(0,0,0,.4);
+	text-shadow: 0 0 1px #000, 0 0 1px #000;
+}
+
+.fullscreen-edit.dark-toy .cm-s-twilight .CodeMirror-gutters {
+	background: rgba(0,0,0,.3);
+}
+
+.fullscreen-edit.dark-toy #toolBar {
+	opacity: .5
+}

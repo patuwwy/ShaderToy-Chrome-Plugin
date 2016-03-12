@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        min-width: 320px;
+        background: #34495e;
+        color: #ddd;
+        border: 0;
+        outline: 0;
+        padding: 0;
+        margin: 0;
+        font-family: monospace;
+    }
+
+    ul {
+        list-style: none; padding: 0;
+    }
+
+    h1 {
+        font-size: 24px;
+        position: relative;
+        z-index: 1;
+        line-height: 48px;
+        height: 48px;
+        text-align: center;
+    }
+
+    h2 {
+        font-size: 16px;
+        line-height: 32px;
+        border-bottom: 1px dotted #000;
+        clear: both;
+        position: relative;
+        z-index: 1;
+    }
+    h3 {
+        fond-size: 14px;
+        line-height: 28px;
+    }
+
+    li {
+        font-size: 14px;
+        line-height: 18px;
+    }
+
+    footer {
+        margin-top: 15px;
+    }
+
+    .changelog > li {
+        margin-bottom: 5px;
+    }
+
+    .keys b {
+        display: block;
+    }
+
+    .keys span {
+        display: block;
+        padding-left: 15px;
+    }
+
+    .keys li {
+        margin-bottom: 5px;
+        clear: left;
+    }
+    .wrapper {
+        position: relative;
+        text-shadow: 2px 2px 0 #000;
+        padding: 0 15px;
+    }
+
+    .wrapper:before {
+        content: "";
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 200%;
+        height: 200%;
+        background-color: #0a0a0a;
+        background-image: linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black),
+        linear-gradient(45deg, black 25%, transparent 25%, transparent 75%, black 75%, black);
+        background-size:60px 60px;
+        background-position:0 0, 30px 30px;
+        z-index: -1;
+        -webkit-animation: shift 5s linear infinite;
+    }
+
+    @-webkit-keyframes shift {
+        0% {
+            transform: translateX(-120px) translateY(-120px);
+        }
+        100% {
+            transform: translateX(0) translateY(-60px);
+        }
+    }
+
+    .bars {
+        position: relative;
+        display: block;
+        width: 100%;
+    }
+
+    .bars li {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 8px;
+        background: #aaa;
+        display: block;
+        animation: bar 1.7s ease-in-out infinite;
+        -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%,rgba(0,0,0,1) 50%, rgba(0,0,0,1) 50%, rgba(0,0,0,0.5) 100%);
+    }
+
+    .bars .l1 { animation-delay: -.1s; background: #301 }
+    .bars .l2 { animation-delay: -.2s; background: #307 }
+    .bars .l3 { animation-delay: -.3s; background: #40a  }
+    .bars .l4 { animation-delay: -.4s; background: #01f }
+    .bars .l5 { animation-delay: -.5s; background: #06a  }
+    .bars .l6 { animation-delay: -.6s; background: #40c  }
+    .bars .l7 { animation-delay: -.7s; background: #70a  }
+    .bars .l8 { animation-delay: -.8s; background: #a10  }
+
+    @keyframes bar {
+        0%, 100% {
+            transform: translateY(0);
+        }
+        50% {
+            transform: translateY(37px);
+        }:
+    }
+
+  </style>
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <ul class="bars">
+                <li class="l1"></li>
+                <li class="l2"></li>
+                <li class="l3"></li>
+                <li class="l4"></li>
+                <li class="l5"></li>
+                <li class="l6"></li>
+                <li class="l7"></li>
+                <li class="l8"></li>
+            </ul>
+            <h1>
+
+
+                Shadertoy utils
+            </h1>
+        </header>
+        <h2>Keys:</h2>
+        <ul class="keys">
+            <li>
+                <p>Fullscreen Shader / focused canvas:</p>
+                <ul>
+                    <li>
+                        <b>1..9 </b><span>Resolution divider.</span>
+                    </li>
+                    <li>
+                        <b>ALT + up</b><span>Pause time. (CMD + up for Mac)</span>
+                    </li>
+                    <li>
+                        <b>ALT + down</b><span>Restart time. (CMD + down for Mac)</span>
+                    </li>
+                    <li>
+                        <b>ALT + SHIFT + SPACE</b><span>Fullscreen edit (CMD + SHIFT + SPACE for Mac)</b></span>
+                    </li>
+                </ul>
+            </li>
+        <ul>
+        <h2>Changelog:</h2>
+            <ul class="changelog">
+                <li>
+                    0.2.1
+                    <ul>
+                        <li>JSDoc</li>
+                    </ul>
+                </li>
+                <li>
+                    0.2.0
+                    <ul>
+                        <li>Basic implementation of fullscreen edit</li>
+                    </ul>
+                </li>
+                <li>
+                    0.1.1
+                    <ul>
+                        <li>Added pause/restart time in fullscreen mode</li>
+                    </ul>
+                </li>
+                <li>
+                    0.1.0
+                    <ul>
+                        <li>Added basic dark theme</li>
+                    </ul>
+                </li>
+                <li>
+                    0.0.1
+                    <ul>
+                        <li>Change resolution by keys 1...9</li>
+                    <ul>
+                </li>
+            </ul>
+        <h2>Future goals:</h2>
+            <ul>
+                <li>Github</li>
+            </ul>
+        </h2>
+        <footer>
+            <!--<p>(c) 2016 <a href="http://patrykfalba.eu" type="_blank">Patu</a></p>-->
+            (c) 2016 patrykfalba.eu
+        </footer>
+    </div>
+
+</body>
+</html>
