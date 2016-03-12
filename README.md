@@ -18,8 +18,7 @@
 !(screen2.jpg)
 !(screen3.jpg)
 
-
-## Changelog:
+# Changelog:
 
 * 0.2.1
 JSDoc
