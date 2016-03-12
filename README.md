@@ -1,5 +1,7 @@
 # ShaderToy unofficial plugin.
 
+[Chrome Web Store](https://chrome.google.com/webstore/detail/shadertoy-unofficial-plug/ohicbclhdmkhoabobgppffepcopomhgl?hl=pl)
+
 ## Features:
 
 * Change resolution in windowed and fullscreen mode by pressing keys 1...9
