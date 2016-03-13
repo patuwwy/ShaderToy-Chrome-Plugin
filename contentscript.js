@@ -77,10 +77,6 @@
         oReq.send();
     }
 
-    function setIconOn() {
-
-    }
-
     /**
      * Inits plugin.
      */
@@ -88,8 +84,12 @@
         loadStyle();
         loadScript();
         waitForEd(switchToDarkTheme);
-        setIconOn();
     }
 
+    chrome.extension.sendMessage({ present: true }, function (response) {
+        //console.log(response);
+    });
+
     init();
+
 })();

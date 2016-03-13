@@ -1,25 +1,14 @@
 (function(d, w, M) {
 
+    'strict mode';
+
     var
-        /**
-         * Body class name for fullscreen edit.
-         *
-         * @type {string}
-         */
-        FULLSCREEN_MODE_CLASS = 'fullscreen-edit',
-
-
-
         /**
          * Stores ToyPlug instance.
          *
          * @type {ToyPlug}
          */
-        tp,
-
-        tpEdit,
-
-        tpProfile;
+        tp;
 
     /**
      * ToyPlug. Plugin.
@@ -49,8 +38,6 @@
         if (this.isProfilePage()) {
             this.profilePage = new ToyPlugProfilePage();
         }
-
-        console.log(this.isEditPage, this.isProfilePage);
     };
 
     function ToyPlugEditPage() {
@@ -58,6 +45,13 @@
     }
 
     ToyPlugEditPage.prototype.init = function init() {
+
+        /**
+         * Body class name for fullscreen edit.
+         *
+         * @type {string}
+         */
+        this.FULLSCREEN_MODE_CLASS = 'fullscreen-edit';
 
         /**
          * Main Shadertoy canvas HTML id attribute.

@@ -24,6 +24,9 @@
 
 # Changelog:
 
+* 0.2.5
+Show plugin popup only when on Shadertoy.com.
+
 * 0.2.3
 Added sort shaders by views/likes/comments on "My profile" page.
 

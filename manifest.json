@@ -1,22 +1,29 @@
 {
     "manifest_version": 2,
     "name": "Shadertoy unofficial plugin.",
-    "version": "0.2.4",
+    "version": "0.2.5",
     "description": "Shadertoy.com unofficial plugin.",
+    "background": {
+        "scripts": [
+            "background.js"
+        ],
+        "persistent": false
+    },
     "permissions": [
-
+        "https://www.shadertoy.com/*"
     ],
     "icons": {
         "128": "assets/icon_active_128.png"
     },
-    "browser_action": {
-        "default_icon": "assets/icon_off_128.png",
+    "page_action": {
+        "default_title": "ShaderToy plugin",
+        "default_icon": "assets/icon_active_128.png",
         "default_popup": "window.html"
     },
     "content_scripts": [
         {
           "matches": ["https://www.shadertoy.com/*"],
-          "js": ["myscript.js"]
+          "js": ["contentscript.js"]
         }
     ],
     "web_accessible_resources": [
