@@ -192,3 +192,11 @@ body.dark-toy:before {
 .fullscreen-edit.dark-toy #toolBar {
 	opacity: .5
 }
+
+#divShaders tr:first-child td:nth-child(3),
+#divShaders tr:first-child td:nth-child(4),
+#divShaders tr:first-child td:nth-child(5) {
+	cursor: pointer;
+	color: #fff;
+
+}

@@ -44,7 +44,7 @@
                 content = this.responseText,
                 script = document.createElement('script');
 
-            script.innerText = content;
+            script.innerHTML = content;
             document.body.appendChild(script);
         });
     }
@@ -57,7 +57,7 @@
             var content = this.responseText,
                 style = document.createElement('style');
 
-            style.innerText = content;
+            style.innerHTML = content;
             document.head.appendChild(style);
             document.body.classList.add('dark-toy');
         });
