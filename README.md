@@ -23,7 +23,7 @@
 # Changelog:
 
 * 0.2.3
-Added sorting shaders by views/likes/comments on "My profile" page.
+Added sort shaders by views/likes/comments on "My profile" page.
 
 * 0.2.2
 Git
