@@ -4,7 +4,7 @@
 
 ## Features:
 
-* Sorting shaders list by views, likes or comments.
+* Sorting shaders list by views, likes or comments on "My profile" page.
 
 * Change resolution in windowed and fullscreen mode by pressing keys 1...9
   Resolution is devided by pressed key value, for example:
