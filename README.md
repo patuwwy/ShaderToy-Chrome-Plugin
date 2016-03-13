@@ -4,6 +4,8 @@
 
 ## Features:
 
+* Sorting shaders list by views, likes or comments.
+
 * Change resolution in windowed and fullscreen mode by pressing keys 1...9
   Resolution is devided by pressed key value, for example:
 
@@ -23,7 +25,7 @@
 # Changelog:
 
 * 0.2.3
-Added sorting shaders by views/likes/comments on "My profile" page.
+Added sort shaders by views/likes/comments on "My profile" page.
 
 * 0.2.2
 Git
