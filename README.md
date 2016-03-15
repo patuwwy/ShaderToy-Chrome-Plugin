@@ -4,25 +4,37 @@
 
 ## Features:
 
+* Switchable dark color theme.
+
 * Sorting shaders list by views, likes or comments on "My profile" page.
 
-* Change resolution in windowed and fullscreen mode by pressing keys 1...9
-  Resolution is devided by pressed key value, for example:
+* Change resolution in windowed and fullscreen mode by pressing keys 1...9.
+
+  Resolution is divided by pressed key value, for example:
 
   Key '2' divides by 2, 1920x1080 becomes 960x540.
-  This allows to run shaders smoothly on non-top GPUs.
+  Key '8' divides by 9, 1920x1080 becomes 240x135.
+
+  This allows to run shaders smoothly (even in fullscreen) on non-top GPUs.
+  Notice that lower resolution is interpolated to original size. This causes blurrish rendering.
 
 * Pause/Restart in fullscreen mode.
 
 * Fullscreen edit mode.
 
-* Dark color theme.
-
+![](./screen4dark.jpg)
+![](./screen4light.jpg)
 ![](./screen1.jpg)
 ![](./screen2.jpg)
 ![](./screen3.jpg)
 
 # Changelog:
+
+* 0.3.0
+Refactoring.
+Switchable dark theme.
+Extension styling.
+Dark theme fixes.
 
 * 0.2.5
 Show plugin popup only when on Shadertoy.com.
@@ -47,3 +59,7 @@ Added basic dark theme
 
 * 0.0.1
 Change resolution by keys 1...9
+
+
+
+[Amiga fonts](https://github.com/rewtnull/amigafonts) are used here.

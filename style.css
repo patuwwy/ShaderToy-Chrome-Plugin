@@ -1,3 +1,7 @@
+body {
+	-webkit-transition: all .3s ease;
+}
+
 body.dark-toy {
 	background: #000;
 	color: #aaa;
@@ -13,9 +17,15 @@ body.dark-toy:before {
 	display: block;
 	background-image: url("/img/topbackground.png");
 	opacity: .3;
+	-webkit-transition: all .3s ease;
 }
 
-.dark-toy a {
+.dark-toy a,
+.dark-toy a.regular,
+.dark-toy a.option,
+.dark-toy a.user,
+.dark-toy a.pageButtons,
+.dark-toy a.shader {
 	color: #f92;
 }
 
@@ -34,9 +44,9 @@ body.dark-toy:before {
 .dark-toy #shaderStats img,
 .dark-toy #shaderButtons img,
 .dark-toy .previewStats img,
-.dark-toy input,
 .dark-toy textarea {
 	-webkit-filter: invert(1);
+	-webkit-transition: all .3s ease;
 }
 
 .dark-toy input,
@@ -198,5 +208,29 @@ body.dark-toy:before {
 #divShaders tr:first-child td:nth-child(5) {
 	cursor: pointer;
 	color: #fff;
+}
 
+.dark-toy div#header {
+	background: #000;
+}
+
+.dark-toy div#headerContent {
+	height: 100%;
+	background: none;
+}
+
+.dark-toy div#headerContent:before {
+	background: url("/img/topbackground.png") repeat;
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -100px;
+	width: 140%;
+	height: 100%;
+	opacity: .1;
+}
+
+.dark-toy #footerContent {
+	color: #fff;
 }

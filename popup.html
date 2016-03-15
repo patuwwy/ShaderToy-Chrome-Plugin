@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @font-face {
+            font-family: Amiga;
+            src: url("assets/TopazPlus_a1200_v1.0.ttf");
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Amiga", monospace, sans-serif;
+            min-width: 320px;
+            background: #34495e;
+            color: #222;
+            border: 0;
+            outline: 0;
+            padding: 0;
+            margin: 0;
+        }
+
+        .dark-toy a {
+            color: rgb(255, 153, 34);
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul:after {
+            clear: both;
+            display: block;
+            content: "";
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 24px;
+            position: relative;
+            z-index: 1;
+            line-height: 48px;
+            height: 48px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 16px;
+            line-height: 32px;
+            font-weight: normal;
+            border-bottom: 1px dotted #000;
+            clear: both;
+            position: relative;
+            z-index: 1;
+        }
+
+        h3 {
+            fond-size: 14px;
+            line-height: 28px;
+            font-weight: normal;
+        }
+
+        li {
+            font-size: 14px;
+            line-height: 18px;
+        }
+
+        footer {
+            margin-top: 15px;
+        }
+
+        .changelog > li {
+            margin-bottom: 5px;
+        }
+
+        .keys b {
+            display: block;
+            font-weight: normal;
+            color: #eee;
+        }
+
+        .keys span {
+            display: block;
+            padding-left: 15px;
+        }
+
+        .keys li {
+            margin-bottom: 5px;
+            clear: left;
+        }
+
+        .wrapper {
+            position: relative;
+            padding: 0 15px;
+            transition: all .2s ease;
+        }
+
+        .wrapper:before {
+            transition: all .2s ease;
+            content: "";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            background-color: #fff;
+            background-image: linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee),
+            linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee);
+            background-size: 60px 60px;
+            background-position:0 0, 30px 30px;
+            z-index: -1;
+            -webkit-animation: shift 5s linear infinite;
+        }
+
+        @-webkit-keyframes shift {
+            0% {
+                transform: translateX(-120px) translateY(-120px);
+            }
+            100% {
+                transform: translateX(0) translateY(-60px);
+            }
+        }
+
+        .bars {
+            position: relative;
+            display: block;
+            width: 100%;
+        }
+
+        .bars li {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: #aaa;
+            display: block;
+            animation: bar 1.7s ease-in-out infinite;
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%,rgba(0,0,0,1) 50%, rgba(0,0,0,1) 50%, rgba(0,0,0,0.5) 100%);
+        }
+
+        .bars .l1 { animation-delay: -.1s; background: #301 }
+        .bars .l2 { animation-delay: -.2s; background: #307 }
+        .bars .l3 { animation-delay: -.3s; background: #40a  }
+        .bars .l4 { animation-delay: -.4s; background: #01f }
+        .bars .l5 { animation-delay: -.5s; background: #06a  }
+        .bars .l6 { animation-delay: -.6s; background: #40c  }
+        .bars .l7 { animation-delay: -.7s; background: #70a  }
+        .bars .l8 { animation-delay: -.8s; background: #a10  }
+
+        @keyframes bar {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(37px);
+            }:
+        }
+
+        a:focus { outline: none;}
+
+        footer { margin: 64px 0 10px; }
+
+        .gitlink {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+        }
+
+        .settings li {
+            clear: both;
+            font-size: 16px;
+        }
+
+        .settings label {
+            float: left;
+            clear: left;
+        }
+
+        .settings input {
+            float: right;
+        }
+
+        body.dark-toy {
+            color: #000;
+        }
+
+        body.dark-toy .wrapper {
+            color: #999;
+            text-shadow: 1px 1px 0 #444;
+        }
+
+        body.dark-toy .wrapper:before {
+            background-color: #0a0a0a;
+            background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000),
+                linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000);
+        }
+
+        section {
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <ul class="bars">
+                <li class="l1"></li>
+                <li class="l2"></li>
+                <li class="l3"></li>
+                <li class="l4"></li>
+                <li class="l5"></li>
+                <li class="l6"></li>
+                <li class="l7"></li>
+                <li class="l8"></li>
+            </ul>
+            <h1>
+                Shadertoy utils
+            </h1>
+        </header>
+        <section class="settings">
+            <ul>
+                <li>
+                    <label>Dark Theme</label>
+                    <input type="checkbox" id="input-dark-theme"/>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <h2>Keys:</h2>
+            <ul class="keys">
+                <li>
+                    <p>Click on Shader, then:</p>
+                    <ul>
+                        <li>
+                            <b>1..9 </b><span>Resolution divider.</span>
+                        </li>
+                        <li>
+                            <b>ALT + up</b><span>Pause time. (CMD + up for Mac)</span>
+                        </li>
+                        <li>
+                            <b>ALT + down</b><span>Restart time. (CMD + down for Mac)</span>
+                        </li>
+                        <li>
+                            <b>ALT + SHIFT + SPACE</b><span>Fullscreen edit (CMD + SHIFT + SPACE for Mac)</b></span>
+                        </li>
+                    </ul>
+                </li>
+            <ul>
+        </section>
+        <footer>
+        <p>(c) 2016 by <a href="http://patrykfalba.eu/" type="_blank">Patu</a></p>
+
+        </footer>
+        <a class="gitlink" target="_blank" href="https://github.com/patuwwy/ShaderToy-Chrome-Plugin"><img src="assets/github_ribbon.png"/></a>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

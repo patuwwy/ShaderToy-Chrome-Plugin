@@ -8,7 +8,13 @@
          *
          * @type {ToyPlug}
          */
-        tp;
+        tp,
+
+        /** Stores Helpers instance.
+         *
+         * @type {Helpers}
+         */
+        helpers;
 
     /**
      * ToyPlug. Plugin.
@@ -20,17 +26,27 @@
     }
 
     ToyPlug.prototype.isEditPage = function isEditPage() {
-        return document.location.href.match('shadertoy.com/view');
+        return document.location.href.match(/(.com\/view|.com\/new)/);
     };
 
     ToyPlug.prototype.isProfilePage = function isProfilePage() {
         return document.location.href.match('shadertoy.com/profile');
     };
 
+    ToyPlug.prototype.toggleDarkTheme = function(status) {
+        if (this.editPage) {
+            this.editPage.switchEditorToDark(window.darkTheme);
+        }
+
+        this.common.switchToDarkTheme();
+    };
+
     /**
      * Inits ToyPlug functionality.
      */
     ToyPlug.prototype.init = function init() {
+        this.common = new ToyPlugCommon();
+
         if (this.isEditPage()) {
             this.editPage = new ToyPlugEditPage();
         }
@@ -40,10 +56,42 @@
         }
     };
 
+    /**
+     * Provides functionality for every type of shadertoy page.
+     *
+     * @constructor
+     */
+    function ToyPlugCommon() {
+        this.init();
+    }
+
+    /**
+     * Inits common functionality.
+     */
+    ToyPlugCommon.prototype.init = function init() {
+        this.switchToDarkTheme();
+    };
+
+    /**
+     * Swithces Shadertoy to dark theme.
+     */
+    ToyPlugCommon.prototype.switchToDarkTheme = function switchToDarkTheme() {
+        document.body.classList.remove('dark-toy');
+        if (window.darkTheme) document.body.classList.add('dark-toy');
+    };
+
+    /**
+     * Provides additional functionality to Shadertoy's edit page.
+     *
+     * @constructor
+     */
     function ToyPlugEditPage() {
         this.init();
     }
 
+    /**
+     * Initializes.
+     */
     ToyPlugEditPage.prototype.init = function init() {
 
         /**
@@ -74,9 +122,34 @@
          */
         this.currentDivider = 1;
 
+        this.switchEditorToDark(window.darkTheme);
         this.bindKeys();
     };
 
+    /**
+     * Waits for CodeMirror editor to init, then changes it's theme.
+     */
+    ToyPlugEditPage.prototype.switchEditorToDark =
+        function switchEditorToDark(isDark) {
+            var ed = null,
+                edClass = isDark ? 'cm-s-twilight' : 'cm-s-default';
+
+            function waitForEd() {
+                ed = document.querySelector('.CodeMirror');
+
+                if (ed) {
+                    ed.classList.remove('cm-s-default');
+                    ed.classList.remove('cm-s-twilight');
+                    ed.classList.add(edClass);
+                } else {
+                    setTimeout(function() {
+                        waitForEd();
+                    }, 10);
+                }
+            }
+
+            waitForEd();
+        };
     /**
      * Changes Shader resolution.
      * Resolution calculation is based on divider and depends of fullscreen
@@ -153,16 +226,24 @@
         this.decraseRes(currentDivider);
     };
 
+    /**
+     * Provides additional functionality to ShaderToy's profile page view.
+     *
+     * @contructor
+     */
     function ToyPlugProfilePage() {
         this.init();
     }
 
+    /**
+     * Initializes profile page functions.
+     */
     ToyPlugProfilePage.prototype.init = function init() {
         this.shadersList();
     };
 
     /**
-     * Manages shaders list.
+     * Adds sorting shaders list on profile page.
      */
     ToyPlugProfilePage.prototype.shadersList = function () {
         var tp = this;
@@ -225,6 +306,7 @@
         this.updateShadersList(tempArray);
 
     };
+
     /**
      * Updates shaders list.
      *
@@ -250,7 +332,11 @@
     /**
      * Common helper function.
      */
-    function Helpers() {}
+    function Helpers(options) {
+        Object.keys(options).forEach(function(item) {
+            this[item] = options[item];
+        });
+    }
 
     /**
      * Converts HTML collection to array.
@@ -262,7 +348,11 @@
         return Array.prototype.slice.apply(collection);
     };
 
-    helpers = new Helpers();
-    tp = new ToyPlug();
+    Helpers.prototype.log = function(val) {
+        if (this.debug) console.log('value:', val);
+    };
+
+    helpers = window.ToyPlugHelpers = new Helpers({ debug: true });
+    window.ToyPlug = new ToyPlug();
 
 })(document, window);

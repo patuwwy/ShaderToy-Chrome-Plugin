@@ -3,39 +3,6 @@
     'strict mode';
 
     /**
-     * Stores CodeMirror HTML Element reference.
-     *
-     * @type {HTMLElement}
-     */
-    var ed = null;
-
-    /**
-     * Runs callback when CodeMirror editor is ready.
-     *
-     * @param {function} callback
-     */
-
-    function waitForEd(callback) {
-        ed = document.querySelector('.CodeMirror');
-
-        if (ed) {
-            callback();
-        } else {
-            setTimeout(function() {
-                waitForEd(callback);
-            }, 20);
-        }
-    }
-
-    /**
-     * Changes CodeMirror color theme to dark.
-     */
-    function switchToDarkTheme() {
-        ed.classList.remove('cm-s-default');
-        ed.classList.add('cm-s-twilight');
-    }
-
-    /**
      * Loads main ToyPlug script and attaches it to ShaderToy.
      */
     function loadScript() {
@@ -46,20 +13,6 @@
 
             script.innerHTML = content;
             document.body.appendChild(script);
-        });
-    }
-
-    /**
-     * Loads ShaderToy dark theme and attaches it to ShaderToy.
-     */
-    function loadStyle() {
-        loadFile(chrome.runtime.getURL('style.css'), function() {
-            var content = this.responseText,
-                style = document.createElement('style');
-
-            style.innerHTML = content;
-            document.head.appendChild(style);
-            document.body.classList.add('dark-toy');
         });
     }
 
@@ -77,17 +30,82 @@
         oReq.send();
     }
 
-    /**
-     * Inits plugin.
-     */
-    function init() {
-        loadStyle();
-        loadScript();
-        waitForEd(switchToDarkTheme);
+    function executeScriptOnPage(javascriptCode) {
+        var script = document.createElement('script');
+
+        script.innerHTML = javascriptCode;
+        document.body.appendChild(script);
     }
 
-    chrome.extension.sendMessage({ present: true }, function (response) {
-        //console.log(response);
+    function onMessage() {
+
+    }
+
+    /**
+     * Appends main extension script.
+     * Toggles on extension icon.
+     */
+    function init() {
+        loadScript();
+        chrome.extension.sendMessage({ present: true }, function (response) {
+            //console.log(response);
+        });
+    }
+
+    chrome.runtime.onMessage.addListener(
+        function(request, sender, sendResponse) {
+            //if (!sender.tab) {
+                //executeScriptOnPage('console.log(\'message\', ' + request.data + ')');
+
+                chrome.storage.sync.get('darkThemeEnable', function(items) {
+                    executeScriptOnPage(
+                        'window.darkTheme = ' + request.data + ';' +
+                        'ToyPlug.toggleDarkTheme();'
+                    );
+                });
+
+                chrome.storage.sync.set({
+                        darkThemeEnable: request.data
+                    },
+                    function() {
+                        //executeScriptOnPage('console.log(\'value saved\');');
+                    }
+                );
+            //}
+        }
+    );
+
+    chrome.storage.onChanged.addListener(function(changes, namespace) {
+        var key;
+
+        for (key in changes) {
+            var storageChange = changes[key];
+
+            if (key == 'darkThemeEnable') {
+
+                setWindowVariable(key, changes[key].newValue);
+                executeScriptOnPage(
+                    //'window.darkTheme = ' + changes[key].newValue + ';' +
+                    'ToyPlug.toggleDarkTheme();'
+                );
+            }
+
+        }
+    });
+
+    function setWindowVariable(variable, value) {
+        var isString = typeof(value) == 'string',
+            code;
+
+        value = isString ? ('\'' + value + '\';') : value;
+        code = 'window.' + variable + ' = ' + value + ';';
+        executeScriptOnPage(code);
+        //executeScriptOnPage('console.log( \'' + variable + '\', ' + value + ');');
+    }
+
+    chrome.storage.sync.get('darkThemeEnable', function(items) {
+        //executeScriptOnPage('window.darkTheme = ' + items.darkThemeEnable);
+        setWindowVariable('darkTheme', items.darkThemeEnable);
     });
 
     init();
