@@ -2,23 +2,43 @@
 
     'use strict';
 
-    var i = document.getElementById('input-dark-theme');
-
     function Popup () {
         this.init();
     }
 
     Popup.prototype.init = function init() {
         this.bindInput();
+        this.bindSelect();
     };
 
     Popup.prototype.bindInput = function bindInput() {
         //chrome.runtime.getBackgroundPage().console.log(i);
+        var i = document.getElementById('input-dark-theme');
 
         i.addEventListener('change', function(e) {
             document.body.classList[i.checked ? 'add' : 'remove']('dark-toy');
             chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                chrome.tabs.sendMessage(tabs[0].id, {data: i.checked}, function(response) {
+                chrome.tabs.sendMessage(tabs[0].id, {
+                    data: {
+                        darkTheme: i.checked
+                    }
+                }, function(response) {
+                    //console.log(i.checked);
+                });
+            });
+        });
+    };
+
+    Popup.prototype.bindSelect = function bindSelect() {
+        var i = document.querySelector('select');
+
+        i.addEventListener('change', function(e) {
+            chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                chrome.tabs.sendMessage(tabs[0].id, {
+                    data: {
+                        renderMode: i.value
+                    }
+                }, function(response) {
                     //console.log(i.checked);
                 });
             });
@@ -26,12 +46,14 @@
     };
 
     chrome.storage.sync.get('darkThemeEnable', function(items) {
+        var i = document.getElementById('input-dark-theme');
+
         i.checked = items.darkThemeEnable;
         document.body.classList[i.checked ? 'add' : 'remove']('dark-toy');
     });
 
     window.addEventListener('click',function(e){
-        if(e.target.href!==undefined){
+        if (e.target.href) {
             chrome.tabs.create({url:e.target.href});
         }
     });

@@ -134,6 +134,15 @@ body.dark-toy:before {
 
 .dark-toy .cm-s-twilight .CodeMirror-activeline-background { background: #27282E; }
 .dark-toy .cm-s-twilight .CodeMirror-matchingbracket { outline:1px solid grey; color:white !important; }
+.dark-toy .cm-s-twilight.CodeMirror-focused .CodeMirror-cursors {
+	visibility: visible !important;
+	animation: cursorBlink .3s ease infinite;
+}
+
+@keyframes cursorBlink {
+	0, 100% { opacity: 1; }
+	50% { opacity: 0; }
+}
 
 .dark-toy div#editor {
 	font-weight: normal;
@@ -188,6 +197,10 @@ body.dark-toy:before {
 	height: 90%;
 	left: auto;
 	z-index: 10;
+}
+
+.fullscreen-edit .cm-s-default.CodeMirror {
+	background: rgba(255,255,255,.4);
 }
 
 .fullscreen-edit.dark-toy .cm-s-twilight.CodeMirror {

@@ -26,9 +26,12 @@
 ![](./screen4light.jpg)
 ![](./screen1.jpg)
 ![](./screen2.jpg)
-![](./screen3.jpg)
 
 # Changelog:
+
+* 0.3.1
+Exclude running shader on login page.
+Added Chrome rendering mode select.
 
 * 0.3.0
 Refactoring.

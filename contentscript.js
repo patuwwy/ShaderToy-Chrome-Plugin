@@ -37,10 +37,6 @@
         document.body.appendChild(script);
     }
 
-    function onMessage() {
-
-    }
-
     /**
      * Appends main extension script.
      * Toggles on extension icon.
@@ -52,29 +48,44 @@
         });
     }
 
+    /**
+     * Listen to extension message.
+     */
     chrome.runtime.onMessage.addListener(
         function(request, sender, sendResponse) {
             //if (!sender.tab) {
                 //executeScriptOnPage('console.log(\'message\', ' + request.data + ')');
 
-                chrome.storage.sync.get('darkThemeEnable', function(items) {
+            if ('darkTheme' in request.data) {
+
+                //chrome.storage.sync.get('darkThemeEnable', function(items) {
                     executeScriptOnPage(
-                        'window.darkTheme = ' + request.data + ';' +
+                        'window.darkTheme = ' + request.data.darkTheme + ';' +
                         'ToyPlug.toggleDarkTheme();'
                     );
-                });
+                //});
 
                 chrome.storage.sync.set({
-                        darkThemeEnable: request.data
+                        darkThemeEnable: request.data.darkTheme
                     },
                     function() {
-                        //executeScriptOnPage('console.log(\'value saved\');');
+                        executeScriptOnPage('console.log(\'value saved\');');
                     }
                 );
-            //}
+            }
+
+            if (request.data.renderMode) {
+                executeScriptOnPage(
+                    'ToyPlug.setRenderMode(\'' + request.data.renderMode + '\');'
+                );
+            }
+
         }
     );
 
+    /**
+     * Listen to extension variables change.
+     */
     chrome.storage.onChanged.addListener(function(changes, namespace) {
         var key;
 
@@ -82,7 +93,6 @@
             var storageChange = changes[key];
 
             if (key == 'darkThemeEnable') {
-
                 setWindowVariable(key, changes[key].newValue);
                 executeScriptOnPage(
                     //'window.darkTheme = ' + changes[key].newValue + ';' +
@@ -99,12 +109,14 @@
 
         value = isString ? ('\'' + value + '\';') : value;
         code = 'window.' + variable + ' = ' + value + ';';
+
         executeScriptOnPage(code);
+
         //executeScriptOnPage('console.log( \'' + variable + '\', ' + value + ');');
     }
 
     chrome.storage.sync.get('darkThemeEnable', function(items) {
-        //executeScriptOnPage('window.darkTheme = ' + items.darkThemeEnable);
+        executeScriptOnPage('window.darkTheme = ' + JSON.stringify(items.darkThemeEnable));
         setWindowVariable('darkTheme', items.darkThemeEnable);
     });
 

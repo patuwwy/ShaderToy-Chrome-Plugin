@@ -41,6 +41,13 @@
         this.common.switchToDarkTheme();
     };
 
+    ToyPlug.prototype.setRenderMode = function setRenderMode(mode) {
+        console.log(mode);
+        if (this.editPage) {
+            this.editPage.setRenderMode(mode);
+        }
+    };
+
     /**
      * Inits ToyPlug functionality.
      */
@@ -166,7 +173,7 @@
         };
 
         gShaderToy.resize(n.w, n.h);
-        currentDivider = divider;
+        this.currentDivider = divider;
     };
 
 
@@ -223,7 +230,11 @@
         var isFS = d.body.classList.contains(this.FULLSCREEN_MODE_CLASS);
 
         d.body.classList[isFS ? 'remove' : 'add'](this.FULLSCREEN_MODE_CLASS);
-        this.decraseRes(currentDivider);
+        this.decraseRes(this.currentDivider);
+    };
+
+    ToyPlugEditPage.prototype.setRenderMode = function(mode) {
+        this.c.style.imageRendering = mode;
     };
 
     /**

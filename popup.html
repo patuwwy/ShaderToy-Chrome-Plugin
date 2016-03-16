@@ -31,7 +31,7 @@
             padding: 0;
         }
 
-        ul:after {
+        ul:after, .settings li:after {
             clear: both;
             display: block;
             content: "";
@@ -45,6 +45,7 @@
             line-height: 48px;
             height: 48px;
             text-align: center;
+            text-shadow: 2px 2px 0 #000;
         }
 
         h2 {
@@ -79,7 +80,7 @@
         .keys b {
             display: block;
             font-weight: normal;
-            color: #eee;
+            color: #000;
         }
 
         .keys span {
@@ -167,13 +168,19 @@
 
         .gitlink {
             position: fixed;
-            bottom: 0;
-            right: 0;
+            bottom: 10px;
+            right: 10px;
+        }
+
+        .gitlink img {
+            width: 48px;
+            height: 48px;
         }
 
         .settings li {
             clear: both;
             font-size: 16px;
+            margin-bottom: 10px;
         }
 
         .settings label {
@@ -181,7 +188,7 @@
             clear: left;
         }
 
-        .settings input {
+        .settings input, .settings select {
             float: right;
         }
 
@@ -198,6 +205,10 @@
             background-color: #0a0a0a;
             background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000),
                 linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000);
+        }
+
+        body.dark-toy .keys b {
+            color: #fff;
         }
 
         section {
@@ -220,7 +231,7 @@
                 <li class="l8"></li>
             </ul>
             <h1>
-                Shadertoy utils
+                Shadertoy extension
             </h1>
         </header>
         <section class="settings">
@@ -228,6 +239,13 @@
                 <li>
                     <label>Dark Theme</label>
                     <input type="checkbox" id="input-dark-theme"/>
+                </li>
+                <li title="When resolution decrased">
+                    <label>Rendering mode</label>
+                    <select id="rendering-mode">
+                        <option value="auto">auto</option>
+                        <option value="pixelated">pixelated</option>
+                    </select>
                 </li>
             </ul>
         </section>
@@ -257,7 +275,7 @@
         <p>(c) 2016 by <a href="http://patrykfalba.eu/" type="_blank">Patu</a></p>
 
         </footer>
-        <a class="gitlink" target="_blank" href="https://github.com/patuwwy/ShaderToy-Chrome-Plugin"><img src="assets/github_ribbon.png"/></a>
+        <a class="gitlink" target="_blank" href="https://github.com/patuwwy/ShaderToy-Chrome-Plugin"><img src="assets/github-10-xxl.png"/></a>
     </div>
 
     <script src="popup.js"></script>
