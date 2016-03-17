@@ -16,7 +16,7 @@
   Key '8' divides by 9, 1920x1080 becomes 240x135.
 
   This allows to run shaders smoothly (even in fullscreen) on non-top GPUs.
-  Notice that lower resolution is interpolated to original size. This causes blurrish rendering.
+  Notice that lower resolution is interpolated to original size. This causes blurrish rendering. For pixelated image, rendering mode switch has been added.
 
 * Pause/Restart in fullscreen mode.
 
@@ -27,7 +27,12 @@
 ![](./screen1.jpg)
 ![](./screen2.jpg)
 
-# Changelog:
+# ShaderToy extension changelog:
+
+* 0.3.2
+Minor update.
+CSS fix for showing user picture on [Profile page](https://www.shadertoy.com/profile) (both themes)
+Extension opens changelog on update/first install.
 
 * 0.3.1
 Exclude running shader on login page.
