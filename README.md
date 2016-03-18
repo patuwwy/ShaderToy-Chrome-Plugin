@@ -18,16 +18,24 @@
   This allows to run shaders smoothly (even in fullscreen) on non-top GPUs.
   Notice that lower resolution is interpolated to original size. This causes blurrish rendering. For pixelated image, rendering mode switch has been added.
 
+* Take screenshot by pressing a key.
+
 * Pause/Restart in fullscreen mode.
 
 * Fullscreen edit mode.
 
-![](./screen4dark.jpg)
-![](./screen4light.jpg)
-![](./screen1.jpg)
-![](./screen2.jpg)
+![](./screenshots/screen4dark.jpg)
+![](./screenshots/screen4light.jpg)
+![](./screenshots/screen1.jpg)
+![](./screenshots/screen2.jpg)
 
 # ShaderToy extension changelog:
+
+* 0.3.3
+Take screenshot in current resolution.
+Fullscreen edit mode key changed to SHIFT + SPACE.
+Google Analytics added.
+Moved preview screens to screenshots folder.
 
 * 0.3.2
 Minor update.

@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Shadertoy unofficial plugin.",
-    "version": "0.3.1",
+    "version": "0.3.3",
     "description": "Shadertoy.com unofficial plugin.",
     "background": {
         "scripts": [
@@ -25,13 +25,14 @@
     },
     "content_scripts": [
         {
-          "matches": ["https://www.shadertoy.com/*"],
-          "exclude_matches": ["https://www.shadertoy.com/signin"],
-          "js": ["contentscript.js"],
-          "css": ["style.css"],
-          "run_at": "document_end"
+            "matches": ["https://www.shadertoy.com/*"],
+            "exclude_matches": ["https://www.shadertoy.com/signin"],
+            "js": ["contentscript.js"],
+            "css": ["style.css"],
+            "run_at": "document_end"
         }
     ],
+    "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
     "web_accessible_resources": [
         "popup.js",
         "shadertoy-plugin.js",

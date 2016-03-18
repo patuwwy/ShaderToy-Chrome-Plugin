@@ -190,20 +190,20 @@
 
             if (e.target.id === self.MAIN_SHADERTOY_DEMO_ID) {
 
-                /**
-                 * 1...9 Keys
-                 */
+                // 1...9 Keys
                 if (which == Math.max(49, Math.min(57, which))) {
                     self.decraseRes(which - 48);
                 }
 
-                /**
-                 * Alt (or Cmd) + arrow up and down.
-                 */
+                // Alt (or Cmd) + arrow ..
                 if (e.altKey || e.metaKey) {
+
+                    // ... up
                     if (which == 38) {
                         gShaderToy.pauseTime();
                     }
+
+                    // ... down
                     if (which == 40) {
                         gShaderToy.resetTime();
                     }
@@ -211,13 +211,14 @@
 
             }
 
-            /**
-             * Alt (cmd) + shift + space
-             */
-            if (e.altKey || e.metaKey) {
-                if (e.which == 32 && e.shiftKey) {
-                    self.toggleFullScreenEdit();
-                }
+            // shift + space
+            if (e.which == 32 && e.shiftKey) {
+                self.toggleFullScreenEdit();
+            }
+
+            // shift + s
+            if (e.shiftKey && e.which == '83') {
+                self.takeScreenShot();
             }
 
         });
@@ -235,6 +236,12 @@
 
     ToyPlugEditPage.prototype.setRenderMode = function(mode) {
         this.c.style.imageRendering = mode;
+    };
+
+    ToyPlugEditPage.prototype.takeScreenShot = function takeScreenShot() {
+        var imageData = gShaderToy.mGLContext.canvas.toDataURL('image/png');
+
+        window.open(imageData);
     };
 
     /**
