@@ -4,6 +4,8 @@
 
 ## Features:
 
+* Adjustable slider for full control of 'iGlobalTime' uniform and audio/video inputs.
+
 * Switchable dark color theme.
 
 * Sorting shaders list by views, likes or comments on "My profile" page.
@@ -30,6 +32,9 @@
 ![](./screenshots/screen2.jpg)
 
 # ShaderToy extension changelog:
+
+* 0.4.0
+Timebar added.
 
 * 0.3.3
 Take screenshot in current resolution.

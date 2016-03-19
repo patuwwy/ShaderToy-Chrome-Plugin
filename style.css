@@ -251,3 +251,40 @@ body.dark-toy:before {
 #userPicture {
 	background-size: 100%;
 }
+
+.time-slider {
+	height: 32px;
+	margin: 5px 0;
+}
+
+.time-slider:after {
+	clear: both;
+	display: block;
+	content: "";
+	float: none;
+}
+
+.time-slider input {
+	float: left;
+	display: block;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	height: 24px;
+	line-height: 24px;
+}
+
+.time-slider [type=number] {
+	width: 7%;
+	text-align: center;
+	background: transparent;
+	border: none;
+}
+
+.time-slider [type=range] {
+	width: 86%
+}
+
+.dark-toy .time-slider input {
+	color: #fff;
+}

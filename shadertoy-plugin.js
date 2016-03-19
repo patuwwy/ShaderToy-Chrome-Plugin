@@ -1,3 +1,5 @@
+/* global gShaderToy */
+
 (function(d, w, M) {
 
     'strict mode';
@@ -131,6 +133,7 @@
 
         this.switchEditorToDark(window.darkTheme);
         this.bindKeys();
+        this.timebar = new Timebar();
     };
 
     /**
@@ -157,6 +160,7 @@
 
             waitForEd();
         };
+
     /**
      * Changes Shader resolution.
      * Resolution calculation is based on divider and depends of fullscreen
@@ -175,7 +179,178 @@
         gShaderToy.resize(n.w, n.h);
         this.currentDivider = divider;
     };
+    /**
+     * Provides timebar functionality.
+     *
+     * @contructor
+     */
+    function Timebar() {
 
+        var d = document,
+            self = this;
+
+        self.busy = false;
+        self.wasPaused = false;
+
+        self.createElements();
+
+        self.sliderInput.addEventListener(
+            'mousedown',
+            self.sliderOnMouseDown.bind(self)
+        );
+
+        self.sliderInput.addEventListener(
+            'mouseup',
+            self.sliderOnMouseUp.bind(self)
+        );
+
+        self.sliderInput.addEventListener(
+            'input',
+            self.updateShaderToy.bind(self)
+        );
+
+        self.minValueInput.addEventListener(
+            'change',
+            self.onChangeMinInput.bind(self)
+        );
+
+        self.maxValueInput.addEventListener(
+            'change',
+            self.onChangeMaxInput.bind(self)
+        );
+
+        self.updateSlider();
+    }
+
+    /**
+     * Creates and appends timebar elements to ShaderToy.
+     */
+    Timebar.prototype.createElements = function createElements() {
+        this.shaderInfo = d.getElementById('shaderInfo');
+        this.sliderBar = d.createElement('div');
+        this.minValueInput = d.createElement('input');
+        this.sliderInput = d.createElement('input');
+        this.maxValueInput = d.createElement('input');
+
+        this.shaderInfo.insertBefore(this.sliderBar, this.shaderInfo.childNodes[0]);
+
+        this.sliderBar.classList.add('time-slider');
+
+        this.sliderBar.appendChild(this.minValueInput);
+        this.sliderBar.appendChild(this.sliderInput);
+        this.sliderBar.appendChild(this.maxValueInput);
+
+        this.sliderInput.type = 'range';
+        this.minValueInput.type = this.maxValueInput.type = 'number';
+
+        this.minValueInput.value = 0;
+        this.minValueInput.min = 0;
+
+        this.maxValueInput.value = 60;
+        this.maxValueInput.min = 1;
+
+        this.sliderInput.min = 0;
+        this.sliderInput.max = 60 * 1000;
+        this.sliderInput.value = 0;
+    };
+
+    Timebar.prototype.onChangeMinInput = function onChangeMinInput() {
+        this.maxValueInput.min = parseInt(this.minValueInput.value, 10) + 1;
+        this.maxValueInput.value = Math.max(
+            parseInt(this.maxValueInput.value, 10),
+            parseInt(this.minValueInput.value, 10) + 1
+        );
+        this.sliderInput.min = parseInt(this.minValueInput.value, 10) * 1000;
+    };
+
+    Timebar.prototype.onChangeMaxInput = function onChangeMinInput() {
+        this.minValueInput.max = parseInt(this.maxValueInput.value, 10);
+        this.minValueInput.value = Math.min(
+            parseInt(this.maxValueInput.value, 10) - 1,
+            parseInt(this.minValueInput.value, 10)
+        );
+        this.sliderInput.max = parseInt(this.maxValueInput.value, 10) * 1000;
+    };
+
+    /**
+     * Sets slider to ShaderToy time.
+     */
+    Timebar.prototype.updateSlider = function updateSlider() {
+        var self = this;
+
+        setTimeout(self.updateSlider.bind(self), 50);
+        if (gShaderToy && !self.busy) self.sliderInput.value = gShaderToy.mTf;
+    };
+
+    /**
+     * Handles click on slider.
+     */
+    Timebar.prototype.sliderOnMouseDown = function sliderOnMouseDown() {
+        this.wasPaused = gShaderToy.mIsPaused;
+        this.sliderInput.min = parseInt(this.minValueInput.value * 1000, 10);
+        this.sliderInput.max = parseInt(this.maxValueInput.value * 1000, 10);
+        if (!this.wasPaused) {
+            this.busy = true;
+            gShaderToy.pauseTime();
+        }
+        return false;
+    };
+
+    /**
+     * Handles relase slider click.
+     */
+    Timebar.prototype.sliderOnMouseUp = function sliderOnMouseUp() {
+        var self = this;
+        if (!self.wasPaused) gShaderToy.pauseTime();
+
+        requestAnimationFrame(function() {
+            self.updateShaderToy(!self.wasPaused);
+            self.updateInputs(self.sliderInput.value);
+            self.busy = false;
+        });
+    };
+
+    /**
+     * Handles user changing slider value.
+     */
+    Timebar.prototype.sliderOnChange = function sliderOnChange() {
+
+        this.updateShaderToy();
+    };
+
+    /**
+     * Updates ShaderToy with slider value.
+     */
+    Timebar.prototype.updateShaderToy = function updateShaderToy(togglePause) {
+
+        var value = parseInt(this.sliderInput.value, 10);
+        gShaderToy.pauseTime();
+        requestAnimationFrame(function() {
+            gShaderToy.mTOffset = 0;
+            gShaderToy.mTo = getRealTime();
+            gShaderToy.mTf = value;
+            gShaderToy.mEffect.mAudioContext.currentTime = value;
+            gShaderToy.pauseTime();
+        });
+    };
+
+    /**
+     * Updates ShaderToy inputs.
+     */
+    Timebar.prototype.updateInputs = function updateInputs(value) {
+        gShaderToy.mEffect.mPasses.forEach(function mPass(pass) {
+            pass.mInputs.forEach(function mInput(input){
+                var media = null;
+                if (input) {
+                    media = input.audio || input.video;
+                    if (media) {
+                        media.controls = true;
+                        media.currentTime = value / 1000;
+                    }
+                }
+            });
+        });
+    };
 
     /**
      * Attaches additional keys support.
@@ -209,16 +384,16 @@
                     }
                 }
 
+                // shift + s
+                if (e.shiftKey && e.which == '83') {
+                    self.takeScreenShot();
+                }
+
             }
 
             // shift + space
             if (e.which == 32 && e.shiftKey) {
                 self.toggleFullScreenEdit();
-            }
-
-            // shift + s
-            if (e.shiftKey && e.which == '83') {
-                self.takeScreenShot();
             }
 
         });

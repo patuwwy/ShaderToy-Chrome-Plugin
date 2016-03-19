@@ -165,16 +165,26 @@
         a:focus { outline: none;}
 
         footer { margin: 64px 0 10px; }
-
+        footer p {
+            float: left;
+            line-height: 48px;
+            margin: 0;
+        }
+        footer:after {
+            clear: both;
+            float: none;
+            display: block;
+            content: ""
+        }
         .gitlink {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
+            float: right;
+            line-height: 48px;
         }
 
         .gitlink img {
             width: 48px;
             height: 48px;
+            vertical-align: middle;
         }
 
         .settings li {
@@ -267,17 +277,16 @@
                             <b>ALT + down</b><span>Restart time. (CMD + down for Mac)</span>
                         </li>
                         <li>
-                            <b>SHIFT + SPACE</b><span>Fullscreen edit (CMD + SHIFT + SPACE for Mac)</b></span>
+                            <b>SHIFT + SPACE</b><span>Fullscreen edit</b></span>
                         </li>
                     </ul>
                 </li>
             <ul>
         </section>
         <footer>
-        <p>(c) 2016 by <a href="http://patrykfalba.eu/" type="_blank">Patu</a></p>
-
+            <p>(c) 2016 by <a href="http://patrykfalba.eu/" type="_blank">Patu</a></p>
+            <a class="gitlink" target="_blank" href="https://github.com/patuwwy/ShaderToy-Chrome-Plugin">Read more: <img src="assets/github-10-xxl.png"/></a>
         </footer>
-        <a class="gitlink" target="_blank" href="https://github.com/patuwwy/ShaderToy-Chrome-Plugin"><img src="assets/github-10-xxl.png"/></a>
     </div>
 
     <script src="popup.js"></script>
