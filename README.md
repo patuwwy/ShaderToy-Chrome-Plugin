@@ -54,7 +54,6 @@ Fullscreen edit (dark theme)
 ## ShaderToy extension changelog:
 
 * 0.4.1
-
 Changed key bindings.
 Changes in popup (show version, ui).
 Removed Google Analytics (can not manage how to make it work ;)
@@ -108,6 +107,6 @@ Added basic dark theme
 * 0.0.1
 Change resolution by keys 1...9
 
-
+## Credits
 
 [Amiga fonts](https://github.com/rewtnull/amigafonts) are used here.
