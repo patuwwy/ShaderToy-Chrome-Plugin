@@ -43,34 +43,27 @@
      */
     function init() {
         loadScript();
-        chrome.extension.sendMessage({ present: true }, function (response) {
-            //console.log(response);
-        });
+        chrome.extension.sendMessage({
+            present: true
+        }, function (response) {});
     }
 
     /**
-     * Listen to extension message.
+     * Listens to extension message.
      */
     chrome.runtime.onMessage.addListener(
         function(request, sender, sendResponse) {
-            //if (!sender.tab) {
-                //executeScriptOnPage('console.log(\'message\', ' + request.data + ')');
-
             if ('darkTheme' in request.data) {
 
-                //chrome.storage.sync.get('darkThemeEnable', function(items) {
-                    executeScriptOnPage(
-                        'window.darkTheme = ' + request.data.darkTheme + ';' +
-                        'ToyPlug.toggleDarkTheme();'
-                    );
-                //});
+                executeScriptOnPage(
+                    'window.darkTheme = ' + request.data.darkTheme + ';' +
+                    'ToyPlug.toggleDarkTheme();'
+                );
 
                 chrome.storage.sync.set({
                         darkThemeEnable: request.data.darkTheme
                     },
-                    function() {
-                        executeScriptOnPage('console.log(\'value saved\');');
-                    }
+                    function() {}
                 );
             }
 
@@ -79,7 +72,6 @@
                     'ToyPlug.setRenderMode(\'' + request.data.renderMode + '\');'
                 );
             }
-
         }
     );
 
@@ -95,7 +87,6 @@
             if (key == 'darkThemeEnable') {
                 setWindowVariable(key, changes[key].newValue);
                 executeScriptOnPage(
-                    //'window.darkTheme = ' + changes[key].newValue + ';' +
                     'ToyPlug.toggleDarkTheme();'
                 );
             }
@@ -104,19 +95,17 @@
     });
 
     function setWindowVariable(variable, value) {
-        var isString = typeof(value) == 'string',
+        var
+            isString = typeof(value) == 'string',
             code;
 
         value = isString ? ('\'' + value + '\';') : value;
         code = 'window.' + variable + ' = ' + value + ';';
 
         executeScriptOnPage(code);
-
-        //executeScriptOnPage('console.log( \'' + variable + '\', ' + value + ');');
     }
 
     chrome.storage.sync.get('darkThemeEnable', function(items) {
-        executeScriptOnPage('window.darkTheme = ' + JSON.stringify(items.darkThemeEnable));
         setWindowVariable('darkTheme', items.darkThemeEnable);
     });
 

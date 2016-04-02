@@ -1,6 +1,11 @@
 # ShaderToy unofficial plugin.
 
+Extension to make shadertoy coding more comfortable.
 [Chrome Web Store](https://chrome.google.com/webstore/detail/shadertoy-unofficial-plug/ohicbclhdmkhoabobgppffepcopomhgl?hl=pl)
+
+## Info
+
+Please report bugs and request feature [here](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues)
 
 ## Features:
 
@@ -26,12 +31,34 @@
 
 * Fullscreen edit mode.
 
-![](./screenshots/screen4dark.jpg)
-![](./screenshots/screen4light.jpg)
-![](./screenshots/screen1.jpg)
-![](./screenshots/screen2.jpg)
+## Screenshots
 
-# ShaderToy extension changelog:
+![](./screenshots/timebar.jpg)
+Timebar (dark theme)
+
+![](./screenshots/timebar2.jpg)
+Timebar
+
+![](./screenshots/screen4dark.jpg)
+popup (dark theme)
+
+![](./screenshots/screen4light.jpg)
+popup
+
+![](./screenshots/screen1.jpg)
+main page (dark theme)
+
+![](./screenshots/screen2.jpg)
+Fullscreen edit (dark theme)
+
+## ShaderToy extension changelog:
+
+* 0.4.1
+
+Changed key bindings.
+Changes in popup (show version, ui).
+Removed Google Analytics (can not manage how to make it work ;)
+Removed open github page when updated.
 
 * 0.4.0
 Timebar added.

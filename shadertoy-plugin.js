@@ -1,10 +1,15 @@
 /* global gShaderToy */
 
-(function(d, w, M) {
+(function() {
 
     'strict mode';
 
     var
+        /**
+         * document reference.
+         */
+        d = document,
+
         /**
          * Stores ToyPlug instance.
          *
@@ -27,15 +32,24 @@
         this.init();
     }
 
+    /**
+     * @returns {boolean} True if current page is editor page.
+     */
     ToyPlug.prototype.isEditPage = function isEditPage() {
         return document.location.href.match(/(.com\/view|.com\/new)/);
     };
 
+    /**
+     * @returns {boolean} True if current page is profile page.
+     */
     ToyPlug.prototype.isProfilePage = function isProfilePage() {
         return document.location.href.match('shadertoy.com/profile');
     };
 
-    ToyPlug.prototype.toggleDarkTheme = function(status) {
+    /**
+     * Turns on/off dark theme.
+     */
+    ToyPlug.prototype.toggleDarkTheme = function() {
         if (this.editPage) {
             this.editPage.switchEditorToDark(window.darkTheme);
         }
@@ -44,7 +58,6 @@
     };
 
     ToyPlug.prototype.setRenderMode = function setRenderMode(mode) {
-        console.log(mode);
         if (this.editPage) {
             this.editPage.setRenderMode(mode);
         }
@@ -168,9 +181,9 @@
      */
     ToyPlugEditPage.prototype.decraseRes = function decraseRes(divider) {
 
-        var n = this.c.height == w.innerHeight ? {
-            w: w.innerWidth / divider,
-            h: w.innerHeight / divider
+        var n = this.c.height == window.innerHeight ? {
+            w: window.innerWidth / divider,
+            h: window.innerHeight / divider
         } : {
             w: this.c.clientWidth / divider,
             h: this.c.clientHeight / divider
@@ -314,7 +327,6 @@
      * Handles user changing slider value.
      */
     Timebar.prototype.sliderOnChange = function sliderOnChange() {
-
         this.updateShaderToy();
     };
 
@@ -384,15 +396,15 @@
                     }
                 }
 
-                // shift + s
-                if (e.shiftKey && e.which == '83') {
+                // shift + ctrl + s
+                if (e.ctrlKey && e.shiftKey && e.which == '83') {
                     self.takeScreenShot();
                 }
 
             }
 
-            // shift + space
-            if (e.which == 32 && e.shiftKey) {
+            // shift + ctrl + enter
+            if (e.which == 13 && e.shiftKey && e.ctrlKey) {
                 self.toggleFullScreenEdit();
             }
 
@@ -402,12 +414,15 @@
     /**
      * Toggles fullscreen edit mode.
      */
-    ToyPlugEditPage.prototype.toggleFullScreenEdit = function toggleFullScreenEdit() {
-        var isFS = d.body.classList.contains(this.FULLSCREEN_MODE_CLASS);
+    ToyPlugEditPage.prototype.toggleFullScreenEdit =
+        function toggleFullScreenEdit() {
+            var isFS = d.body.classList.contains(this.FULLSCREEN_MODE_CLASS);
 
-        d.body.classList[isFS ? 'remove' : 'add'](this.FULLSCREEN_MODE_CLASS);
-        this.decraseRes(this.currentDivider);
-    };
+            d.body.classList[isFS ? 'remove' : 'add'](
+                this.FULLSCREEN_MODE_CLASS
+            );
+            this.decraseRes(this.currentDivider);
+        };
 
     ToyPlugEditPage.prototype.setRenderMode = function(mode) {
         this.c.style.imageRendering = mode;
