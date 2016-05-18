@@ -53,7 +53,13 @@ main page (dark theme)
 ![](./screenshots/screen2.jpg)
 Fullscreen edit (dark theme)
 
+![](./screenshots/previews.jpg)
+Preview images on profile page with detail overlay on mouse hover
+
 ## ShaderToy extension changelog:
+
+* 0.4.2
+Added preview images on profile page.
 
 * 0.4.1
 Changed key bindings.
@@ -110,5 +116,7 @@ Added basic dark theme
 Change resolution by keys 1...9
 
 ## Credits
+
+[movAX13h](http://blog.thrill-project.com/)
 
 [Amiga fonts](https://github.com/rewtnull/amigafonts) are used here.
