@@ -475,7 +475,7 @@
             img.setAttribute('height', 110);
             img.setAttribute('src', url);
             img.style.display = 'block';
-            link.parentNode.appendChild(img);
+            link.appendChild(img);
         }
         
         helpers.collectionToArray(

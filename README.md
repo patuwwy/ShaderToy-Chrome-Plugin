@@ -15,6 +15,8 @@ Please report bugs and request feature [here](https://github.com/patuwwy/ShaderT
 
 * Sorting shaders list by views, likes or comments on "My profile" page.
 
+* Preview images on "My profile" page.
+
 * Change resolution in windowed and fullscreen mode by pressing keys 1...9.
 
   Resolution is divided by pressed key value, for example:
