@@ -468,9 +468,8 @@
         for(i = 1, num = this.shadersListRows.length; i < num; i++)
         {
             var link = this.shadersListRows[i].querySelector('td:first-child a');
-                
             var id = link.getAttribute('href').substr(6);
-            var url = 'https://www.shadertoy.com/media/shaders/' + id + '.jpg';
+            var url = '/media/shaders/' + id + '.jpg';
             var img = document.createElement('img');
             img.setAttribute('width', 200);
             img.setAttribute('height', 110);
