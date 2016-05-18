@@ -452,6 +452,8 @@
 
     /**
      * Adds sorting shaders list on profile page.
+     * Adds preview image overlay.
+     * Loads preview images of all shaders.
      */
     ToyPlugProfilePage.prototype.shadersList = function () {
         var tp = this;
@@ -463,10 +465,63 @@
         );
         this.shadersListHeadRow = this.shadersListRows[0];
 
+        /* Add overlay preview image */
+        this.shadersListPreviewImageDiv = document.createElement('div');
+        this.shadersListPreviewImageDiv.setAttribute('id', 'previewImage');
+        this.shadersListPreviewImageDiv.style.position = 'absolute';
+        this.shadersListPreviewImageDiv.style.backgroundColor = '#000';
+        this.shadersListPreviewImageDiv.style.padding = '4px';
+        this.shadersListPreviewImageDiv.style.zIndex = 11;
+
+        this.shadersListPreviewImage = document.createElement('img');
+        this.shadersListPreviewImageDiv.appendChild(this.shadersListPreviewImage);
+
+        document.body.appendChild(this.shadersListPreviewImageDiv);
+
+        /* Add small preview images to shaders list */
+        for(i = 1, num = this.shadersListRows.length; i < num; i++)
+        {
+            var row = this.shadersListRows[i];
+            var link = row.querySelector('td:first-child a');
+            link.style.lineHeight = '22px';
+            link.style.verticalAlign = 'middle';
+
+            link.parentElement.style.whiteSpace = 'nowrap';
+
+            var id = link.getAttribute('href').substr(6);
+            var url = '/media/shaders/' + id + '.jpg';
+            var img = document.createElement('img');
+            img.setAttribute('width', 40);
+            img.setAttribute('height', 22);
+            img.setAttribute('src', url);
+            img.style.display = 'block';
+            img.style.float = 'left';
+            img.style.marginRight = '6px';
+
+            img.addEventListener('mouseover', function(e){
+                tp.shadersListPreviewImageDiv.style.display = 'block';
+                tp.shadersListPreviewImage.setAttribute('width', 320);
+                tp.shadersListPreviewImage.setAttribute('height', 180);
+                tp.shadersListPreviewImage.setAttribute('src', this.getAttribute('src'));
+            });
+
+            img.addEventListener('mouseout', function(e){
+                tp.shadersListPreviewImageDiv.style.display = 'none';
+            });
+
+            img.addEventListener('mousemove', function(e){
+                tp.shadersListPreviewImageDiv.style.left = (e.clientX - tp.shadersListPreviewImage.width - 40) + 'px';
+                tp.shadersListPreviewImageDiv.style.top = (e.clientY - 0.5*tp.shadersListPreviewImage.height) + 'px';
+
+            });
+            link.insertBefore(img, link.firstChild);
+        }
+        
         helpers.collectionToArray(
             this.shadersListHeadRow.querySelectorAll('td')
         ).forEach(tp.bindClickSorting.bind(tp));
     };
+
 
     /**
      * Binds click.

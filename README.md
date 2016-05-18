@@ -15,6 +15,8 @@ Please report bugs and request feature [here](https://github.com/patuwwy/ShaderT
 
 * Sorting shaders list by views, likes or comments on "My profile" page.
 
+* Preview images on "My profile" page.
+
 * Change resolution in windowed and fullscreen mode by pressing keys 1...9.
 
   Resolution is divided by pressed key value, for example:
@@ -51,7 +53,13 @@ main page (dark theme)
 ![](./screenshots/screen2.jpg)
 Fullscreen edit (dark theme)
 
+![](./screenshots/previews.jpg)
+Preview images on profile page with detail overlay on mouse hover
+
 ## ShaderToy extension changelog:
+
+* 0.4.2
+Added preview images on profile page.
 
 * 0.4.1
 Changed key bindings.
@@ -108,5 +116,7 @@ Added basic dark theme
 Change resolution by keys 1...9
 
 ## Credits
+
+[movAX13h](http://blog.thrill-project.com/)
 
 [Amiga fonts](https://github.com/rewtnull/amigafonts) are used here.
