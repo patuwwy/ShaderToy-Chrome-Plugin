@@ -90,7 +90,6 @@
                     'ToyPlug.toggleDarkTheme();'
                 );
             }
-
         }
     });
 
@@ -107,6 +106,7 @@
 
     chrome.storage.sync.get('darkThemeEnable', function(items) {
         setWindowVariable('darkTheme', items.darkThemeEnable);
+        if (items.darkThemeEnable) document.body.classList.add('dark-toy');
     });
 
     init();

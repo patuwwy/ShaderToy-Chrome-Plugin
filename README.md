@@ -38,8 +38,14 @@ Please report bugs and request feature [here](https://github.com/patuwwy/ShaderT
 ![](./screenshots/timebar.jpg)
 Timebar (dark theme)
 
+![](./screenshots/previews.jpg)
+Preview images on profile page with detail overlay on mouse hover
+
 ![](./screenshots/timebar2.jpg)
 Timebar
+
+![](./screenshots/screen2.jpg)
+Fullscreen edit (dark theme)
 
 ![](./screenshots/screen4dark.jpg)
 popup (dark theme)
@@ -50,15 +56,13 @@ popup
 ![](./screenshots/screen1.jpg)
 main page (dark theme)
 
-![](./screenshots/screen2.jpg)
-Fullscreen edit (dark theme)
-
-![](./screenshots/previews.jpg)
-Preview images on profile page with detail overlay on mouse hover
 
 ## ShaderToy extension changelog:
 
-* 0.4.2
+* 0.5.1
+Minor changes. Nothing new. Mostly code styling.
+
+* 0.5.0
 Added preview images on profile page.
 
 * 0.4.1
@@ -115,8 +119,12 @@ Added basic dark theme
 * 0.0.1
 Change resolution by keys 1...9
 
-## Credits
+
+## Contributors:
 
 [movAX13h](http://blog.thrill-project.com/)
+
+
+## Credits
 
 [Amiga fonts](https://github.com/rewtnull/amigafonts) are used here.
