@@ -452,6 +452,7 @@
 
     /**
      * Adds sorting shaders list on profile page.
+     * Load preview images of all shaders.
      */
     ToyPlugProfilePage.prototype.shadersList = function () {
         var tp = this;
@@ -463,6 +464,21 @@
         );
         this.shadersListHeadRow = this.shadersListRows[0];
 
+        /* TODO: add checkbox to config panel to enable/disable this feature */
+        for(i = 1, num = this.shadersListRows.length; i < num; i++)
+        {
+            var link = this.shadersListRows[i].querySelector('td:first-child a');
+                
+            var id = link.getAttribute('href').substr(6);
+            var url = 'https://www.shadertoy.com/media/shaders/' + id + '.jpg';
+            var img = document.createElement('img');
+            img.setAttribute('width', 200);
+            img.setAttribute('height', 110);
+            img.setAttribute('src', url);
+            img.style.display = 'block';
+            link.parentNode.appendChild(img);
+        }
+        
         helpers.collectionToArray(
             this.shadersListHeadRow.querySelectorAll('td')
         ).forEach(tp.bindClickSorting.bind(tp));
