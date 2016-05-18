@@ -483,7 +483,7 @@
         {
             var row = this.shadersListRows[i];
             var link = row.querySelector('td:first-child a');
-            link.style.lineHeight = '30px';
+            link.style.lineHeight = '22px';
             link.style.verticalAlign = 'middle';
 
             link.parentElement.style.whiteSpace = 'nowrap';
@@ -492,7 +492,7 @@
             var url = '/media/shaders/' + id + '.jpg';
             var img = document.createElement('img');
             img.setAttribute('width', 40);
-            img.setAttribute('height', 30);
+            img.setAttribute('height', 22);
             img.setAttribute('src', url);
             img.style.display = 'block';
             img.style.float = 'left';
@@ -501,7 +501,7 @@
             img.addEventListener('mouseover', function(e){
                 tp.shadersListPreviewImageDiv.style.display = 'block';
                 tp.shadersListPreviewImage.setAttribute('width', 320);
-                tp.shadersListPreviewImage.setAttribute('height', 200);
+                tp.shadersListPreviewImage.setAttribute('height', 180);
                 tp.shadersListPreviewImage.setAttribute('src', this.getAttribute('src'));
             });
 
