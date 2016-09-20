@@ -123,7 +123,7 @@ body.dark-toy:before {
 .dark-toy .cm-s-twilight .cm-comment { color:#777; font-style:italic; font-weight:normal; } /**/
 .dark-toy .cm-s-twilight .cm-string { color:#8f9d6a; font-style:italic; } /**/
 .dark-toy .cm-s-twilight .cm-string-2 { color:#bd6b18; } /*?*/
-.dark-toy .cm-s-twilight .cm-meta { background-color:#141414; color:#f7f7f7; } /*?*/
+/*.dark-toy .cm-s-twilight .cm-meta { background-color:#141414; color:#f7f7f7; } /*?*/
 .dark-toy .cm-s-twilight .cm-builtin { color: #cda869; } /*?*/
 .dark-toy .cm-s-twilight .cm-tag { color: #997643; } /**/
 .dark-toy .cm-s-twilight .cm-attribute { color: #d6bb6d; } /*?*/
@@ -287,4 +287,9 @@ body.dark-toy:before {
 
 .dark-toy .time-slider input {
 	color: #fff;
+}
+
+.dark-toy .CodeMirror-selected,
+.dark-toy .CodeMirror-focused .CodeMirror-selected {
+	background: #4c4c4c;
 }
