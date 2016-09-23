@@ -11,6 +11,8 @@ Please report bugs and request feature [here](https://github.com/patuwwy/ShaderT
 
 * Adjustable slider for full control of 'iGlobalTime' uniform and audio/video inputs.
 
+* Two sliders simulating mouse position with the same range. This can be used to tweaking variables.
+
 * Switchable dark color theme.
 
 * Sorting shaders list by views, likes or comments on "My profile" page.

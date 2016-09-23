@@ -282,7 +282,34 @@ body.dark-toy:before {
 }
 
 .time-slider [type=range] {
-	width: 86%
+	width: 86%;
+}
+
+.mouse-uniforms {
+	height: 24px;
+	line-height: 24px;
+	margin-bottom: 20px;
+}
+
+.mouse-uniforms input {
+	float: left;
+	display: block;
+	width: 40%
+}
+
+.mouse-uniforms:after {
+	content: "";
+	display: block;
+	float: none;
+	clear: both;
+}
+
+.mouse-uniforms span {
+	float: left;
+	display: block;
+	width: 9%;
+	height: 100%;
+	text-align: center;
 }
 
 .dark-toy .time-slider input {

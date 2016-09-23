@@ -17,11 +17,16 @@
          */
         tp,
 
-        /** Stores Helpers instance.
+        /**
+         * Stores Helpers instance.
          *
          * @type {Helpers}
          */
-        helpers;
+        helpers,
+
+        shaderToyElements = {
+            shaderInfo: d.getElementById('shaderInfo')
+        };
 
     /**
      * ToyPlug. Plugin.
@@ -147,6 +152,7 @@
         this.switchEditorToDark(window.darkTheme);
         this.bindKeys();
         this.timebar = new Timebar();
+        this.mouseUniforms = new MouseUniforms();
     };
 
     /**
@@ -240,15 +246,14 @@
      * Creates and appends timebar elements to ShaderToy.
      */
     Timebar.prototype.createElements = function createElements() {
-        this.shaderInfo = d.getElementById('shaderInfo');
         this.sliderBar = d.createElement('div');
         this.minValueInput = d.createElement('input');
         this.sliderInput = d.createElement('input');
         this.maxValueInput = d.createElement('input');
 
-        this.shaderInfo.insertBefore(
+        shaderToyElements.shaderInfo.insertBefore(
             this.sliderBar,
-            this.shaderInfo.childNodes[0]
+            shaderToyElements.shaderInfo.childNodes[0]
         );
 
         this.sliderBar.classList.add('time-slider');
@@ -460,7 +465,8 @@
      * Loads preview images of all shaders.
      */
     ToyPlugProfilePage.prototype.shadersList = function () {
-        var tp = this;
+        var tp = this,
+            i = 1;
 
         this.shadersListContainer = document.getElementById('divShaders');
         this.shadersTable = this.shadersListContainer.querySelector('table');
@@ -484,7 +490,7 @@
         document.body.appendChild(this.shadersListPreviewImageDiv);
 
         // Add small preview images to shaders list.
-        for(i = 1, num = this.shadersListRows.length; i < num; i++) {
+        for(i, num = this.shadersListRows.length; i < num; i++) {
             var
                 row = this.shadersListRows[i],
                 link = row.querySelector('td:first-child a'),
@@ -608,6 +614,85 @@
         };
 
     /**
+     * Mouse uniform sliders constructor.
+     */
+    MouseUniforms = function() {
+        this.addSliders();
+        this.onResize();
+        window.addEventListener('resize', this.onResize.bind(this));
+    };
+
+    /**
+     * Adds sliders to page.
+     */
+    MouseUniforms.prototype.addSliders = function() {
+        this.slidersWrapper = d.createElement('div');
+        this.slidersWrapper.classList.add('mouse-uniforms');
+
+        this.sliders = ['X', 'Y'].map(function createSlider(axis) {
+            var slider = d.createElement('input'),
+                valueElement = d.createElement('span');
+
+            slider.type = 'range';
+            slider.min = 0;
+            slider.setAttribute('data-axis', axis);
+
+            valueElement.textContent = axis + ': 0';
+            this.slidersWrapper.appendChild(slider);
+            this.slidersWrapper.appendChild(valueElement);
+
+            slider.addEventListener('input', this.onSliderChange.bind(this));
+            slider.addEventListener('blur', this.onSliderBlur);
+            return slider;
+        }, this);
+
+        shaderToyElements.shaderInfo.insertBefore(
+            this.slidersWrapper,
+            d.getElementById('shaderInfoHeader')
+        );
+    };
+
+    /**
+     * Resets mouse left button status.
+     */
+    MouseUniforms.prototype.onSliderBlur = function() {
+        gShaderToy.mMouseIsDown = false;
+    };
+
+    /**
+     * Updates shaderToy mouse uniforms.
+     * Waits 20ms to reset mouse button status.
+     */
+    MouseUniforms.prototype.onSliderChange = function() {
+        var slider = e.target,
+            axis = slider.getAttribute('data-axis'),
+            value = slider.value;
+
+        slider.nextSibling.textContent = axis + ': ' + value;
+
+        gShaderToy.mMouseIsDown = true;
+        gShaderToy['mMousePos' + axis] = value;
+        gShaderToy['mMouseOri' + axis] = -value;
+        setTimeout(this.onSliderBlur, 20);
+    };
+
+    /**
+     * Updates sliders range on window resize.
+     */
+    MouseUniforms.prototype.onResize = function() {
+        var sizes = d.getElementById('demogl').getBoundingClientRect();
+
+        this.mouseRange = {
+            X: sizes.width,
+            Y: sizes.height
+        };
+
+        this.sliders.forEach(function(slider) {
+            slider.max = this.mouseRange[slider.getAttribute('data-axis')];
+        }, this);
+    };
+
+    /**
      * Common helper function.
      */
     function Helpers(options) {
@@ -632,5 +717,6 @@
 
     helpers = window.ToyPlugHelpers = new Helpers({ debug: true });
     window.ToyPlug = new ToyPlug();
+
 
 })(document, window);
