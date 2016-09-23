@@ -663,7 +663,7 @@
      * Updates shaderToy mouse uniforms.
      * Waits 20ms to reset mouse button status.
      */
-    MouseUniforms.prototype.onSliderChange = function() {
+    MouseUniforms.prototype.onSliderChange = function(e) {
         var slider = e.target,
             axis = slider.getAttribute('data-axis'),
             value = slider.value;
