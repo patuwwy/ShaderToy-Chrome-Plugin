@@ -1,18 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link href="https://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet">
     <style>
-        @font-face {
-            font-family: Amiga;
-            src: url("assets/TopazPlus_a1200_v1.0.ttf");
-        }
-
         * {
             box-sizing: border-box;
         }
 
         body {
-            font-family: "Amiga", monospace, sans-serif;
+            font-family: 'Quicksand', sans-serif;
             min-width: 320px;
             background: #34495e;
             color: #222;
@@ -50,14 +46,6 @@
             line-height: 48px;
             text-shadow: 2px 2px 0 #000;
             display: inline-block;
-        }
-
-        h1 span {
-            font-size: 8px;
-            display: block;
-            text-align: left;
-            position: relative;
-            top: -10px;
         }
 
         h2 {
@@ -207,6 +195,7 @@
         .gitlink {
             float: right;
             line-height: 48px;
+            font-size: 14px;
         }
 
         .gitlink img {
@@ -253,14 +242,6 @@
             margin-bottom: 20px;
         }
 
-        .version {
-            text-align: right;
-            position: absolute;
-            bottom: 12px;
-            right: 5px;
-            font-size: 8px;
-        }
-
     </style>
 </head>
 <body>
@@ -280,9 +261,7 @@
                 <b>
                     Shadertoy extension
                 </b>
-                <span><a href="http://patrykfalba.eu">by Patu</a></span>
             </h1>
-            <p id="version" class="version">version</p>
         </header>
         <section class="settings">
             <ul>
@@ -322,11 +301,11 @@
                         </li>
                     </ul>
                     <p>On OSX use CMD instead of ALT.</p>
-                    <p>Shaders list thumbnails by <a href="http://blog.thrill-project.com/">[movAX13h]</a>
                 </li>
             <ul>
         </section>
         <footer>
+            <p id="version" class="version">version</p>
             <a class="gitlink" target="_blank" href="https://github.com/patuwwy/ShaderToy-Chrome-Plugin">Read more, report bugs: <img src="assets/github-10-xxl.png"/></a>
         </footer>
     </div>

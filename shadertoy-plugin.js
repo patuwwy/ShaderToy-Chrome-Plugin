@@ -635,6 +635,7 @@
 
             slider.type = 'range';
             slider.min = 0;
+            slider.value = 0;
             slider.setAttribute('data-axis', axis);
 
             valueElement.textContent = axis + ': 0';
@@ -673,6 +674,7 @@
         gShaderToy.mMouseIsDown = true;
         gShaderToy['mMousePos' + axis] = value;
         gShaderToy['mMouseOri' + axis] = -value;
+        gShaderToy.mForceFrame = true;
         setTimeout(this.onSliderBlur, 20);
     };
 

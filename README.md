@@ -1,6 +1,6 @@
 # ShaderToy unofficial plugin.
 
-Extension to make shadertoy coding more comfortable.
+Extension to make Shadertoy coding more comfortable.
 [Chrome Web Store](https://chrome.google.com/webstore/detail/shadertoy-unofficial-plug/ohicbclhdmkhoabobgppffepcopomhgl?hl=pl)
 
 ## Info
@@ -60,6 +60,14 @@ main page (dark theme)
 
 
 ## ShaderToy extension changelog:
+
+* 0.6.2
+iMouse uniform sliders fix for paused state.
+Set sliders initial values to 0.
+Extension popup appearance change.
+
+* 0.6.0
+iMouse uniform sliders.
 
 * 0.5.1
 Minor changes. Nothing new. Mostly code styling.
@@ -125,8 +133,3 @@ Change resolution by keys 1...9
 ## Contributors:
 
 [movAX13h](http://blog.thrill-project.com/)
-
-
-## Credits
-
-[Amiga fonts](https://github.com/rewtnull/amigafonts) are used here.

@@ -43,8 +43,7 @@ body.dark-toy:before {
 .dark-toy .tab.selected:not(.selected),
 .dark-toy #shaderStats img,
 .dark-toy #shaderButtons img,
-.dark-toy .previewStats img,
-.dark-toy textarea {
+.dark-toy .previewStats img {
 	-webkit-filter: invert(1);
 	-webkit-transition: all .3s ease;
 }
@@ -78,7 +77,7 @@ body.dark-toy:before {
 }
 
 .dark-toy .tableRowOdd {
-	background: #222;
+	background: #161616;
 }
 
 .dark-toy .likesIcon {
@@ -96,6 +95,10 @@ body.dark-toy:before {
 .dark-toy .inputForm,
 .dark-toy .formButton {
 	border-radius: 0 !important;
+}
+
+.dark-toy canvas.playerCanvas {
+	outline: none;
 }
 
 .uiButton {
@@ -216,6 +219,15 @@ body.dark-toy:before {
 	opacity: .5
 }
 
+.dark-toy #divShaders tr:first-child {
+	background: #222 !important;
+}
+
+.dark-toy #divShaders tr:first-child td {
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
 #divShaders tr:first-child td:nth-child(3),
 #divShaders tr:first-child td:nth-child(4),
 #divShaders tr:first-child td:nth-child(5) {
@@ -224,6 +236,17 @@ body.dark-toy:before {
 }
 
 .dark-toy div#header {
+	background: #000;
+}
+.dark-toy div#headerLogin {
+	color: #999;
+}
+
+.dark-toy a.headerLinks {
+	color: #555;
+}
+
+.dark-toy a.headerLinks:hover {
 	background: #000;
 }
 
@@ -246,6 +269,25 @@ body.dark-toy:before {
 
 .dark-toy #footerContent {
 	color: #fff;
+}
+
+.dark-toy .formButton, .dark-toy .formButtonSmall {
+	background: #222;
+}
+
+.dark-toy .formButton:hover, .dark-toy .formButtonSmall:hover {
+	background: #444;
+}
+
+.dark-toy .inputForm, .dark-toy #commentTextArea, .dark-toy textarea {
+	background: #000;
+	color: #fff;
+}
+
+.dark-toy input#mySearch {
+	color: #fff;
+	background: #111;
+	font-size: 14px;
 }
 
 #userPicture {
@@ -319,4 +361,11 @@ body.dark-toy:before {
 .dark-toy .CodeMirror-selected,
 .dark-toy .CodeMirror-focused .CodeMirror-selected {
 	background: #4c4c4c;
+}
+
+.dark-toy div#headerCuadradito {
+	width: 4px;
+	height: 4px;
+	top: 0;
+	right: 0;
 }
