@@ -12,7 +12,6 @@
     };
 
     Popup.prototype.bindInput = function bindInput() {
-        //chrome.runtime.getBackgroundPage().console.log(i);
         var i = document.getElementById('input-dark-theme');
 
         i.addEventListener('change', function(e) {
@@ -22,8 +21,7 @@
                     data: {
                         darkTheme: i.checked
                     }
-                }, function(response) {
-                    //console.log(i.checked);
+                }, function() {
                 });
             });
         });
@@ -38,9 +36,7 @@
                     data: {
                         renderMode: i.value
                     }
-                }, function(response) {
-                    //console.log(i.checked);
-                });
+                }, function() {});
             });
         });
     };

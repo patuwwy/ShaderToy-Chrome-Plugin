@@ -96,6 +96,10 @@ body.dark-toy:before {
 .dark-toy .formButton {
 	border-radius: 0 !important;
 }
+.dark-toy .inputForm:focus {
+	background: #000;
+	box-shadow: 0 0 15px rgba(0, 64, 192, .5);
+}
 
 .dark-toy canvas.playerCanvas {
 	outline: none;
@@ -290,6 +294,10 @@ body.dark-toy:before {
 	font-size: 14px;
 }
 
+.dark-toy .dialog {
+	background: rgba(0,0,0,.9);
+}
+
 #userPicture {
 	background-size: 100%;
 }
@@ -328,7 +336,6 @@ body.dark-toy:before {
 }
 
 .mouse-uniforms {
-	height: 24px;
 	line-height: 24px;
 	margin-bottom: 20px;
 }
@@ -337,6 +344,11 @@ body.dark-toy:before {
 	float: left;
 	display: block;
 	width: 40%
+}
+
+.mouse-uniforms:before {
+	content: "iMouse uniform";
+	display: block;
 }
 
 .mouse-uniforms:after {
@@ -368,4 +380,34 @@ body.dark-toy:before {
 	height: 4px;
 	top: 0;
 	right: 0;
+}
+
+#divShaders a {
+	line-height: 22px;
+	position: relative;
+}
+
+#divShaders img.small {
+	height: 22px;
+	margin-right: 5px;
+	float: left;
+}
+
+#divShaders .bigPreview {
+	opacity: 0;
+	pointer-events: none;
+	display: block;
+	right: 100%;
+	top: -180px;
+	height: 360px;
+	width: 640px;
+	margin-right: 60px;
+	position: absolute;
+	transition: opacity .15s ease;
+	z-index: 3;
+	box-shadow: 5px 5px 20px #000;
+}
+
+#divShaders td:hover .bigPreview {
+	opacity: 1;
 }

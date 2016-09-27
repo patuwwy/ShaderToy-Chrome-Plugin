@@ -61,10 +61,15 @@ main page (dark theme)
 
 ## ShaderToy extension changelog:
 
+* 0.6.3
+Dark theme updated.
+Shaders preview on profile page updated.
+
 * 0.6.2
 iMouse uniform sliders fix for paused state.
-Set sliders initial values to 0.
-Extension popup appearance change.
+Sliders initial value.
+Change in extension popup appearance.
+Dark theme update.
 
 * 0.6.0
 iMouse uniform sliders.

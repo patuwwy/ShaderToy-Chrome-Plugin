@@ -490,50 +490,24 @@
         document.body.appendChild(this.shadersListPreviewImageDiv);
 
         // Add small preview images to shaders list.
-        for(i, num = this.shadersListRows.length; i < num; i++) {
-            var
-                row = this.shadersListRows[i],
-                link = row.querySelector('td:first-child a'),
+        this.shadersListRows.forEach(function(row, i) {
+            if (!i) return;
+
+            var link = row.querySelector('a'),
                 id = link.getAttribute('href').substr(6),
                 url = '/media/shaders/' + id + '.jpg',
-                img = document.createElement('img');
+                smallImg = document.createElement('img');
+                bigImg = document.createElement('img');
 
-            link.style.lineHeight = '22px';
-            link.style.verticalAlign = 'middle';
+            smallImg.setAttribute('src', url);
+            smallImg.classList.add('small');
 
-            link.parentElement.style.whiteSpace = 'nowrap';
+            bigImg.setAttribute('src', url);
+            bigImg.classList.add('bigPreview');
 
-            img.setAttribute('width', 40);
-            img.setAttribute('height', 22);
-            img.setAttribute('src', url);
-            img.style.display = 'block';
-            img.style.float = 'left';
-            img.style.marginRight = '6px';
-
-            img.addEventListener('mouseover', function(e) {
-                tp.shadersListPreviewImageDiv.style.display = 'block';
-                tp.shadersListPreviewImage.setAttribute('width', 320);
-                tp.shadersListPreviewImage.setAttribute('height', 180);
-                tp.shadersListPreviewImage.setAttribute(
-                    'src',
-                    this.getAttribute('src')
-                );
-            });
-
-            img.addEventListener('mouseout', function(e) {
-                tp.shadersListPreviewImageDiv.style.display = 'none';
-            });
-
-            img.addEventListener('mousemove', function(e) {
-                tp.shadersListPreviewImageDiv.style.left =
-                    (e.clientX - tp.shadersListPreviewImage.width - 40) + 'px';
-                tp.shadersListPreviewImageDiv.style.top =
-                    (e.clientY - 0.5 * tp.shadersListPreviewImage.height) +
-                        'px';
-            });
-
-            link.insertBefore(img, link.firstChild);
-        }
+            link.insertBefore(smallImg, link.firstChild);
+            link.insertBefore(bigImg, link.firstChild);
+        });
 
         helpers.collectionToArray(
             this.shadersListHeadRow.querySelectorAll('td')
@@ -617,6 +591,12 @@
      * Mouse uniform sliders constructor.
      */
     MouseUniforms = function() {
+        this.config = [
+            { gS: 'PosX', vPart: 'x', size: 'width'},
+            { gS: 'PosY', vPart: 'y', size: 'height'},
+            { gS: 'OriX', vPart: 'z', size: 'width'},
+            { gS: 'OriY', vPart: 'w', size: 'height'}
+        ];
         this.addSliders();
         this.onResize();
         window.addEventListener('resize', this.onResize.bind(this));
@@ -629,16 +609,18 @@
         this.slidersWrapper = d.createElement('div');
         this.slidersWrapper.classList.add('mouse-uniforms');
 
-        this.sliders = ['X', 'Y'].map(function createSlider(axis) {
+        this.sliders = this.config.map(function createSlider(obj) {
             var slider = d.createElement('input'),
                 valueElement = d.createElement('span');
 
             slider.type = 'range';
             slider.min = 0;
             slider.value = 0;
-            slider.setAttribute('data-axis', axis);
+            slider.setAttribute('data-axis', obj.gS);
+            slider.setAttribute('data-vpart', obj.vPart);
+            slider.setAttribute('data-size', obj.size);
 
-            valueElement.textContent = axis + ': 0';
+            valueElement.textContent = obj.vPart + ': 0';
             this.slidersWrapper.appendChild(slider);
             this.slidersWrapper.appendChild(valueElement);
 
@@ -667,13 +649,14 @@
     MouseUniforms.prototype.onSliderChange = function(e) {
         var slider = e.target,
             axis = slider.getAttribute('data-axis'),
+            vPart = slider.getAttribute('data-vPart'),
             value = slider.value;
 
-        slider.nextSibling.textContent = axis + ': ' + value;
+        slider.nextSibling.textContent = vPart + ': ' + value;
 
-        gShaderToy.mMouseIsDown = true;
-        gShaderToy['mMousePos' + axis] = value;
-        gShaderToy['mMouseOri' + axis] = -value;
+        //gShaderToy.mMouseIsDown = true;
+        gShaderToy['mMouse' + axis] = value;
+        //gShaderToy['mMouseOri' + axis] = -value;
         gShaderToy.mForceFrame = true;
         setTimeout(this.onSliderBlur, 20);
     };
@@ -682,15 +665,12 @@
      * Updates sliders range on window resize.
      */
     MouseUniforms.prototype.onResize = function() {
+        console.log('resize');
         var sizes = d.getElementById('demogl').getBoundingClientRect();
 
-        this.mouseRange = {
-            X: sizes.width,
-            Y: sizes.height
-        };
-
         this.sliders.forEach(function(slider) {
-            slider.max = this.mouseRange[slider.getAttribute('data-axis')];
+            slider.max = sizes[slider.getAttribute('data-size')];
+            this.onSliderChange({target: slider});
         }, this);
     };
 
@@ -718,6 +698,7 @@
     };
 
     helpers = window.ToyPlugHelpers = new Helpers({ debug: true });
+
     window.ToyPlug = new ToyPlug();
 
 
