@@ -335,6 +335,10 @@ body.dark-toy:before {
 	width: 86%;
 }
 
+.dark-toy input[type="range" i]::-webkit-slider-runnable-track {
+	background: #222;
+}
+
 .mouse-uniforms {
 	line-height: 24px;
 	margin-bottom: 20px;

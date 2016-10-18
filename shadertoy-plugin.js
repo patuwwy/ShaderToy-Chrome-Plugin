@@ -182,16 +182,15 @@
      * Changes Shader resolution.
      * Resolution calculation is based on divider and depends of fullscreen
      * mode.
+     *
+     * @param {number} divider
      */
     ToyPlugEditPage.prototype.decraseRes = function decraseRes(divider) {
-        var
-            n = this.c.height == window.innerHeight ? {
-            w: window.innerWidth / divider,
-            h: window.innerHeight / divider
-        } : {
-            w: this.c.clientWidth / divider,
-            h: this.c.clientHeight / divider
-        };
+        var b = this.c.getBoundingClientRect(),
+            n = {
+                w: b.width / divider,
+                h: b.height / divider
+            };
 
         gShaderToy.resize(n.w, n.h);
         this.currentDivider = divider;
@@ -202,41 +201,37 @@
      * @contructor
      */
     function Timebar() {
-        var
-            d = document,
-            self = this;
+        this.busy = false;
+        this.wasPaused = false;
 
-        self.busy = false;
-        self.wasPaused = false;
+        this.createElements();
 
-        self.createElements();
-
-        self.sliderInput.addEventListener(
+        this.sliderInput.addEventListener(
             'mousedown',
-            self.sliderOnMouseDown.bind(self)
+            this.sliderOnMouseDown.bind(this)
         );
 
-        self.sliderInput.addEventListener(
+        this.sliderInput.addEventListener(
             'mouseup',
-            self.sliderOnMouseUp.bind(self)
+            this.sliderOnMouseUp.bind(this)
         );
 
-        self.sliderInput.addEventListener(
+        this.sliderInput.addEventListener(
             'input',
-            self.updateShaderToy.bind(self)
+            this.updateShaderToy.bind(this)
         );
 
-        self.minValueInput.addEventListener(
+        this.minValueInput.addEventListener(
             'change',
-            self.onChangeMinInput.bind(self)
+            this.onChangeMinInput.bind(this)
         );
 
-        self.maxValueInput.addEventListener(
+        this.maxValueInput.addEventListener(
             'change',
-            self.onChangeMaxInput.bind(self)
+            this.onChangeMaxInput.bind(this)
         );
 
-        self.updateSlider();
+        this.updateSlider();
     }
 
     /**
@@ -271,6 +266,7 @@
         this.sliderInput.min = 0;
         this.sliderInput.max = 60 * 1000;
         this.sliderInput.value = 0;
+        this.sliderInput.step = 20;
     };
 
     Timebar.prototype.onChangeMinInput = function onChangeMinInput() {
@@ -295,10 +291,8 @@
      * Sets slider to ShaderToy time.
      */
     Timebar.prototype.updateSlider = function updateSlider() {
-        var self = this;
-
-        setTimeout(self.updateSlider.bind(self), 50);
-        if (gShaderToy && !self.busy) self.sliderInput.value = gShaderToy.mTf;
+        setTimeout(this.updateSlider.bind(this), 50);
+        if (gShaderToy && !this.busy) this.sliderInput.value = gShaderToy.mTf;
     };
 
     /**
@@ -319,14 +313,13 @@
      * Handles relase slider click.
      */
     Timebar.prototype.sliderOnMouseUp = function sliderOnMouseUp() {
-        var self = this;
-        if (!self.wasPaused) gShaderToy.pauseTime();
+        if (!this.wasPaused) gShaderToy.pauseTime();
 
         requestAnimationFrame(function() {
-            self.updateShaderToy(!self.wasPaused);
-            self.updateInputs(self.sliderInput.value);
-            self.busy = false;
-        });
+            this.updateShaderToy(!this.wasPaused);
+            this.updateInputs(this.sliderInput.value);
+            this.busy = false;
+        }.bind(this));
     };
 
     /**
@@ -340,8 +333,8 @@
      * Updates ShaderToy with slider value.
      */
     Timebar.prototype.updateShaderToy = function updateShaderToy(togglePause) {
-
         var value = parseInt(this.sliderInput.value, 10);
+
         gShaderToy.pauseTime();
         requestAnimationFrame(function() {
             gShaderToy.mTOffset = 0;
@@ -406,14 +399,12 @@
                 if (e.ctrlKey && e.shiftKey && e.which == '83') {
                     self.takeScreenShot();
                 }
-
             }
 
             // shift + ctrl + enter
             if (e.which == 13 && e.shiftKey && e.ctrlKey) {
                 self.toggleFullScreenEdit();
             }
-
         });
     };
 
@@ -431,14 +422,27 @@
             this.decraseRes(this.currentDivider);
         };
 
-    ToyPlugEditPage.prototype.setRenderMode = function(mode) {
+    ToyPlugEditPage.prototype.setRenderMode = function setRenderMode(mode) {
         this.c.style.imageRendering = mode;
     };
 
     ToyPlugEditPage.prototype.takeScreenShot = function takeScreenShot() {
-        var imageData = gShaderToy.mGLContext.canvas.toDataURL('image/png');
+        var imageData = null,
+            currentDivider = this.currentDivider,
+            paused = gShaderToy.mIsPaused;
 
-        window.open(imageData);
+        if (!paused) gShaderToy.pauseTime();
+        this.decraseRes(currentDivider * 0.25);
+
+        setTimeout(function() {
+            imageData = gShaderToy.mGLContext.canvas.toDataURL('image/png');
+        }, 100);
+
+        setTimeout(function() {
+            this.decraseRes(currentDivider);
+            window.open(imageData);
+            if (!paused) gShaderToy.pauseTime();
+        }.bind(this), 1000);
     };
 
     /**
@@ -462,7 +466,7 @@
      * Adds preview image overlay.
      * Loads preview images of all shaders.
      */
-    ToyPlugProfilePage.prototype.shadersList = function () {
+    ToyPlugProfilePage.prototype.shadersList = function shadersList() {
         var tp = this,
             i = 1;
 

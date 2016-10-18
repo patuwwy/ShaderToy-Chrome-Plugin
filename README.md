@@ -29,7 +29,7 @@ Please report bugs and request feature [here](https://github.com/patuwwy/ShaderT
   This allows to run shaders smoothly (even in fullscreen) on non-top GPUs.
   Notice that lower resolution is interpolated to original size. This causes blurrish rendering. For pixelated image, rendering mode switch has been added.
 
-* Take screenshot by pressing a key.
+* Take HQ screenshot. Screenshot resolution is 2 * current resolution (including current resolution divider). 1920x1080 becomes 3840x2160.
 
 * Pause/Restart in fullscreen mode.
 
