@@ -62,6 +62,11 @@ main page (dark theme)
 
 ## ShaderToy extension changelog:
 
+* 0.7.0
+HQ Screenshot
+Code cleanup
+Minor style changes
+
 * 0.6.3
 Dark theme updated.
 Shaders preview on profile page updated.
