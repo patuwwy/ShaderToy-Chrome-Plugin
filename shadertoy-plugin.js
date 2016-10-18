@@ -4,18 +4,12 @@
 
     'strict mode';
 
-    var
-        /**
-         * document reference.
-         */
-        d = document,
-
-        /**
-         * Stores ToyPlug instance.
-         *
-         * @type {ToyPlug}
-         */
-        tp,
+    /**
+     * Stores ToyPlug instance.
+     *
+     * @type {ToyPlug}
+     */
+    var tp,
 
         /**
          * Stores Helpers instance.
@@ -24,8 +18,11 @@
          */
         helpers,
 
+        /**
+         * Stores references to ShaderToy HTML elements.
+         */
         shaderToyElements = {
-            shaderInfo: d.getElementById('shaderInfo')
+            shaderInfo: document.getElementById('shaderInfo')
         };
 
     /**
@@ -246,10 +243,10 @@
      * Creates and appends timebar elements to ShaderToy.
      */
     Timebar.prototype.createElements = function createElements() {
-        this.sliderBar = d.createElement('div');
-        this.minValueInput = d.createElement('input');
-        this.sliderInput = d.createElement('input');
-        this.maxValueInput = d.createElement('input');
+        this.sliderBar = document.createElement('div');
+        this.minValueInput = document.createElement('input');
+        this.sliderInput = document.createElement('input');
+        this.maxValueInput = document.createElement('input');
 
         shaderToyElements.shaderInfo.insertBefore(
             this.sliderBar,
@@ -380,7 +377,7 @@
 
         var self = this;
 
-        d.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function(e) {
 
             var which = e.which;
 
@@ -425,9 +422,10 @@
      */
     ToyPlugEditPage.prototype.toggleFullScreenEdit =
         function toggleFullScreenEdit() {
-            var isFS = d.body.classList.contains(this.FULLSCREEN_MODE_CLASS);
+            var isFS = document.body.classList
+                    .contains(this.FULLSCREEN_MODE_CLASS);
 
-            d.body.classList[isFS ? 'remove' : 'add'](
+            document.body.classList[isFS ? 'remove' : 'add'](
                 this.FULLSCREEN_MODE_CLASS
             );
             this.decraseRes(this.currentDivider);
@@ -524,9 +522,7 @@
      * @param {number} index Column index.
      */
     ToyPlugProfilePage.prototype.sortByColumn = function sortByColumn(index) {
-        var
-            tp = this,
-            tempArray = [];
+        var tempArray = [];
 
         this.shadersListRows = helpers.collectionToArray(
             this.shadersListContainer.querySelectorAll('tr')
@@ -592,12 +588,12 @@
      * Adds sliders to page.
      */
     MouseUniforms.prototype.addSliders = function() {
-        this.slidersWrapper = d.createElement('div');
+        this.slidersWrapper = document.createElement('div');
         this.slidersWrapper.classList.add('mouse-uniforms');
 
         this.sliders = this.config.map(function createSlider(obj) {
-            var slider = d.createElement('input'),
-                valueElement = d.createElement('span');
+            var slider = document.createElement('input'),
+                valueElement = document.createElement('span');
 
             slider.type = 'range';
             slider.min = 0;
@@ -617,7 +613,7 @@
 
         shaderToyElements.shaderInfo.insertBefore(
             this.slidersWrapper,
-            d.getElementById('shaderInfoHeader')
+            document.getElementById('shaderInfoHeader')
         );
     };
 
@@ -649,7 +645,7 @@
      * Updates sliders range on window resize.
      */
     MouseUniforms.prototype.onResize = function() {
-        var sizes = d.getElementById('demogl').getBoundingClientRect();
+        var sizes = document.getElementById('demogl').getBoundingClientRect();
 
         this.sliders.forEach(function(slider) {
             slider.max = sizes[slider.getAttribute('data-size')];
