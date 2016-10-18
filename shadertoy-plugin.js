@@ -1,6 +1,6 @@
 /* global gShaderToy */
 
-(function() {
+(function shadertoyPlugin() {
 
     'strict mode';
 
@@ -475,20 +475,6 @@
         );
         this.shadersListHeadRow = this.shadersListRows[0];
 
-        // Add overlay preview image.
-        this.shadersListPreviewImageDiv = document.createElement('div');
-        this.shadersListPreviewImageDiv.setAttribute('id', 'previewImage');
-        this.shadersListPreviewImageDiv.style.position = 'absolute';
-        this.shadersListPreviewImageDiv.style.backgroundColor = '#000';
-        this.shadersListPreviewImageDiv.style.padding = '4px';
-        this.shadersListPreviewImageDiv.style.zIndex = 11;
-
-        this.shadersListPreviewImage = document.createElement('img');
-        this.shadersListPreviewImageDiv
-            .appendChild(this.shadersListPreviewImage);
-
-        document.body.appendChild(this.shadersListPreviewImageDiv);
-
         // Add small preview images to shaders list.
         this.shadersListRows.forEach(function(row, i) {
             if (!i) return;
@@ -654,9 +640,7 @@
 
         slider.nextSibling.textContent = vPart + ': ' + value;
 
-        //gShaderToy.mMouseIsDown = true;
         gShaderToy['mMouse' + axis] = value;
-        //gShaderToy['mMouseOri' + axis] = -value;
         gShaderToy.mForceFrame = true;
         setTimeout(this.onSliderBlur, 20);
     };
@@ -665,7 +649,6 @@
      * Updates sliders range on window resize.
      */
     MouseUniforms.prototype.onResize = function() {
-        console.log('resize');
         var sizes = d.getElementById('demogl').getBoundingClientRect();
 
         this.sliders.forEach(function(slider) {
