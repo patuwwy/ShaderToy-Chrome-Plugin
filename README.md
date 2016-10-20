@@ -40,7 +40,7 @@ Please report bugs and request feature [here](https://github.com/patuwwy/ShaderT
 
 ## Screenshots
 
-![](./screenshots/screen3.png)
+![](./screenshots/screen3.jpg)
 
 ![](./screenshots/previews.jpg)
 Preview images on profile page with detail overlay on mouse hover
