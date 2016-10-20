@@ -201,6 +201,7 @@
      * @contructor
      */
     function Timebar() {
+        this.loop = window.TimebarLoop;
         this.busy = false;
         this.wasPaused = false;
 
@@ -291,8 +292,18 @@
      * Sets slider to ShaderToy time.
      */
     Timebar.prototype.updateSlider = function updateSlider() {
-        setTimeout(this.updateSlider.bind(this), 50);
-        if (gShaderToy && !this.busy) this.sliderInput.value = gShaderToy.mTf;
+        if (gShaderToy && !this.busy) {
+            this.sliderInput.value = gShaderToy.mTf;
+        }
+
+        if (this.loop &&
+                (gShaderToy.mTf > this.maxValueInput.value * 1000)
+        ) {
+            this.sliderInput.value = this.minValueInput.value * 1000;
+            this.updateShaderToy();
+            this.updateInputs(this.sliderInput.value);
+        }
+        setTimeout(this.updateSlider.bind(this), 26);
     };
 
     /**

@@ -60,7 +60,8 @@
                     'ToyPlug.toggleDarkTheme();'
                 );
 
-                chrome.storage.sync.set({
+                chrome.storage.sync.set(
+                    {
                         darkThemeEnable: request.data.darkTheme
                     },
                     function() {}
@@ -70,6 +71,20 @@
             if (request.data.renderMode) {
                 executeScriptOnPage(
                     'ToyPlug.setRenderMode(\'' + request.data.renderMode + '\');'
+                );
+            }
+
+            if ('loopEnabled' in request.data) {
+
+                executeScriptOnPage(
+                    'ToyPlug.editPage.timebar.loop = ' + request.data.loopEnabled + ';'
+                );
+
+                chrome.storage.sync.set(
+                    {
+                        loopEnabled: request.data.loopEnabled
+                    },
+                    function() {}
                 );
             }
         }
@@ -107,6 +122,15 @@
     chrome.storage.sync.get('darkThemeEnable', function(items) {
         if (items.darkThemeEnable) document.body.classList.add('dark-toy');
         setWindowVariable('darkTheme', items.darkThemeEnable);
+    });
+
+    chrome.storage.sync.get('loopEnabled', function(items) {
+        var code = '';
+        if ('loopEnabled' in items) {
+            code = 'TimebarLoop = ' + items.loopEnabled;
+            executeScriptOnPage(code);
+        }
+
     });
 
     window.addEventListener('load', init);

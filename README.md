@@ -62,6 +62,9 @@ main page (dark theme)
 
 ## ShaderToy extension changelog:
 
+* 0.7.1
+Time looping.
+
 * 0.7.0
 HQ Screenshot
 Code cleanup
