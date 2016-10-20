@@ -150,6 +150,7 @@
         this.bindKeys();
         this.timebar = new Timebar();
         this.mouseUniforms = new MouseUniforms();
+        this.duplicateShader();
     };
 
     /**
@@ -454,6 +455,26 @@
             window.open(imageData);
             if (!paused) gShaderToy.pauseTime();
         }.bind(this), 1000);
+    };
+
+    ToyPlugEditPage.prototype.duplicateShader = function duplicateShader() {
+        var publishWrapper = document.getElementById('shaderPublished'),
+            duplicate = document.createElement('div');
+
+        if (publishWrapper) {
+            duplicate.classList.add('formButton');
+            duplicate.style.marginLeft = "12px";
+            duplicate.style.display = "inline-block";
+            duplicate.textContent = 'Duplicate';
+
+            publishWrapper.appendChild(duplicate);
+            duplicate.addEventListener('click', function() {
+                gShaderToy.mInfo.username = "None";
+                gShaderToy.mInfo.id = "-1";
+
+                window.openSubmitShaderForm(false);
+            });
+        }
     };
 
     /**

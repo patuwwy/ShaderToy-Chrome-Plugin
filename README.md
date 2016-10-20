@@ -36,31 +36,27 @@ Please report bugs and request feature [here](https://github.com/patuwwy/ShaderT
 
 * Fullscreen edit mode.
 
+* Cloning own shaders with one click!
+
 ## Screenshots
 
-![](./screenshots/timebar.jpg)
-Timebar (dark theme)
+![](./screenshots/screen3.png)
 
 ![](./screenshots/previews.jpg)
 Preview images on profile page with detail overlay on mouse hover
 
-![](./screenshots/timebar2.jpg)
-Timebar
-
 ![](./screenshots/screen2.jpg)
 Fullscreen edit (dark theme)
-
-![](./screenshots/screen4dark.jpg)
-popup (dark theme)
-
-![](./screenshots/screen4light.jpg)
-popup
 
 ![](./screenshots/screen1.jpg)
 main page (dark theme)
 
 
 ## ShaderToy extension changelog:
+
+* 0.7.2
+Cloning own shaders. No more copying uniforms and passes by hand.
+Images for Github preview removed. One image added.
 
 * 0.7.1
 Time looping.
