@@ -54,6 +54,9 @@ main page (dark theme)
 
 ## ShaderToy extension changelog:
 
+* 0.7.4
+Confirm shader cloning when original shader has not been saved.
+
 * 0.7.2
 Cloning own shaders. No more copying uniforms and passes by hand.
 Images for Github preview removed. One image added.

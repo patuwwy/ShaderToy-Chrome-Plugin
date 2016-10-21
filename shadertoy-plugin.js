@@ -469,10 +469,15 @@
 
             publishWrapper.appendChild(duplicate);
             duplicate.addEventListener('click', function() {
-                gShaderToy.mInfo.username = "None";
-                gShaderToy.mInfo.id = "-1";
+                if (
+                    (gShaderToy.mNeedsSave &&
+                        confirm('Original shader has not been saved!')
+                    ) || !gShaderToy.mNeedsSave) {
+                        gShaderToy.mInfo.username = "None";
+                        gShaderToy.mInfo.id = "-1";
 
-                window.openSubmitShaderForm(false);
+                        window.openSubmitShaderForm(false);
+                    }
             });
         }
     };
