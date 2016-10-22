@@ -293,17 +293,27 @@
      * Sets slider to ShaderToy time.
      */
     Timebar.prototype.updateSlider = function updateSlider() {
+        var outsideLoop = false;
+
         if (gShaderToy && !this.busy) {
             this.sliderInput.value = gShaderToy.mTf;
         }
 
-        if (this.loop &&
-                (gShaderToy.mTf > this.maxValueInput.value * 1000)
-        ) {
+        if (this.loop && gShaderToy.mTf > this.maxValueInput.value * 1000) {
             this.sliderInput.value = this.minValueInput.value * 1000;
+            outsideLoop = true;
+        }
+
+        if (this.loop && gShaderToy.mTf < this.minValueInput.value * 1000) {
+            this.sliderInput.value = this.minValueInput.value * 1000;
+            outsideLoop = true;
+        }
+
+        if (outsideLoop) {
             this.updateShaderToy();
             this.updateInputs(this.sliderInput.value);
         }
+
         setTimeout(this.updateSlider.bind(this), 26);
     };
 
@@ -345,14 +355,27 @@
      * Updates ShaderToy with slider value.
      */
     Timebar.prototype.updateShaderToy = function updateShaderToy(togglePause) {
-        var value = parseInt(this.sliderInput.value, 10);
+        var value = parseInt(this.sliderInput.value, 10),
+            i = 0;
 
         gShaderToy.pauseTime();
+        
+        gShaderToy.mFpsFrame = ~~(value / 1000 * 60);
+        gShaderToy.mForceFrame = true;
+        gShaderToy.mRestarted = true;
+        gShaderToy.mFpsTo = gShaderToy.mTo;
+        gShaderToy.mEffect.mFrame = gShaderToy.mFpsFrame;
+
+        for (i; i < gShaderToy.mEffect.mPasses.length; i++ ) {
+            gShaderToy.mEffect.mPasses[i].mFrame = gShaderToy.mFpsFrame;
+        }
+
         requestAnimationFrame(function() {
-            gShaderToy.mTOffset = 0;
+            gShaderToy.mTOffset = value;
             gShaderToy.mTo = getRealTime();
             gShaderToy.mTf = value;
             gShaderToy.mEffect.mAudioContext.currentTime = value;
+
             gShaderToy.pauseTime();
         });
     };

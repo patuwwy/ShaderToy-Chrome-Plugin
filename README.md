@@ -54,8 +54,11 @@ main page (dark theme)
 
 ## ShaderToy extension changelog:
 
+* 0.7.5
+Correct value for iFrame uniform.
+
 * 0.7.4
-Confirm shader cloning when original shader has not been saved.
+Confirm shader cloning when original shader has not been saved
 
 * 0.7.2
 Cloning own shaders. No more copying uniforms and passes by hand.
