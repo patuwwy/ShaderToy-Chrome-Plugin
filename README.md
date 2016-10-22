@@ -54,6 +54,9 @@ main page (dark theme)
 
 ## ShaderToy extension changelog:
 
+* 0.7.6
+Loop switch fix.
+
 * 0.7.5
 Correct value for iFrame uniform.
 

@@ -105,6 +105,12 @@
                     'ToyPlug.toggleDarkTheme();'
                 );
             }
+
+            if (key == 'loopEnabled') {
+                executeScriptOnPage(
+                    'window.TimebarLoop = ' + changes[key].newValue + ';'
+                );
+            }
         }
     });
 

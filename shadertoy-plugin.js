@@ -293,6 +293,8 @@
      * Sets slider to ShaderToy time.
      */
     Timebar.prototype.updateSlider = function updateSlider() {
+        this.loop = window.TimebarLoop;
+        
         var outsideLoop = false;
 
         if (gShaderToy && !this.busy) {
@@ -359,7 +361,7 @@
             i = 0;
 
         gShaderToy.pauseTime();
-        
+
         gShaderToy.mFpsFrame = ~~(value / 1000 * 60);
         gShaderToy.mForceFrame = true;
         gShaderToy.mRestarted = true;
