@@ -86,7 +86,7 @@
         }
     });
 
-    document.getElementById('version').innerText =
+    document.getElementById('version').innerText = 'v' +
         chrome.runtime.getManifest().version;
 
     return new Popup();

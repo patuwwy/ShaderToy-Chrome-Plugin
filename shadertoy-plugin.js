@@ -294,7 +294,7 @@
      */
     Timebar.prototype.updateSlider = function updateSlider() {
         this.loop = window.TimebarLoop;
-        
+
         var outsideLoop = false;
 
         if (gShaderToy && !this.busy) {
@@ -490,17 +490,17 @@
             duplicate.classList.add('formButton');
             duplicate.style.marginLeft = "12px";
             duplicate.style.display = "inline-block";
-            duplicate.textContent = 'Duplicate';
+            duplicate.textContent = 'Save as new draft';
 
             publishWrapper.appendChild(duplicate);
             duplicate.addEventListener('click', function() {
                 if (
                     (gShaderToy.mNeedsSave &&
-                        confirm('Original shader has not been saved!')
+                        window.confirm('Original shader has not been saved!')
                     ) || !gShaderToy.mNeedsSave) {
                         gShaderToy.mInfo.username = "None";
                         gShaderToy.mInfo.id = "-1";
-
+                        document.getElementById('published').value = "0";
                         window.openSubmitShaderForm(false);
                     }
             });

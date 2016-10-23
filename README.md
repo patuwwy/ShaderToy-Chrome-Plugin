@@ -54,6 +54,10 @@ main page (dark theme)
 
 ## ShaderToy extension changelog:
 
+* 0.7.7
+Cloned shader is saved as draft.
+Dark theme dialog buttons colors fixed.
+
 * 0.7.6
 Loop switch fix.
 

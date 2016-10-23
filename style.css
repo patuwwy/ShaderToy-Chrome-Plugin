@@ -386,6 +386,11 @@ body.dark-toy:before {
 	right: 0;
 }
 
+.dark-toy .dialogButton {
+	color: #fff;
+	background: #222;
+}
+
 #divShaders a {
 	line-height: 22px;
 	position: relative;
