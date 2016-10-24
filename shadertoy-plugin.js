@@ -158,11 +158,10 @@
      */
     ToyPlugEditPage.prototype.switchEditorToDark =
         function switchEditorToDark(isDark) {
-            var
-                ed = null,
+            var ed = null,
                 edClass = isDark ? 'cm-s-twilight' : 'cm-s-default';
 
-            function waitForEd() {
+            function waitForCodeMirror() {
                 ed = document.querySelector('.CodeMirror');
 
                 if (ed) {
@@ -171,12 +170,12 @@
                     ed.classList.add(edClass);
                 } else {
                     setTimeout(function() {
-                        waitForEd();
+                        waitForCodeMirror();
                     }, 10);
                 }
             }
 
-            waitForEd();
+            waitForCodeMirror();
         };
 
     /**
@@ -196,6 +195,114 @@
         gShaderToy.resize(n.w, n.h);
         this.currentDivider = divider;
     };
+
+    /**
+     * Attaches additional keys support.
+     */
+    ToyPlugEditPage.prototype.bindKeys = function bindKeys() {
+
+        var self = this;
+
+        document.addEventListener('keydown', function(e) {
+
+            var which = e.which;
+
+            if (e.target.id === self.MAIN_SHADERTOY_DEMO_ID) {
+
+                // 1...9 Keys
+                if (which == Math.max(49, Math.min(57, which))) {
+                    self.decraseRes(which - 48);
+                }
+
+                // Alt (or Cmd) + arrow ..
+                if (e.altKey || e.metaKey) {
+
+                    // ... up
+                    if (which == 38) {
+                        gShaderToy.pauseTime();
+                    }
+
+                    // ... down
+                    if (which == 40) {
+                        gShaderToy.resetTime();
+                    }
+                }
+
+                // shift + ctrl + s
+                if (e.ctrlKey && e.shiftKey && e.which == '83') {
+                    self.takeScreenShot();
+                }
+            }
+
+            // shift + ctrl + enter
+            if (e.which == 13 && e.shiftKey && e.ctrlKey) {
+                self.toggleFullScreenEdit();
+            }
+        });
+    };
+
+    /**
+     * Toggles fullscreen edit mode.
+     */
+    ToyPlugEditPage.prototype.toggleFullScreenEdit =
+        function toggleFullScreenEdit() {
+            var isFS = document.body.classList
+                    .contains(this.FULLSCREEN_MODE_CLASS);
+
+            document.body.classList[isFS ? 'remove' : 'add'](
+                this.FULLSCREEN_MODE_CLASS
+            );
+            this.decraseRes(this.currentDivider);
+        };
+
+    ToyPlugEditPage.prototype.setRenderMode = function setRenderMode(mode) {
+        this.c.style.imageRendering = mode;
+    };
+
+    ToyPlugEditPage.prototype.takeScreenShot = function takeScreenShot() {
+        var imageData = null,
+            currentDivider = this.currentDivider,
+            paused = gShaderToy.mIsPaused;
+
+        if (!paused) gShaderToy.pauseTime();
+        this.decraseRes(currentDivider * 0.25);
+
+        setTimeout(function() {
+            imageData = gShaderToy.mGLContext.canvas.toDataURL('image/png');
+        }, 100);
+
+        setTimeout(function() {
+            this.decraseRes(currentDivider);
+            window.open(imageData);
+            if (!paused) gShaderToy.pauseTime();
+        }.bind(this), 1000);
+    };
+
+    ToyPlugEditPage.prototype.duplicateShader = function duplicateShader() {
+        var publishWrapper = document.getElementById('shaderPublished'),
+            duplicate = document.createElement('div');
+
+        if (publishWrapper) {
+            duplicate.classList.add('formButton');
+            duplicate.style.marginLeft = "12px";
+            duplicate.style.display = "inline-block";
+            duplicate.textContent = 'Save as new draft';
+
+            publishWrapper.appendChild(duplicate);
+            duplicate.addEventListener('click', function() {
+                if (
+                    (gShaderToy.mNeedsSave &&
+                        window.confirm('Original shader has not been saved!')
+                    ) || !gShaderToy.mNeedsSave) {
+                        gShaderToy.mInfo.username = "None";
+                        gShaderToy.mInfo.id = "-1";
+                        document.getElementById('published').value = "0";
+                        window.openSubmitShaderForm(false);
+                    }
+            });
+        }
+    };
+
     /**
      * Provides timebar functionality.
      *
@@ -400,135 +507,16 @@
         });
     };
 
-    /**
-     * Attaches additional keys support.
-     */
-    ToyPlugEditPage.prototype.bindKeys = function bindKeys() {
-
-        var self = this;
-
-        document.addEventListener('keydown', function(e) {
-
-            var which = e.which;
-
-            if (e.target.id === self.MAIN_SHADERTOY_DEMO_ID) {
-
-                // 1...9 Keys
-                if (which == Math.max(49, Math.min(57, which))) {
-                    self.decraseRes(which - 48);
-                }
-
-                // Alt (or Cmd) + arrow ..
-                if (e.altKey || e.metaKey) {
-
-                    // ... up
-                    if (which == 38) {
-                        gShaderToy.pauseTime();
-                    }
-
-                    // ... down
-                    if (which == 40) {
-                        gShaderToy.resetTime();
-                    }
-                }
-
-                // shift + ctrl + s
-                if (e.ctrlKey && e.shiftKey && e.which == '83') {
-                    self.takeScreenShot();
-                }
-            }
-
-            // shift + ctrl + enter
-            if (e.which == 13 && e.shiftKey && e.ctrlKey) {
-                self.toggleFullScreenEdit();
-            }
-        });
-    };
-
-    /**
-     * Toggles fullscreen edit mode.
-     */
-    ToyPlugEditPage.prototype.toggleFullScreenEdit =
-        function toggleFullScreenEdit() {
-            var isFS = document.body.classList
-                    .contains(this.FULLSCREEN_MODE_CLASS);
-
-            document.body.classList[isFS ? 'remove' : 'add'](
-                this.FULLSCREEN_MODE_CLASS
-            );
-            this.decraseRes(this.currentDivider);
-        };
-
-    ToyPlugEditPage.prototype.setRenderMode = function setRenderMode(mode) {
-        this.c.style.imageRendering = mode;
-    };
-
-    ToyPlugEditPage.prototype.takeScreenShot = function takeScreenShot() {
-        var imageData = null,
-            currentDivider = this.currentDivider,
-            paused = gShaderToy.mIsPaused;
-
-        if (!paused) gShaderToy.pauseTime();
-        this.decraseRes(currentDivider * 0.25);
-
-        setTimeout(function() {
-            imageData = gShaderToy.mGLContext.canvas.toDataURL('image/png');
-        }, 100);
-
-        setTimeout(function() {
-            this.decraseRes(currentDivider);
-            window.open(imageData);
-            if (!paused) gShaderToy.pauseTime();
-        }.bind(this), 1000);
-    };
-
-    ToyPlugEditPage.prototype.duplicateShader = function duplicateShader() {
-        var publishWrapper = document.getElementById('shaderPublished'),
-            duplicate = document.createElement('div');
-
-        if (publishWrapper) {
-            duplicate.classList.add('formButton');
-            duplicate.style.marginLeft = "12px";
-            duplicate.style.display = "inline-block";
-            duplicate.textContent = 'Save as new draft';
-
-            publishWrapper.appendChild(duplicate);
-            duplicate.addEventListener('click', function() {
-                if (
-                    (gShaderToy.mNeedsSave &&
-                        window.confirm('Original shader has not been saved!')
-                    ) || !gShaderToy.mNeedsSave) {
-                        gShaderToy.mInfo.username = "None";
-                        gShaderToy.mInfo.id = "-1";
-                        document.getElementById('published').value = "0";
-                        window.openSubmitShaderForm(false);
-                    }
-            });
-        }
-    };
-
-    /**
-     * Provides additional functionality to ShaderToy's profile page view.
-     *
-     * @contructor
-     */
-    function ToyPlugProfilePage() {
-        this.init();
+    function SortableShaderList() {
+        this.rebuildList();
     }
 
     /**
-     * Initializes profile page functions.
-     */
-    ToyPlugProfilePage.prototype.init = function init() {
-        this.shadersList();
-    };
-
-    /**
-     * Adds sorting shaders list on profile page.
+     * Adds shaders list sorting on profile page.
      * Adds preview image overlay.
      * Loads preview images of all shaders.
      */
-    ToyPlugProfilePage.prototype.shadersList = function shadersList() {
+    SortableShaderList.prototype.rebuildList = function shadersList() {
         var tp = this,
             i = 1;
 
@@ -561,14 +549,14 @@
 
         helpers.collectionToArray(
             this.shadersListHeadRow.querySelectorAll('td')
-        ).forEach(tp.bindClickSorting.bind(tp));
+        ).forEach(tp.bindColumnClick.bind(tp));
     };
 
     /**
      * Binds sorting on click event for provided element if element's index
      * exists in defined list.
      */
-    ToyPlugProfilePage.prototype.bindClickSorting =
+    SortableShaderList.prototype.bindColumnClick =
         function bindSort(elem, index) {
             var tp = this,
 
@@ -577,7 +565,7 @@
 
             if (~sortableColumns.indexOf(index)) {
                 elem.addEventListener('click', function() {
-                    tp.sortByColumn(index);
+                    tp.onColumnHeaderClick(index);
                 });
             }
         };
@@ -587,36 +575,37 @@
      *
      * @param {number} index Column index.
      */
-    ToyPlugProfilePage.prototype.sortByColumn = function sortByColumn(index) {
-        var tempArray = [];
+    SortableShaderList.prototype.onColumnHeaderClick =
+        function sortByColumn(index) {
+            var tempArray = [];
 
-        this.shadersListRows = helpers.collectionToArray(
-            this.shadersListContainer.querySelectorAll('tr')
-        );
+            this.shadersListRows = helpers.collectionToArray(
+                this.shadersListContainer.querySelectorAll('tr')
+            );
 
-        tempArray = tempArray.concat(this.shadersListRows);
+            tempArray = tempArray.concat(this.shadersListRows);
 
-        tempArray.sort(function(a, b) {
-            var
-                val1 = helpers.collectionToArray(
-                    a.querySelectorAll('td')
-                )[index].innerText,
-                val2 = helpers.collectionToArray(
-                    b.querySelectorAll('td')
-                )[index].innerText;
+            tempArray.sort(function(a, b) {
+                var
+                    val1 = helpers.collectionToArray(
+                        a.querySelectorAll('td')
+                    )[index].innerText,
+                    val2 = helpers.collectionToArray(
+                        b.querySelectorAll('td')
+                    )[index].innerText;
 
-            return val2 - val1;
-        });
+                return val2 - val1;
+            });
 
-        this.updateShadersList(tempArray);
-    };
+            this.updateShadersList(tempArray);
+        };
 
     /**
      * Updates shaders list.
      *
      * @param {HTMLElement[]} contents Array of sorted rows.
      */
-    ToyPlugProfilePage.prototype.updateShadersList =
+    SortableShaderList.prototype.updateShadersList =
         function updateShadersList(contents) {
             var tp = this,
                 oldRows = helpers.collectionToArray(
@@ -634,6 +623,15 @@
                 tbody.appendChild(elem);
             });
         };
+
+    /**
+     * Provides additional functionality to ShaderToy's profile page view.
+     *
+     * @contructor
+     */
+    function ToyPlugProfilePage() {
+        this.sortableShaderList = new SortableShaderList();
+    }
 
     /**
      * Mouse uniform sliders constructor.

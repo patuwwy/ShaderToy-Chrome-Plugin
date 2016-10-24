@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Shadertoy unofficial plugin.",
-    "version": "0.7.7",
+    "version": "0.7.8",
     "description": "Shadertoy.com unofficial plugin.",
     "background": {
         "scripts": [
@@ -32,10 +32,8 @@
             "run_at": "document_end"
         }
     ],
-    "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
     "web_accessible_resources": [
         "popup.js",
-        "shadertoy-plugin.js",
-        "assets/TopazPlus_a1200_v1.0.ttf"
+        "shadertoy-plugin.js"
     ]
 }
