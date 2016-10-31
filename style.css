@@ -13,6 +13,7 @@ body.dark-toy:before {
 	left: 0;
 	width: 100%;
 	height: 100%;
+	z-index: -1;
 	content: "";
 	display: block;
 	background-image: url("/img/topbackground.png");
@@ -255,7 +256,6 @@ body.dark-toy:before {
 }
 
 .dark-toy div#headerContent {
-	height: 100%;
 	background: none;
 }
 
@@ -419,4 +419,102 @@ body.dark-toy:before {
 
 #divShaders td:hover .bigPreview {
 	opacity: 1;
+}
+
+body.alternate-profile {
+	overflow: auto;
+	height: auto;
+}
+
+body.alternate-profile div#footer {
+	position: fixed;
+}
+
+body.alternate-profile, body.alternate-profile div#contentScroll {
+	top: auto;
+	height: auto;
+	overflow: visible;
+}
+
+body.alternate-profile div#header {
+	position: fixed;
+	z-index: 3;
+	background: #000;
+}
+
+.tiles-wrapper * {
+	box-sizing: border-box;
+}
+
+.tiles-wrapper {
+	padding: 50px 0 0;
+}
+
+.tiles-wrapper .status {
+	width: 100%;
+}
+
+.tiles-wrapper ul {
+	padding: 0;
+	list-style: none;
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: flex-start;
+}
+
+.tiles-wrapper .shader {
+	width: 19.5%;
+	margin: 0 auto 30px;
+}
+
+.tiles-wrapper .shader-tile {
+	margin: 0 15px;
+	display: block;
+	position: relative;
+}
+
+.tiles-wrapper .shader-tile .shader-name {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	line-height: 1.2em;
+	color: #fff;
+	padding: 5px;
+	background: rgba(0,0,0,.4);
+	display: block;
+}
+
+.tiles-wrapper ul ul:before {
+	content: 'Draft';
+	display: block;
+	font-size: 24px;
+    clear: both;
+    width: 100%;
+    padding: 15px 0;
+    border-bottom: 1px solid #888;
+    margin: 15px;
+}
+
+.tiles-wrapper ul .public:before {
+	content: 'Public';
+}
+
+.tiles-wrapper ul .publicapi:before {
+	content: 'Public + API';
+}
+
+.tiles-wrapper ul .private:before {
+	content: 'Private';
+}
+
+.tiles-wrapper .shader-image {
+	width: 100%;
+}
+
+.tiles-wrapper:after {
+	content: "";
+	display: block;
+	float: none;
+	clear: both;
 }

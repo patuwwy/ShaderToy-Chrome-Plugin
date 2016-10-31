@@ -1,4 +1,4 @@
-/* global gShaderToy */
+/* global gShaderToy, window, document */
 
 (function shadertoyPlugin() {
 
@@ -10,13 +10,6 @@
      * @type {ToyPlug}
      */
     var tp,
-
-        /**
-         * Stores Helpers instance.
-         *
-         * @type {Helpers}
-         */
-        helpers,
 
         /**
          * Stores references to ShaderToy HTML elements.
@@ -39,13 +32,6 @@
      */
     ToyPlug.prototype.isEditPage = function isEditPage() {
         return document.location.href.match(/(.com\/view|.com\/new)/);
-    };
-
-    /**
-     * @returns {boolean} True if current page is profile page.
-     */
-    ToyPlug.prototype.isProfilePage = function isProfilePage() {
-        return document.location.href.match('shadertoy.com/profile');
     };
 
     /**
@@ -73,10 +59,6 @@
 
         if (this.isEditPage()) {
             this.editPage = new ToyPlugEditPage();
-        }
-
-        if (this.isProfilePage()) {
-            this.profilePage = new ToyPlugProfilePage();
         }
     };
 
@@ -169,7 +151,7 @@
                     ed.classList.remove('cm-s-twilight');
                     ed.classList.add(edClass);
                 } else {
-                    setTimeout(function() {
+                    window.setTimeout(function() {
                         waitForCodeMirror();
                     }, 10);
                 }
@@ -267,11 +249,11 @@
         if (!paused) gShaderToy.pauseTime();
         this.decraseRes(currentDivider * 0.25);
 
-        setTimeout(function() {
+        window.setTimeout(function() {
             imageData = gShaderToy.mGLContext.canvas.toDataURL('image/png');
         }, 100);
 
-        setTimeout(function() {
+        window.setTimeout(function() {
             this.decraseRes(currentDivider);
             window.open(imageData);
             if (!paused) gShaderToy.pauseTime();
@@ -292,7 +274,7 @@
             duplicate.addEventListener('click', function() {
                 if (
                     (gShaderToy.mNeedsSave &&
-                        window.confirm('Original shader has not been saved!')
+                        window.confirm('Current shader will be saved as new draft. Page will be reloaded. Continue?')
                     ) || !gShaderToy.mNeedsSave) {
                         gShaderToy.mInfo.username = "None";
                         gShaderToy.mInfo.id = "-1";
@@ -507,132 +489,6 @@
         });
     };
 
-    function SortableShaderList() {
-        this.rebuildList();
-    }
-
-    /**
-     * Adds shaders list sorting on profile page.
-     * Adds preview image overlay.
-     * Loads preview images of all shaders.
-     */
-    SortableShaderList.prototype.rebuildList = function shadersList() {
-        var tp = this,
-            i = 1;
-
-        this.shadersListContainer = document.getElementById('divShaders');
-        this.shadersTable = this.shadersListContainer.querySelector('table');
-        this.shadersListRows = helpers.collectionToArray(
-            this.shadersListContainer.querySelectorAll('tr')
-        );
-        this.shadersListHeadRow = this.shadersListRows[0];
-
-        // Add small preview images to shaders list.
-        this.shadersListRows.forEach(function(row, i) {
-            if (!i) return;
-
-            var link = row.querySelector('a'),
-                id = link.getAttribute('href').substr(6),
-                url = '/media/shaders/' + id + '.jpg',
-                smallImg = document.createElement('img');
-                bigImg = document.createElement('img');
-
-            smallImg.setAttribute('src', url);
-            smallImg.classList.add('small');
-
-            bigImg.setAttribute('src', url);
-            bigImg.classList.add('bigPreview');
-
-            link.insertBefore(smallImg, link.firstChild);
-            link.insertBefore(bigImg, link.firstChild);
-        });
-
-        helpers.collectionToArray(
-            this.shadersListHeadRow.querySelectorAll('td')
-        ).forEach(tp.bindColumnClick.bind(tp));
-    };
-
-    /**
-     * Binds sorting on click event for provided element if element's index
-     * exists in defined list.
-     */
-    SortableShaderList.prototype.bindColumnClick =
-        function bindSort(elem, index) {
-            var tp = this,
-
-                // sortable columns indexes.
-                sortableColumns = [2, 3, 4];
-
-            if (~sortableColumns.indexOf(index)) {
-                elem.addEventListener('click', function() {
-                    tp.onColumnHeaderClick(index);
-                });
-            }
-        };
-
-    /**
-     * Sorts shaders list.
-     *
-     * @param {number} index Column index.
-     */
-    SortableShaderList.prototype.onColumnHeaderClick =
-        function sortByColumn(index) {
-            var tempArray = [];
-
-            this.shadersListRows = helpers.collectionToArray(
-                this.shadersListContainer.querySelectorAll('tr')
-            );
-
-            tempArray = tempArray.concat(this.shadersListRows);
-
-            tempArray.sort(function(a, b) {
-                var
-                    val1 = helpers.collectionToArray(
-                        a.querySelectorAll('td')
-                    )[index].innerText,
-                    val2 = helpers.collectionToArray(
-                        b.querySelectorAll('td')
-                    )[index].innerText;
-
-                return val2 - val1;
-            });
-
-            this.updateShadersList(tempArray);
-        };
-
-    /**
-     * Updates shaders list.
-     *
-     * @param {HTMLElement[]} contents Array of sorted rows.
-     */
-    SortableShaderList.prototype.updateShadersList =
-        function updateShadersList(contents) {
-            var tp = this,
-                oldRows = helpers.collectionToArray(
-                    tp.shadersTable.querySelectorAll('tr')
-                ),
-                tbody = tp.shadersTable.querySelector('tbody');
-
-            // remove old rows except first one (header).
-            oldRows.shift();
-            oldRows.forEach(function (elem) {
-                elem.remove();
-            });
-
-            contents.forEach(function (elem) {
-                tbody.appendChild(elem);
-            });
-        };
-
-    /**
-     * Provides additional functionality to ShaderToy's profile page view.
-     *
-     * @contructor
-     */
-    function ToyPlugProfilePage() {
-        this.sortableShaderList = new SortableShaderList();
-    }
-
     /**
      * Mouse uniform sliders constructor.
      */
@@ -716,31 +572,6 @@
             this.onSliderChange({target: slider});
         }, this);
     };
-
-    /**
-     * Common helper function.
-     */
-    function Helpers(options) {
-        Object.keys(options).forEach(function(item) {
-            this[item] = options[item];
-        });
-    }
-
-    /**
-     * Converts HTML collection to array.
-     *
-     * @param {HTMLCollection} collection
-     * @returns {HTMLElement[]}
-     */
-    Helpers.prototype.collectionToArray = function(collection) {
-        return Array.prototype.slice.apply(collection);
-    };
-
-    Helpers.prototype.log = function(val) {
-        if (this.debug) console.log('value:', val);
-    };
-
-    helpers = window.ToyPlugHelpers = new Helpers({ debug: true });
 
     window.ToyPlug = new ToyPlug();
 

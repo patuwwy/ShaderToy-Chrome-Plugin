@@ -5,7 +5,7 @@ Extension to make Shadertoy coding more comfortable.
 
 ## Info
 
-Please report bugs and request feature [here](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues)
+Please report bugs and request features [here](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues)
 
 ## Features:
 
@@ -17,6 +17,8 @@ Please report bugs and request feature [here](https://github.com/patuwwy/ShaderT
 * Switchable dark color theme.
 
 * Sorting shaders list by views, likes or comments on "My profile" page.
+
+* Alternative shaders list on profile page.
 
 * Shaders previews on "My profile" page.
 
@@ -42,6 +44,9 @@ Please report bugs and request feature [here](https://github.com/patuwwy/ShaderT
 
 ![](./screenshots/screen3.jpg)
 
+![](./screenshots/alt-profile.jpg)
+Alternative shader list
+
 ![](./screenshots/previews.jpg)
 Preview images on profile page with detail overlay on mouse hover
 
@@ -53,6 +58,11 @@ main page (dark theme)
 
 
 ## ShaderToy extension changelog:
+
+* 0.8.0
+Alternative profile page - new shaders list.
+New shaders list option added to extension's popup.
+Code structure changed. Dedicated JS module for profile page.
 
 * 0.7.7
 Cloned shader is saved as draft.
@@ -152,6 +162,9 @@ Added basic dark theme
 * 0.0.1
 Change resolution by keys 1...9
 
+## Contact
+
+[here](http://patrykfalba.eu)
 
 ## Contributors:
 

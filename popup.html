@@ -52,11 +52,9 @@
             font-size: 16px;
             line-height: 32px;
             font-weight: normal;
-            border-top: 1px dashed #333;
             clear: both;
             position: relative;
             z-index: 1;
-            padding-top: 8px;
             margin-top: 8px;
         }
 
@@ -64,6 +62,11 @@
             font-size: 14px;
             line-height: 28px;
             font-weight: normal;
+        }
+
+        section, ul ~ ul {
+            border-top: 1px dashed #333;
+            padding-top: 8px;
         }
 
         li {
@@ -238,10 +241,6 @@
             color: #fff;
         }
 
-        section {
-            margin-bottom: 20px;
-        }
-
     </style>
 </head>
 <body>
@@ -269,14 +268,20 @@
                     <label>Dark Theme</label>
                     <input type="checkbox" id="input-dark-theme"/>
                 </li>
+                <li>
+                    <label>Alternative profile page</label>
+                    <input type="checkbox" id="input-alternate-profile"/>
+                </li>
+            </ul>
+            <ul>
                 <li title="When resolution decrased">
                     <label>Rendering mode</label>
-                    <select id="rendering-mode">
+                    <select id="input-rendering-mode">
                         <option value="auto">auto</option>
                         <option value="pixelated">pixelated</option>
                     </select>
                 </li>
-                <li>
+                <li title="Time loop in set range">
                     <label>Loop</label>
                     <input type="checkbox" id="input-loop"/>
                 </li>
