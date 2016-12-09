@@ -7,13 +7,13 @@
     }
 
     Popup.prototype.init = function init() {
-        this.bindDarkThemeInput();
+        //this.bindDarkThemeInput();
         this.bindLoopInput();
         this.bindRenderModeSelect();
         this.bindAlternateProfileInput();
     };
 
-    Popup.prototype.bindDarkThemeInput = function bindInput() {
+    /*Popup.prototype.bindDarkThemeInput = function bindInput() {
         var i = document.getElementById('input-dark-theme');
 
         i.addEventListener('change', function(e) {
@@ -22,7 +22,7 @@
                 darkTheme: i.checked
             });
         });
-    };
+    };*/
 
     Popup.prototype.bindRenderModeSelect = function bindSelect() {
         var i = document.querySelector('select');
@@ -73,12 +73,12 @@
     /**
      * Gets stored value for dark theme option.
      */
-    chrome.storage.sync.get('darkThemeEnable', function(items) {
+    /*chrome.storage.sync.get('darkThemeEnable', function(items) {
         var i = document.getElementById('input-dark-theme');
 
         i.checked = items.darkThemeEnable;
         document.body.classList[i.checked ? 'add' : 'remove']('dark-toy');
-    });
+    });*/
 
     /**
      * Gets stored state of loop option.

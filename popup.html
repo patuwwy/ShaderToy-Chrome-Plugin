@@ -18,7 +18,7 @@
             margin: 0;
         }
 
-        .dark-toy a {
+        a {
             color: rgb(255, 153, 34);
         }
 
@@ -222,25 +222,27 @@
             float: right;
         }
 
-        body.dark-toy {
+        body {
             color: #000;
         }
 
-        body.dark-toy .wrapper {
+        body .wrapper {
             color: #999;
             text-shadow: 1px 1px 0 #444;
         }
 
-        body.dark-toy .wrapper:before {
+        body .wrapper:before {
             background-color: #0a0a0a;
             background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000),
                 linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000);
         }
 
-        body.dark-toy .keys b {
+        body .keys b {
             color: #fff;
         }
-
+        .info {
+            color: #0f0;
+        }
     </style>
 </head>
 <body>
@@ -265,8 +267,7 @@
         <section class="settings">
             <ul>
                 <li>
-                    <label>Dark Theme</label>
-                    <input type="checkbox" id="input-dark-theme"/>
+                    <p class="info">Dark theme is now available in Shadertoy profile settings.</p>
                 </li>
                 <li>
                     <label>Alternative profile page</label>

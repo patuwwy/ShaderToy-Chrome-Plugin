@@ -58,7 +58,7 @@
     function bindMessagesListener() {
         chrome.runtime.onMessage.addListener(
             function(request, sender, sendResponse) {
-                if ('darkTheme' in request.data) {
+                /*if ('darkTheme' in request.data) {
 
                     executeScriptOnPage(
                         'window.darkTheme = ' + request.data.darkTheme + ';' +
@@ -71,7 +71,7 @@
                         },
                         function() {}
                     );
-                }
+                }*/
 
                 if (request.data.renderMode) {
                     executeScriptOnPage(
@@ -113,12 +113,12 @@
             for (key in changes) {
                 var storageChange = changes[key];
 
-                if (key === 'darkThemeEnable') {
+                /*if (key === 'darkThemeEnable') {
                     setWindowVariable(key, changes[key].newValue);
                     executeScriptOnPage(
                         'ToyPlug.toggleDarkTheme();'
                     );
-                }
+                }*/
 
                 if (key === 'loopEnabled') {
                     executeScriptOnPage(
@@ -147,10 +147,10 @@
      * Gets stored variables from google cloud.
      */
     function synchronizeChrome() {
-        chrome.storage.sync.get('darkThemeEnable', function(items) {
+        /*chrome.storage.sync.get('darkThemeEnable', function(items) {
             if (items.darkThemeEnable) document.body.classList.add('dark-toy');
             setWindowVariable('darkTheme', items.darkThemeEnable);
-        });
+        });*/
 
         chrome.storage.sync.get('alternateProfile', function(items) {
             setWindowVariable('alternateProfile', items.alternateProfile);

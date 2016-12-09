@@ -37,13 +37,13 @@
     /**
      * Turns on/off dark theme.
      */
-    ToyPlug.prototype.toggleDarkTheme = function() {
+    /*ToyPlug.prototype.toggleDarkTheme = function() {
         if (this.editPage) {
             this.editPage.switchEditorToDark(window.darkTheme);
         }
 
         this.common.switchToDarkTheme();
-    };
+    };*/
 
     ToyPlug.prototype.setRenderMode = function setRenderMode(mode) {
         if (this.editPage) {
@@ -75,16 +75,16 @@
      * Inits common functionality.
      */
     ToyPlugCommon.prototype.init = function init() {
-        this.switchToDarkTheme();
+        //this.switchToDarkTheme();
     };
 
     /**
      * Swithces Shadertoy to dark theme.
      */
-    ToyPlugCommon.prototype.switchToDarkTheme = function switchToDarkTheme() {
+    /*ToyPlugCommon.prototype.switchToDarkTheme = function switchToDarkTheme() {
         document.body.classList.remove('dark-toy');
         if (window.darkTheme) document.body.classList.add('dark-toy');
-    };
+    };*/
 
     /**
      * Provides additional functionality to Shadertoy's edit page.
@@ -128,7 +128,7 @@
          */
         this.currentDivider = 1;
 
-        this.switchEditorToDark(window.darkTheme);
+        //this.switchEditorToDark(window.darkTheme);
         this.bindKeys();
         this.timebar = new Timebar();
         this.mouseUniforms = new MouseUniforms();
@@ -138,7 +138,7 @@
     /**
      * Waits for CodeMirror editor to init, then changes it's theme.
      */
-    ToyPlugEditPage.prototype.switchEditorToDark =
+    /*ToyPlugEditPage.prototype.switchEditorToDark =
         function switchEditorToDark(isDark) {
             var ed = null,
                 edClass = isDark ? 'cm-s-twilight' : 'cm-s-default';
@@ -159,7 +159,7 @@
 
             waitForCodeMirror();
         };
-
+    */
     /**
      * Changes Shader resolution.
      * Resolution calculation is based on divider and depends of fullscreen
