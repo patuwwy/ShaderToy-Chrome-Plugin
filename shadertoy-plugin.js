@@ -34,17 +34,6 @@
         return document.location.href.match(/(.com\/view|.com\/new)/);
     };
 
-    /**
-     * Turns on/off dark theme.
-     */
-    /*ToyPlug.prototype.toggleDarkTheme = function() {
-        if (this.editPage) {
-            this.editPage.switchEditorToDark(window.darkTheme);
-        }
-
-        this.common.switchToDarkTheme();
-    };*/
-
     ToyPlug.prototype.setRenderMode = function setRenderMode(mode) {
         if (this.editPage) {
             this.editPage.setRenderMode(mode);
@@ -77,14 +66,6 @@
     ToyPlugCommon.prototype.init = function init() {
         //this.switchToDarkTheme();
     };
-
-    /**
-     * Swithces Shadertoy to dark theme.
-     */
-    /*ToyPlugCommon.prototype.switchToDarkTheme = function switchToDarkTheme() {
-        document.body.classList.remove('dark-toy');
-        if (window.darkTheme) document.body.classList.add('dark-toy');
-    };*/
 
     /**
      * Provides additional functionality to Shadertoy's edit page.
@@ -135,31 +116,6 @@
         this.duplicateShader();
     };
 
-    /**
-     * Waits for CodeMirror editor to init, then changes it's theme.
-     */
-    /*ToyPlugEditPage.prototype.switchEditorToDark =
-        function switchEditorToDark(isDark) {
-            var ed = null,
-                edClass = isDark ? 'cm-s-twilight' : 'cm-s-default';
-
-            function waitForCodeMirror() {
-                ed = document.querySelector('.CodeMirror');
-
-                if (ed) {
-                    ed.classList.remove('cm-s-default');
-                    ed.classList.remove('cm-s-twilight');
-                    ed.classList.add(edClass);
-                } else {
-                    window.setTimeout(function() {
-                        waitForCodeMirror();
-                    }, 10);
-                }
-            }
-
-            waitForCodeMirror();
-        };
-    */
     /**
      * Changes Shader resolution.
      * Resolution calculation is based on divider and depends of fullscreen
