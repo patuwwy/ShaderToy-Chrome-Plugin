@@ -143,7 +143,8 @@
 
         document.addEventListener('keydown', function(e) {
 
-            var which = e.which;
+            var which = e.which,
+                code = e.code;
 
             if (e.target.id === self.MAIN_SHADERTOY_DEMO_ID) {
 
@@ -164,12 +165,18 @@
                     if (which == 40) {
                         gShaderToy.resetTime();
                     }
+
                 }
 
                 // shift + ctrl + s
                 if (e.ctrlKey && e.shiftKey && e.which == '83') {
                     self.takeScreenShot();
                 }
+
+                if (e.ctrlKey && e.shiftKey && code === 'KeyR') {
+                    self.switchRecording();
+                }
+
             }
 
             // shift + ctrl + enter
@@ -210,10 +217,32 @@
         }, 100);
 
         window.setTimeout(function() {
+            var link = document.createElement('a'),
+                clickEvent = new MouseEvent("click", {
+                    "view": window,
+                    "bubbles": true,
+                    "cancelable": false
+                }),
+                filename = document.getElementById('shaderTitle').value +
+                    '_' + new Date().toJSON().slice(0,10) +
+                    ' ' + new Date(new Date()).toString().split(' ')[4];
+
+            link.setAttribute('href', imageData);
+            link.setAttribute('download', filename);
+            link.dispatchEvent(clickEvent);
+
             this.decraseRes(currentDivider);
-            window.open(imageData);
             if (!paused) gShaderToy.pauseTime();
         }.bind(this), 1000);
+    };
+
+    ToyPlugEditPage.prototype.switchRecording = function switchRecording() {
+        if (gShaderToy.mMediaRecorder.state == "inactive") {
+            gShaderToy.mMediaRecorder.start();
+        }
+        else {
+            gShaderToy.mMediaRecorder.stop();
+        }
     };
 
     ToyPlugEditPage.prototype.duplicateShader = function duplicateShader() {

@@ -121,17 +121,15 @@ body, a {
 	opacity: 0;
 	pointer-events: none;
 	display: block;
+	right: 100%;
+	top: -180px;
 	height: 360px;
 	width: 640px;
+	margin-right: 60px;
+	position: absolute;
 	transition: opacity .15s ease;
 	z-index: 3;
 	box-shadow: 5px 5px 20px #000;
-	position: fixed;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	margin: auto;
 }
 
 #divShaders td:hover .bigPreview {
@@ -180,12 +178,12 @@ body.alternate-profile div#header {
 }
 
 .tiles-wrapper .shader {
-	width: 15.5%;
+	width: 19.5%;
 	margin: 0 auto 30px;
 }
 
 .tiles-wrapper .shader-tile {
-	margin: 0 10px;
+	margin: 0 15px;
 	display: block;
 	position: relative;
 }

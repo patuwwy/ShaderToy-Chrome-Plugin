@@ -56,10 +56,12 @@ Fullscreen edit (dark theme)
 
 ## ShaderToy extension changelog:
 
+* 0.8.3
+On/Off record with CTRL + SHIFT + R (for fullscreen).
+Fixed taking screenshot.
+
 * 0.8.2
 Clean up.
-Fix for shader preview in profile shaders list.
-Show 6 shaders instead of 5 in one row on shaders grid (alternative profile page)
 
 * 0.8.1
 Dark theme removed. Dark theme has been implemented in ShaderToy.
