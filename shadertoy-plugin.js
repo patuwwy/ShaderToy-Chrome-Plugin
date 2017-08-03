@@ -5,11 +5,18 @@
     'strict mode';
 
     /**
-     * Stores ToyPlug instance.
+     * Arrow keys time change (ms).
      *
-     * @type {ToyPlug}
+     * @type {number}
      */
-    var tp,
+    var ARROW_KEY_TIMESHIFT = 5000,
+    
+        /**
+         * Stores ToyPlug instance.
+         *
+         * @type {ToyPlug}
+         */
+        tp,
 
         /**
          * Stores references to ShaderToy HTML elements.
@@ -135,6 +142,35 @@
     };
 
     /**
+     * Changes time position.
+     * 
+     * @param {number} timeshift. Time change value in ms. 
+     */
+    ToyPlugEditPage.prototype.changeTimePosition = function(timeShift) {
+        var destTime = Math.max(0, gShaderToy.mTf + timeShift);
+
+        updateShaderToyTime(destTime);
+        updateInputsTime(destTime);
+        gShaderToy.mTf = destTime;
+    };
+
+    /**
+     * Increases time position.
+     */
+    ToyPlugEditPage.prototype.increaseTimePosition = 
+        function increaseTimePosition() {
+            this.changeTimePosition(ARROW_KEY_TIMESHIFT);
+        };
+
+    /**
+     * Decrease time position.
+     */
+    ToyPlugEditPage.prototype.decreaseTimePosition = 
+        function decreaseTimePosition() {
+            this.changeTimePosition(-ARROW_KEY_TIMESHIFT);
+        };
+
+    /**
      * Attaches additional keys support.
      */
     ToyPlugEditPage.prototype.bindKeys = function bindKeys() {
@@ -177,6 +213,14 @@
                     self.switchRecording();
                 }
 
+                if (e.key === 'ArrowRight') {
+                    self.increaseTimePosition();
+                }
+
+                if (e.key === 'ArrowLeft') {
+                    self.decreaseTimePosition();
+                }
+
             }
 
             // shift + ctrl + enter
@@ -193,6 +237,10 @@
         function toggleFullScreenEdit() {
             var isFS = document.body.classList
                     .contains(this.FULLSCREEN_MODE_CLASS);
+
+            if (document.webkitIsFullScreen) {
+                document.webkitExitFullscreen();
+            }
 
             document.body.classList[isFS ? 'remove' : 'add'](
                 this.FULLSCREEN_MODE_CLASS
@@ -294,7 +342,9 @@
 
         this.sliderInput.addEventListener(
             'input',
-            this.updateShaderToy.bind(this)
+            function() {
+                updateShaderToyTime(this.sliderInput.value)
+            }.bind(this)
         );
 
         this.minValueInput.addEventListener(
@@ -386,8 +436,8 @@
         }
 
         if (outsideLoop) {
-            this.updateShaderToy();
-            this.updateInputs(this.sliderInput.value);
+            updateShaderToyTime(this.sliderInput.value);
+            updateInputsTime(this.sliderInput.value);
         }
 
         setTimeout(this.updateSlider.bind(this), 26);
@@ -414,8 +464,8 @@
         if (!this.wasPaused) gShaderToy.pauseTime();
 
         requestAnimationFrame(function() {
-            this.updateShaderToy(!this.wasPaused);
-            this.updateInputs(this.sliderInput.value);
+            updateShaderToyTime(this.sliderInput.value, !this.wasPaused);
+            updateInputsTime(this.sliderInput.value);
             this.busy = false;
         }.bind(this));
     };
@@ -424,14 +474,14 @@
      * Handles user changing slider value.
      */
     Timebar.prototype.sliderOnChange = function sliderOnChange() {
-        this.updateShaderToy();
+        updateShaderToyTime(this.sliderInput.value);
     };
 
     /**
-     * Updates ShaderToy with slider value.
+     * Updates ShaderToy with provided time value.
      */
-    Timebar.prototype.updateShaderToy = function updateShaderToy(togglePause) {
-        var value = parseInt(this.sliderInput.value, 10),
+    function updateShaderToyTime(time, togglePause) {
+        var value = parseInt(time, 10),
             i = 0;
 
         gShaderToy.pauseTime();
@@ -459,7 +509,7 @@
     /**
      * Updates ShaderToy inputs.
      */
-    Timebar.prototype.updateInputs = function updateInputs(value) {
+    function updateInputsTime(value) {
         gShaderToy.mEffect.mPasses.forEach(function mPass(pass) {
             pass.mInputs.forEach(function mInput(input){
                 var media = null;

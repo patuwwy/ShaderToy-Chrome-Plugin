@@ -76,85 +76,10 @@
             smallImg.classList.add('small');
             bigImg.classList.add('bigPreview');
 
-            link.insertBefore(smallImg, link.firstChild);
             link.insertBefore(bigImg, link.firstChild);
+            link.insertBefore(smallImg, link.firstChild);
         });
-
-        helpers.collectionToArray(
-            this.shadersListHeadRow.querySelectorAll('td')
-        ).forEach(tp.bindColumnClick.bind(tp));
     };
-
-    /**
-     * Binds sorting on click event for provided element if element's index
-     * exists in defined list.
-     */
-    SortableShaderList.prototype.bindColumnClick =
-        function bindSort(elem, index) {
-            var tp = this,
-
-                // sortable columns indexes.
-                sortableColumns = [2, 3, 4];
-
-            if (~sortableColumns.indexOf(index)) {
-                elem.addEventListener('click', function() {
-                    tp.onColumnHeaderClick(index);
-                });
-            }
-        };
-
-    /**
-     * Sorts shaders list.
-     *
-     * @param {number} index Column index.
-     */
-    SortableShaderList.prototype.onColumnHeaderClick =
-        function sortByColumn(index) {
-            var tempArray = [];
-
-            this.shadersListRows = helpers.collectionToArray(
-                this.shadersListContainer.querySelectorAll('tr')
-            );
-
-            tempArray = tempArray.concat(this.shadersListRows);
-
-            tempArray.sort(function(a, b) {
-                var val1 = helpers.collectionToArray(
-                        a.querySelectorAll('td')
-                    )[index].innerText,
-                    val2 = helpers.collectionToArray(
-                        b.querySelectorAll('td')
-                    )[index].innerText;
-
-                return val2 - val1;
-            });
-
-            this.updateShadersList(tempArray);
-        };
-
-    /**
-     * Updates shaders list.
-     *
-     * @param {HTMLElement[]} contents Array of sorted rows.
-     */
-    SortableShaderList.prototype.updateShadersList =
-        function updateShadersList(contents) {
-            var tp = this,
-                oldRows = helpers.collectionToArray(
-                    tp.shadersTable.querySelectorAll('tr')
-                ),
-                tbody = tp.shadersTable.querySelector('tbody');
-
-            // remove old rows except first one (header).
-            oldRows.shift();
-            oldRows.forEach(function (elem) {
-                elem.remove();
-            });
-
-            contents.forEach(function (elem) {
-                tbody.appendChild(elem);
-            });
-        };
 
     function TilesView() {
         this.init();
@@ -186,7 +111,8 @@
                         id: link.replace('/view/', ''),
                         link: link,
                         title: linkElement.textContent,
-                        status: tr.lastElementChild.previousElementSibling
+                        status: tr.lastElementChild
+                            .previousElementSibling
                             .textContent.replace(/(\s+|\+)/g, '').toLowerCase()
                     }, this);
                 }, this);
@@ -212,8 +138,9 @@
             replace(
                 '{shaderTitle}', this.shader.title
             );
-            this.tilesView.tilesWrapper.querySelector('.' + this.shader.status)
-                .appendChild(li);
+
+        this.tilesView.tilesWrapper.querySelector('.' + this.shader.status)
+            .appendChild(li);
     };
 
     /**

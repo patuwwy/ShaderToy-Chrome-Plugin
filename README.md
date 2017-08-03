@@ -14,9 +14,11 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 * Four sliders simulating mouse position with the same range.
   This can be used to tweaking variables with iMouse.xyzw uniform.
 
-* Switchable dark color theme. (feature removed)
+* ~~Switchable dark color theme.~~
+(feature removed - implemented natively in Shadertoy)
 
-* Sorting shaders list by views, likes or comments on "My profile" page.
+* ~~Sorting shaders list by views, likes or comments on "My profile" page.~~
+(feature removed - implemented natively in Shadertoy)
 
 * Alternative shaders list on profile page.
 
@@ -51,10 +53,15 @@ Alternative shader list
 Preview images on profile page with detail overlay on mouse hover
 
 ![](./screenshots/screen2.jpg)
-Fullscreen edit (dark theme)
+Fullscreen edit ~~(dark theme)~~
 
 
 ## ShaderToy extension changelog:
+
+* 0.8.4 (04-08-2017)
+Rewind/Forward with arrow keys when shader is active.
+Removed shaders sorting on Profile page (Sorting is provided natively in ShaderToy now).
+Minor fixes.
 
 * 0.8.3
 On/Off record with CTRL + SHIFT + R (for fullscreen).
