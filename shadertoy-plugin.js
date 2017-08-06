@@ -74,6 +74,16 @@
         //this.switchToDarkTheme();
     };
 
+    ToyPlugCommon.prototype.downloadJson = function downloadJson(filename, data) {
+        var blob = new Blob([data], {type: 'application/json'});
+        var a = window.document.createElement('a');
+        a.href = window.URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
+
     /**
      * Provides additional functionality to Shadertoy's edit page.
      *
@@ -121,6 +131,8 @@
         this.timebar = new Timebar();
         this.mouseUniforms = new MouseUniforms();
         this.duplicateShader();
+        this.uploadShader();
+        this.downloadShader();
     };
 
     /**
@@ -314,6 +326,74 @@
                         document.getElementById('published').value = "0";
                         window.openSubmitShaderForm(false);
                     }
+            });
+        }
+    };
+
+    ToyPlugEditPage.prototype.downloadShader = function downloadShader() {
+        var container = document.getElementById('shaderPublished'),
+            download = document.createElement('div');
+
+        if (container) {
+            download.classList.add('formButton');
+            download.style.marginLeft = '12px';
+            download.style.float = 'right';
+            download.style.width = '60px';
+            download.style.minWidth = '60px';
+            download.style.display = 'inline-block';
+            download.textContent = 'Export';
+
+            container.appendChild(download);
+            download.addEventListener('click', function onDownloadButtonClick() {
+                var name = gShaderToy.mInfo.id;
+                if (name == '-1') name = 'default';
+                window.ToyPlug.common.downloadJson(name + '.json', JSON.stringify(gShaderToy.exportToJSON()));
+            });
+        }
+    };
+
+    ToyPlugEditPage.prototype.uploadShader = function downloadShader() {
+        var container = document.getElementById('shaderPublished'),
+            upload = document.createElement('div');
+
+        if (container) {
+            upload.classList.add('formButton');
+            upload.style.marginLeft = '12px';
+            upload.style.float = 'right';
+            upload.style.width = '60px';
+            upload.style.minWidth = '60px';
+            upload.style.display = 'inline-block';
+            upload.textContent = 'Import';
+            container.appendChild(upload);
+
+            upload.addEventListener('click', function() {
+
+                var fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.addEventListener('change', function() {
+                    var file = this.files[0];
+                    var reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        var text = reader.result;
+                        try
+                        {
+                            dataLoadShader(JSON.parse('[' + text + ']'));
+                        }
+                        catch(e)
+                        {
+                            alert("Failed to load shader!");
+                            console.log(e);
+                        }
+                        gShaderToy.mInfo.id = "-1";
+                    }
+
+                    reader.readAsText(file);
+                });
+
+                container.appendChild(fileInput);
+                fileInput.click();
+                container.removeChild(fileInput);
             });
         }
     };

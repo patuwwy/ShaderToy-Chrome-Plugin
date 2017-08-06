@@ -144,6 +144,110 @@
     };
 
     /**
+     * Download button to download all shaders from the profile page
+     */
+    function ShaderDownload() {
+        this.downloadCaption = 'DOWNLOAD ALL SHADERS';
+        this.loadingCaption = 'LOADING ';
+        this.loading = false;
+        this.button = null;
+        this.numShaders = 0;
+        this.downloadQueue = [];
+        this.downloadResults = [];
+        this.createHTML();
+    }
+
+    ShaderDownload.prototype.createHTML = function() {
+        var me = this;
+        var section = document.getElementById('userData');
+        me.button = document.createElement('div');
+        me.button.className = 'formButtonSmall';
+        me.button.style.width = '200px';
+        me.button.style.marginTop = '10px';
+        me.button.innerHTML = me.downloadCaption;
+
+        this.button.onclick = function(e) {
+            if (me.loading)
+            {
+                alert('Please wait while we are processing your request!');
+                return;
+            }
+
+            this.innerHTML = me.loadingCaption;
+            var ids = helpers.collectionToArray(document.querySelectorAll('#divShaders tr + tr'))
+                .map(function(tr) {
+                    var linkElement = tr.querySelector('a'),
+                        link = linkElement.getAttribute('href');
+                    return link.replace('/view/', '');
+                }, this);
+
+            me.numShaders = ids.length;
+
+            if (ids.length > 0)
+            {
+                me.loading = true;
+                me.downloadQueue = [];
+                me.downloadResults = [];
+                var numRequests = Math.ceil(ids.length / 8);
+                for(var i = 0; i < numRequests; i++) me.downloadQueue.push(ids.slice(i*8, (i+1)*8));
+                me.processQueue();
+            }
+            else
+            {
+                this.innerHTML = me.downloadCaption;
+                alert('No shaders found!');
+            }
+        };
+        section.appendChild(me.button);
+    };
+
+    ShaderDownload.prototype.processQueue = function () {
+        var me = this;
+        var request = me.downloadQueue.shift();
+        me.button.innerHTML = me.loadingCaption + ' ' + me.downloadResults.length + '/' + me.numShaders;
+
+        try
+        {
+            var httpReq = new XMLHttpRequest();
+            httpReq.addEventListener('load', function (event) {
+                var json = event.target.response;
+
+                if (json === null) {
+                    alert('Error loading shader');
+                    return;
+                };
+
+                me.downloadResults = me.downloadResults.concat(json);
+
+                if (me.downloadQueue.length > 0) {
+                    me.processQueue();
+                }
+                else
+                {
+                    me.loading = false;
+                    me.button.innerHTML = me.downloadCaption;
+                    window.ToyPlug.common.downloadJson(me.downloadResults[0].info.username + '.json', JSON.stringify(me.downloadResults));
+                }
+            }, false );
+
+            httpReq.addEventListener('error', function() {
+                alert('Error loading shader');
+            }, false);
+
+            httpReq.open('POST', '/shadertoy', true);
+            httpReq.responseType = 'json';
+            httpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            var str = '{ "shaders" : ["'+ request.join('","') +'"] }';
+            str = 's=' + encodeURIComponent( str );
+            httpReq.send(str);
+        }
+        catch(e)
+        {
+            return;
+        }
+    };
+
+    /**
      * Provides additional functionality to ShaderToy's profile page view.
      *
      * @contructor
@@ -152,6 +256,7 @@
         helpers = new Helpers({});
         this.sortableShaderList = new SortableShaderList();
         if (window.alternateProfile) this.tilesView = new TilesView();
+        this.shaderDownload = new ShaderDownload();
     }
 
     /**
