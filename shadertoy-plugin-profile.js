@@ -143,17 +143,17 @@
             .appendChild(li);
     };
 
-	/**
-	 * Download button to download all shaders from the profile page
-	 */
+    /**
+     * Download button to download all shaders from the profile page
+     */
     function ShaderDownload() {
         this.downloadCaption = 'DOWNLOAD ALL SHADERS';
         this.loadingCaption = 'LOADING ';
         this.loading = false;
         this.button = null;
         this.numShaders = 0;
-		this.downloadQueue = [];
-		this.downloadResults = [];
+        this.downloadQueue = [];
+        this.downloadResults = [];
         this.createHTML();
     }
 
@@ -202,51 +202,51 @@
     };
 
     ShaderDownload.prototype.processQueue = function () {
-		var me = this;
-		var request = me.downloadQueue.shift();
+        var me = this;
+        var request = me.downloadQueue.shift();
         me.button.innerHTML = me.loadingCaption + ' ' + me.downloadResults.length + '/' + me.numShaders;
 
-		try
-		{
-			var httpReq = new XMLHttpRequest();
-			httpReq.addEventListener('load', function (event) {
-				var json = event.target.response;
+        try
+        {
+            var httpReq = new XMLHttpRequest();
+            httpReq.addEventListener('load', function (event) {
+                var json = event.target.response;
 
-				if (json === null) {
+                if (json === null) {
                     alert('Error loading shader');
                     return;
                 };
 
-				me.downloadResults = me.downloadResults.concat(json);
+                me.downloadResults = me.downloadResults.concat(json);
 
-				if (me.downloadQueue.length > 0) {
+                if (me.downloadQueue.length > 0) {
                     me.processQueue();
                 }
-				else
+                else
                 {
                     me.loading = false;
-					me.button.innerHTML = me.downloadCaption;
-					window.ToyPlug.common.downloadJson(me.downloadResults[0].info.username + '.json', JSON.stringify(me.downloadResults));
-				}
-			}, false );
-			
-			httpReq.addEventListener('error', function() {
+                    me.button.innerHTML = me.downloadCaption;
+                    window.ToyPlug.common.downloadJson(me.downloadResults[0].info.username + '.json', JSON.stringify(me.downloadResults));
+                }
+            }, false );
+
+            httpReq.addEventListener('error', function() {
                 alert('Error loading shader');
             }, false);
 
-			httpReq.open('POST', '/shadertoy', true);
-			httpReq.responseType = 'json';
-			httpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-			var str = '{ "shaders" : ["'+ request.join('","') +'"] }';
-			str = 's=' + encodeURIComponent( str );
-			httpReq.send(str);
-		}
-		catch(e)
-		{
-			return;
-		}
-	};
-	
+            httpReq.open('POST', '/shadertoy', true);
+            httpReq.responseType = 'json';
+            httpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            var str = '{ "shaders" : ["'+ request.join('","') +'"] }';
+            str = 's=' + encodeURIComponent( str );
+            httpReq.send(str);
+        }
+        catch(e)
+        {
+            return;
+        }
+    };
+
     /**
      * Provides additional functionality to ShaderToy's profile page view.
      *

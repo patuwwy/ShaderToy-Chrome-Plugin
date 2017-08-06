@@ -73,16 +73,16 @@
     ToyPlugCommon.prototype.init = function init() {
         //this.switchToDarkTheme();
     };
-	
-	ToyPlugCommon.prototype.downloadJson = function downloadJson(filename, data) {
-		var blob = new Blob([data], {type: 'application/json'});
+
+    ToyPlugCommon.prototype.downloadJson = function downloadJson(filename, data) {
+        var blob = new Blob([data], {type: 'application/json'});
         var a = window.document.createElement('a');
         a.href = window.URL.createObjectURL(blob);
         a.download = filename;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-	};
+    };
 
     /**
      * Provides additional functionality to Shadertoy's edit page.
@@ -132,7 +132,7 @@
         this.mouseUniforms = new MouseUniforms();
         this.duplicateShader();
         this.uploadShader();
-		this.downloadShader();
+        this.downloadShader();
     };
 
     /**
@@ -330,7 +330,7 @@
         }
     };
 
-	ToyPlugEditPage.prototype.downloadShader = function downloadShader() {
+    ToyPlugEditPage.prototype.downloadShader = function downloadShader() {
         var container = document.getElementById('shaderPublished'),
             download = document.createElement('div');
 
@@ -347,12 +347,12 @@
             download.addEventListener('click', function onDownloadButtonClick() {
                 var name = gShaderToy.mInfo.id;
                 if (name == '-1') name = 'default';
-				window.ToyPlug.common.downloadJson(name + '.json', JSON.stringify(gShaderToy.exportToJSON()));
+                window.ToyPlug.common.downloadJson(name + '.json', JSON.stringify(gShaderToy.exportToJSON()));
             });
         }
     };
 
-	ToyPlugEditPage.prototype.uploadShader = function downloadShader() {
+    ToyPlugEditPage.prototype.uploadShader = function downloadShader() {
         var container = document.getElementById('shaderPublished'),
             upload = document.createElement('div');
 
@@ -389,7 +389,7 @@
             });
         }
     };
-	
+
     /**
      * Provides timebar functionality.
      *
