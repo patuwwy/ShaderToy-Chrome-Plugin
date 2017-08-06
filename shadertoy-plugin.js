@@ -344,9 +344,9 @@
             download.textContent = 'Export';
 
             container.appendChild(download);
-            download.addEventListener('click', function() {
+            download.addEventListener('click', function onDownloadButtonClick() {
                 var name = gShaderToy.mInfo.id;
-                if (name == "-1") name = "default";
+                if (name == '-1') name = 'default';
 				window.ToyPlug.common.downloadJson(name + '.json', JSON.stringify(gShaderToy.exportToJSON()));
             });
         }
