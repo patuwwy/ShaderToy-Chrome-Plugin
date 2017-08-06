@@ -73,6 +73,21 @@
     ToyPlugCommon.prototype.init = function init() {
         //this.switchToDarkTheme();
     };
+	
+	ToyPlugCommon.prototype.downloadJson = function downloadFile(filename, data) {
+		var blob = new Blob([data], {type: 'application/json'});
+		if(window.navigator.msSaveOrOpenBlob) {
+			window.navigator.msSaveBlob(blob, filename);
+		}
+		else{
+			var elem = window.document.createElement('a');
+			elem.href = window.URL.createObjectURL(blob);
+			elem.download = filename;        
+			document.body.appendChild(elem);
+			elem.click();        
+			document.body.removeChild(elem);
+		}
+	};
 
     /**
      * Provides additional functionality to Shadertoy's edit page.
@@ -121,6 +136,7 @@
         this.timebar = new Timebar();
         this.mouseUniforms = new MouseUniforms();
         this.duplicateShader();
+		this.downloadShader();
     };
 
     /**
@@ -318,6 +334,23 @@
         }
     };
 
+	ToyPlugEditPage.prototype.downloadShader = function downloadShader() {
+        var publishWrapper = document.getElementById('shaderPublished'),
+            download = document.createElement('div');
+
+        if (publishWrapper) {
+            download.classList.add('formButton');
+            download.style.marginLeft = "12px";
+            download.style.display = "inline-block";
+            download.textContent = 'Download';
+
+            publishWrapper.appendChild(download);
+            download.addEventListener('click', function() {			
+				window.ToyPlug.common.downloadJson(gShaderToy.mInfo.id + '.json', JSON.stringify(gShaderToy.exportToJSON()));
+            });
+        }
+    };
+	
     /**
      * Provides timebar functionality.
      *

@@ -21,6 +21,9 @@
             '</ul>',
 
         contentWrapper = null,
+		
+		downloadQueue = [],
+		downloadResults = [],
 
         /**
          * Stores Helpers instance.
@@ -143,6 +146,73 @@
             .appendChild(li);
     };
 
+	/**
+	 * Add download button to download all shaders
+	 */
+	 function createDownloadButton()
+	 {
+		var section = document.getElementById('userData');
+		var btn = document.createElement('div');
+		btn.className = 'formButtonSmall';
+		btn.setAttribute("id","downloadButton");
+		btn.setAttribute("style","width:200px; margin-top:10px;"); // had this in css but it did not seem to work
+		btn.innerHTML = "DOWNLOAD ALL SHADERS";		
+		btn.onclick = function(e){
+			if (this.innerHTML == "LOADING ...") return;			
+			this.innerHTML = "LOADING ...";
+			var ids = helpers.collectionToArray(document.querySelectorAll('#divShaders tr + tr'))
+                .map(function(tr) {
+                    var linkElement = tr.querySelector('a'),
+                        link = linkElement.getAttribute('href');
+					return link.replace('/view/', '');
+                }, this);
+		
+			var numRequests = Math.ceil(ids.length / 8);
+			downloadQueue = [];
+			downloadResults = [];
+			for(var i = 0; i < numRequests; i++) downloadQueue.push(ids.slice(i*8, (i+1)*8));
+			processDownloadQueue(downloadQueue);			
+		};
+		section.appendChild(btn);		
+	 }
+	 
+	function processDownloadQueue()
+	{
+		var request = downloadQueue.shift();
+		
+		//console.log(requests);
+		try
+		{
+			var httpReq = new XMLHttpRequest();
+			httpReq.addEventListener('load', function (event) 
+			{ 
+				var jsnShader = event.target.response;
+				if( jsnShader===null ) { alert( "Error loading shader" ); return; };
+				downloadResults = downloadResults.concat(jsnShader);
+				if (downloadQueue.length > 0) processDownloadQueue();
+				else 
+				{
+					document.getElementById("downloadButton").innerHTML = "DOWNLOAD ALL SHADERS";
+					window.ToyPlug.common.downloadJson('shaders.json', JSON.stringify(downloadResults));
+				}
+			}, false );
+			
+			httpReq.addEventListener( 'error', function () { alert( "Error loading shader" ); }, false );
+
+			httpReq.open( "POST", "/shadertoy", true );
+			httpReq.responseType = "json";
+			httpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			var str = "{ \"shaders\" : [\""+ request.join("\",\"") +"\"] }";
+			str = "s=" + encodeURIComponent( str );
+			httpReq.send(str);
+		}
+		catch(e)
+		{
+			return;
+		}
+	
+	}
+	
     /**
      * Provides additional functionality to ShaderToy's profile page view.
      *
@@ -152,6 +222,7 @@
         helpers = new Helpers({});
         this.sortableShaderList = new SortableShaderList();
         if (window.alternateProfile) this.tilesView = new TilesView();
+		createDownloadButton();		
     }
 
     /**
