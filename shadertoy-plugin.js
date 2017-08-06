@@ -376,7 +376,15 @@
 
                     reader.onload = function(e) {
                         var text = reader.result;
-                        dataLoadShader(JSON.parse('[' + text + ']'));
+                        try
+                        {
+                            dataLoadShader(JSON.parse('[' + text + ']'));
+                        }
+                        catch(e)
+                        {
+                            alert("Failed to load shader!");
+                            console.log(e);
+                        }
                         gShaderToy.mInfo.id = "-1";
                     }
 
