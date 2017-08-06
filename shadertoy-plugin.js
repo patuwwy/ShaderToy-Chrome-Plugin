@@ -74,7 +74,7 @@
         //this.switchToDarkTheme();
     };
 	
-	ToyPlugCommon.prototype.downloadJson = function downloadFile(filename, data) {
+	ToyPlugCommon.prototype.downloadJson = function downloadJson(filename, data) {
 		var blob = new Blob([data], {type: 'application/json'});
 		if(window.navigator.msSaveOrOpenBlob) {
 			window.navigator.msSaveBlob(blob, filename);

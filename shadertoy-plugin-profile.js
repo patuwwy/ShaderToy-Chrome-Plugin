@@ -21,9 +21,6 @@
             '</ul>',
 
         contentWrapper = null,
-		
-		downloadQueue = [],
-		downloadResults = [],
 
         /**
          * Stores Helpers instance.
@@ -147,40 +144,49 @@
     };
 
 	/**
-	 * Add download button to download all shaders
+	 * Download button to download all shaders from the profile page
 	 */
-	 function createDownloadButton()
-	 {
-		var section = document.getElementById('userData');
-		var btn = document.createElement('div');
-		btn.className = 'formButtonSmall';
-		btn.setAttribute("id","downloadButton");
-		btn.setAttribute("style","width:200px; margin-top:10px;"); // had this in css but it did not seem to work
-		btn.innerHTML = "DOWNLOAD ALL SHADERS";		
-		btn.onclick = function(e){
-			if (this.innerHTML == "LOADING ...") return;			
-			this.innerHTML = "LOADING ...";
-			var ids = helpers.collectionToArray(document.querySelectorAll('#divShaders tr + tr'))
+    function ShaderDownload() {
+        this.downloadCaption = "DOWNLOAD ALL SHADERS";
+        this.loadingCaption = "LOADING ...";
+		this.downloadQueue = [];
+		this.downloadResults = [];
+        this.createHTML();
+    }
+
+    ShaderDownload.prototype.createHTML = function() {
+        var me = this;
+        var section = document.getElementById('userData');
+        var btn = document.createElement('div');
+        btn.className = 'formButtonSmall';
+        btn.setAttribute("id", "downloadButton");
+        btn.style.width = "200px";
+        btn.style.marginTop = "10px";
+        btn.innerHTML = this.downloadCaption;
+
+        btn.onclick = function(e){
+            if (this.innerHTML == me.loadingCaption) return;
+            this.innerHTML = me.loadingCaption;
+            var ids = helpers.collectionToArray(document.querySelectorAll('#divShaders tr + tr'))
                 .map(function(tr) {
                     var linkElement = tr.querySelector('a'),
                         link = linkElement.getAttribute('href');
-					return link.replace('/view/', '');
+                    return link.replace('/view/', '');
                 }, this);
-		
-			var numRequests = Math.ceil(ids.length / 8);
-			downloadQueue = [];
-			downloadResults = [];
-			for(var i = 0; i < numRequests; i++) downloadQueue.push(ids.slice(i*8, (i+1)*8));
-			processDownloadQueue(downloadQueue);			
-		};
-		section.appendChild(btn);		
-	 }
-	 
-	function processDownloadQueue()
-	{
-		var request = downloadQueue.shift();
-		
-		//console.log(requests);
+
+            me.downloadQueue = [];
+            me.downloadResults = [];
+            var numRequests = Math.ceil(ids.length / 8);
+            for(var i = 0; i < numRequests; i++) me.downloadQueue.push(ids.slice(i*8, (i+1)*8));
+            me.processQueue();
+        };
+        section.appendChild(btn);
+    };
+
+    ShaderDownload.prototype.processQueue = function () {
+		var request = this.downloadQueue.shift();
+		var me = this;
+
 		try
 		{
 			var httpReq = new XMLHttpRequest();
@@ -188,12 +194,12 @@
 			{ 
 				var jsnShader = event.target.response;
 				if( jsnShader===null ) { alert( "Error loading shader" ); return; };
-				downloadResults = downloadResults.concat(jsnShader);
-				if (downloadQueue.length > 0) processDownloadQueue();
+				me.downloadResults = me.downloadResults.concat(jsnShader);
+				if (me.downloadQueue.length > 0) me.processQueue();
 				else 
 				{
-					document.getElementById("downloadButton").innerHTML = "DOWNLOAD ALL SHADERS";
-					window.ToyPlug.common.downloadJson('shaders.json', JSON.stringify(downloadResults));
+					document.getElementById("downloadButton").innerHTML = me.downloadCaption;
+					window.ToyPlug.common.downloadJson('shaders.json', JSON.stringify(me.downloadResults));
 				}
 			}, false );
 			
@@ -210,8 +216,7 @@
 		{
 			return;
 		}
-	
-	}
+	};
 	
     /**
      * Provides additional functionality to ShaderToy's profile page view.
@@ -222,7 +227,7 @@
         helpers = new Helpers({});
         this.sortableShaderList = new SortableShaderList();
         if (window.alternateProfile) this.tilesView = new TilesView();
-		createDownloadButton();		
+        this.shaderDownload = new ShaderDownload();
     }
 
     /**
