@@ -42,6 +42,8 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 * Cloning own shaders with one click!
 
+* Downloading single/all shaders (json)
+
 ## Screenshots
 
 ![](./screenshots/screen3.jpg)

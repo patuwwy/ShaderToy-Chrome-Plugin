@@ -137,6 +137,7 @@
         this.mouseUniforms = new MouseUniforms();
         this.duplicateShader();
 		this.downloadShader();
+        //this.uploadShader();
     };
 
     /**
@@ -335,18 +336,40 @@
     };
 
 	ToyPlugEditPage.prototype.downloadShader = function downloadShader() {
-        var publishWrapper = document.getElementById('shaderPublished'),
+        var container = document.getElementById('shaderPublished'),
             download = document.createElement('div');
 
-        if (publishWrapper) {
+        if (container) {
             download.classList.add('formButton');
             download.style.marginLeft = "12px";
             download.style.display = "inline-block";
             download.textContent = 'Download';
 
-            publishWrapper.appendChild(download);
-            download.addEventListener('click', function() {			
-				window.ToyPlug.common.downloadJson(gShaderToy.mInfo.id + '.json', JSON.stringify(gShaderToy.exportToJSON()));
+            container.appendChild(download);
+            download.addEventListener('click', function() {
+                var name = gShaderToy.mInfo.id;
+                if (name == "-1") name = "default";
+				window.ToyPlug.common.downloadJson(name + '.json', JSON.stringify(gShaderToy.exportToJSON()));
+            });
+        }
+    };
+
+	ToyPlugEditPage.prototype.uploadShader = function downloadShader() {
+        var container = document.getElementById('shaderPublished'),
+            upload = document.createElement('div');
+
+        if (container) {
+            upload.classList.add('formButton');
+            upload.style.marginLeft = "12px";
+            upload.style.width = "60px";
+            upload.style.minWidth = "60px";
+            upload.style.display = "inline-block";
+            upload.textContent = 'Import';
+
+            container.appendChild(upload);
+            upload.addEventListener('click', function() {
+
+				console.log("import clicked");
             });
         }
     };

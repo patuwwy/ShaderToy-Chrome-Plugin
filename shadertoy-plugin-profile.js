@@ -160,11 +160,11 @@
     ShaderDownload.prototype.createHTML = function() {
         var me = this;
         var section = document.getElementById('userData');
-        this.button = document.createElement('div');
-        this.button.className = 'formButtonSmall';
-        this.button.style.width = "200px";
-        this.button.style.marginTop = "10px";
-        this.button.innerHTML = this.downloadCaption;
+        me.button = document.createElement('div');
+        me.button.className = 'formButtonSmall';
+        me.button.style.width = "200px";
+        me.button.style.marginTop = "10px";
+        me.button.innerHTML = me.downloadCaption;
 
         this.button.onclick = function(e) {
             if (me.loading)
@@ -198,12 +198,12 @@
                 alert("No shaders found!");
             }
         };
-        section.appendChild(this.button);
+        section.appendChild(me.button);
     };
 
     ShaderDownload.prototype.processQueue = function () {
-		var request = this.downloadQueue.shift();
 		var me = this;
+		var request = me.downloadQueue.shift();
         me.button.innerHTML = me.loadingCaption + " " + me.downloadResults.length + "/" + me.numShaders;
 
 		try
@@ -219,7 +219,6 @@
 				{
                     me.loading = false;
 					me.button.innerHTML = me.downloadCaption;
-
 					window.ToyPlug.common.downloadJson(me.downloadResults[0].info.username + '.json', JSON.stringify(me.downloadResults));
 				}
 			}, false );
