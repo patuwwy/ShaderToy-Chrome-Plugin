@@ -76,17 +76,12 @@
 	
 	ToyPlugCommon.prototype.downloadJson = function downloadJson(filename, data) {
 		var blob = new Blob([data], {type: 'application/json'});
-		if(window.navigator.msSaveOrOpenBlob) {
-			window.navigator.msSaveBlob(blob, filename);
-		}
-		else{
-			var elem = window.document.createElement('a');
-			elem.href = window.URL.createObjectURL(blob);
-			elem.download = filename;        
-			document.body.appendChild(elem);
-			elem.click();        
-			document.body.removeChild(elem);
-		}
+        var a = window.document.createElement('a');
+        a.href = window.URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
 	};
 
     /**
@@ -136,8 +131,8 @@
         this.timebar = new Timebar();
         this.mouseUniforms = new MouseUniforms();
         this.duplicateShader();
+        this.uploadShader();
 		this.downloadShader();
-        //this.uploadShader();
     };
 
     /**
@@ -341,9 +336,12 @@
 
         if (container) {
             download.classList.add('formButton');
-            download.style.marginLeft = "12px";
-            download.style.display = "inline-block";
-            download.textContent = 'Download';
+            download.style.marginLeft = '12px';
+            download.style.float = 'right';
+            download.style.width = '60px';
+            download.style.minWidth = '60px';
+            download.style.display = 'inline-block';
+            download.textContent = 'Export';
 
             container.appendChild(download);
             download.addEventListener('click', function() {
@@ -360,16 +358,34 @@
 
         if (container) {
             upload.classList.add('formButton');
-            upload.style.marginLeft = "12px";
-            upload.style.width = "60px";
-            upload.style.minWidth = "60px";
-            upload.style.display = "inline-block";
+            upload.style.marginLeft = '12px';
+            upload.style.float = 'right';
+            upload.style.width = '60px';
+            upload.style.minWidth = '60px';
+            upload.style.display = 'inline-block';
             upload.textContent = 'Import';
-
             container.appendChild(upload);
+
             upload.addEventListener('click', function() {
 
-				console.log("import clicked");
+                var fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.addEventListener('change', function() {
+                    var file = this.files[0];
+                    var reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        var text = reader.result;
+                        dataLoadShader(JSON.parse('[' + text + ']'));
+                        gShaderToy.mInfo.id = "-1";
+                    }
+
+                    reader.readAsText(file);
+                });
+
+                container.appendChild(fileInput);
+                fileInput.click();
+                container.removeChild(fileInput);
             });
         }
     };

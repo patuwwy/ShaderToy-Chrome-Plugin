@@ -147,8 +147,8 @@
 	 * Download button to download all shaders from the profile page
 	 */
     function ShaderDownload() {
-        this.downloadCaption = "DOWNLOAD ALL SHADERS";
-        this.loadingCaption = "LOADING ";
+        this.downloadCaption = 'DOWNLOAD ALL SHADERS';
+        this.loadingCaption = 'LOADING ';
         this.loading = false;
         this.button = null;
         this.numShaders = 0;
@@ -162,14 +162,14 @@
         var section = document.getElementById('userData');
         me.button = document.createElement('div');
         me.button.className = 'formButtonSmall';
-        me.button.style.width = "200px";
-        me.button.style.marginTop = "10px";
+        me.button.style.width = '200px';
+        me.button.style.marginTop = '10px';
         me.button.innerHTML = me.downloadCaption;
 
         this.button.onclick = function(e) {
             if (me.loading)
             {
-                alert("Please wait while we are processing your request!");
+                alert('Please wait while we are processing your request!');
                 return;
             }
 
@@ -195,7 +195,7 @@
             else
             {
                 this.innerHTML = me.downloadCaption;
-                alert("No shaders found!");
+                alert('No shaders found!');
             }
         };
         section.appendChild(me.button);
@@ -204,32 +204,41 @@
     ShaderDownload.prototype.processQueue = function () {
 		var me = this;
 		var request = me.downloadQueue.shift();
-        me.button.innerHTML = me.loadingCaption + " " + me.downloadResults.length + "/" + me.numShaders;
+        me.button.innerHTML = me.loadingCaption + ' ' + me.downloadResults.length + '/' + me.numShaders;
 
 		try
 		{
 			var httpReq = new XMLHttpRequest();
-			httpReq.addEventListener('load', function (event) 
-			{ 
-				var jsnShader = event.target.response;
-				if( jsnShader===null ) { alert( "Error loading shader" ); return; };
-				me.downloadResults = me.downloadResults.concat(jsnShader);
-				if (me.downloadQueue.length > 0) me.processQueue();
+			httpReq.addEventListener('load', function (event) {
+				var json = event.target.response;
+
+				if (json === null) {
+                    alert('Error loading shader');
+                    return;
+                };
+
+				me.downloadResults = me.downloadResults.concat(json);
+
+				if (me.downloadQueue.length > 0) {
+                    me.processQueue();
+                }
 				else
-				{
+                {
                     me.loading = false;
 					me.button.innerHTML = me.downloadCaption;
 					window.ToyPlug.common.downloadJson(me.downloadResults[0].info.username + '.json', JSON.stringify(me.downloadResults));
 				}
 			}, false );
 			
-			httpReq.addEventListener( 'error', function () { alert( "Error loading shader" ); }, false );
+			httpReq.addEventListener('error', function() {
+                alert('Error loading shader');
+            }, false);
 
-			httpReq.open( "POST", "/shadertoy", true );
-			httpReq.responseType = "json";
+			httpReq.open('POST', '/shadertoy', true);
+			httpReq.responseType = 'json';
 			httpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-			var str = "{ \"shaders\" : [\""+ request.join("\",\"") +"\"] }";
-			str = "s=" + encodeURIComponent( str );
+			var str = '{ "shaders" : ["'+ request.join('","') +'"] }';
+			str = 's=' + encodeURIComponent( str );
 			httpReq.send(str);
 		}
 		catch(e)
