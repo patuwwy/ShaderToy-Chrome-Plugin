@@ -148,7 +148,10 @@
 	 */
     function ShaderDownload() {
         this.downloadCaption = "DOWNLOAD ALL SHADERS";
-        this.loadingCaption = "LOADING ...";
+        this.loadingCaption = "LOADING ";
+        this.loading = false;
+        this.button = null;
+        this.numShaders = 0;
 		this.downloadQueue = [];
 		this.downloadResults = [];
         this.createHTML();
@@ -157,15 +160,19 @@
     ShaderDownload.prototype.createHTML = function() {
         var me = this;
         var section = document.getElementById('userData');
-        var btn = document.createElement('div');
-        btn.className = 'formButtonSmall';
-        btn.setAttribute("id", "downloadButton");
-        btn.style.width = "200px";
-        btn.style.marginTop = "10px";
-        btn.innerHTML = this.downloadCaption;
+        this.button = document.createElement('div');
+        this.button.className = 'formButtonSmall';
+        this.button.style.width = "200px";
+        this.button.style.marginTop = "10px";
+        this.button.innerHTML = this.downloadCaption;
 
-        btn.onclick = function(e){
-            if (this.innerHTML == me.loadingCaption) return;
+        this.button.onclick = function(e) {
+            if (me.loading)
+            {
+                alert("Please wait while we are processing your request!");
+                return;
+            }
+
             this.innerHTML = me.loadingCaption;
             var ids = helpers.collectionToArray(document.querySelectorAll('#divShaders tr + tr'))
                 .map(function(tr) {
@@ -174,18 +181,30 @@
                     return link.replace('/view/', '');
                 }, this);
 
-            me.downloadQueue = [];
-            me.downloadResults = [];
-            var numRequests = Math.ceil(ids.length / 8);
-            for(var i = 0; i < numRequests; i++) me.downloadQueue.push(ids.slice(i*8, (i+1)*8));
-            me.processQueue();
+            me.numShaders = ids.length;
+
+            if (ids.length > 0)
+            {
+                me.loading = true;
+                me.downloadQueue = [];
+                me.downloadResults = [];
+                var numRequests = Math.ceil(ids.length / 8);
+                for(var i = 0; i < numRequests; i++) me.downloadQueue.push(ids.slice(i*8, (i+1)*8));
+                me.processQueue();
+            }
+            else
+            {
+                this.innerHTML = me.downloadCaption;
+                alert("No shaders found!");
+            }
         };
-        section.appendChild(btn);
+        section.appendChild(this.button);
     };
 
     ShaderDownload.prototype.processQueue = function () {
 		var request = this.downloadQueue.shift();
 		var me = this;
+        me.button.innerHTML = me.loadingCaption + " " + me.downloadResults.length + "/" + me.numShaders;
 
 		try
 		{
@@ -196,10 +215,12 @@
 				if( jsnShader===null ) { alert( "Error loading shader" ); return; };
 				me.downloadResults = me.downloadResults.concat(jsnShader);
 				if (me.downloadQueue.length > 0) me.processQueue();
-				else 
+				else
 				{
-					document.getElementById("downloadButton").innerHTML = me.downloadCaption;
-					window.ToyPlug.common.downloadJson('shaders.json', JSON.stringify(me.downloadResults));
+                    me.loading = false;
+					me.button.innerHTML = me.downloadCaption;
+
+					window.ToyPlug.common.downloadJson(me.downloadResults[0].info.username + '.json', JSON.stringify(me.downloadResults));
 				}
 			}, false );
 			
