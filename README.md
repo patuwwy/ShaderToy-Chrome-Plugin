@@ -60,6 +60,13 @@ Fullscreen edit ~~(dark theme)~~
 
 ## ShaderToy extension changelog:
 
+* 0.9.0 (06-08-2017)
+Export/Import shader (JSON) by [movAX13h](http://blog.thrill-project.com/)
+Backup all user's shaders (JSON) by [movAX13h](http://blog.thrill-project.com/)
+Bigger shaders list on Profile page.
+Redirect to login page when user visit own profile but is not logged anymore.
+Code style clean up.
+
 * 0.8.4 (04-08-2017)
 Rewind/Forward with arrow keys when shader is active.
 Removed shaders sorting on Profile page (Sorting is provided natively in ShaderToy now).

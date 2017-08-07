@@ -66,7 +66,6 @@
                 }
 
                 if ('loopEnabled' in request.data) {
-
                     executeScriptOnPage(
                         'ToyPlug.editPage.timebar.loop = ' +
                             request.data.loopEnabled + ';'
@@ -89,7 +88,7 @@
     }
 
     /**
-     * Listen to extension variables change.
+     * Sets extension variables changes listener.
      */
     function bindStorageListener() {
         chrome.storage.onChanged.addListener(function(changes, namespace) {
@@ -159,7 +158,7 @@
     }
 
     /**
-     * Initialization.
+     * Initializes extension.
      */
     function init() {
         synchronizeChrome();

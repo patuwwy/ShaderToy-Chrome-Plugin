@@ -2,16 +2,27 @@
 
     'use strict';
 
+    /**
+     * Initializes Popup window.
+     *
+     * @constructor
+     */
     function Popup () {
         this.init();
     }
 
+    /**
+     * Calls initialization of sub modules.
+     */
     Popup.prototype.init = function init() {
         this.bindLoopInput();
         this.bindRenderModeSelect();
         this.bindAlternateProfileInput();
     };
 
+    /**
+     * Sets listener for render mode select element.
+     */
     Popup.prototype.bindRenderModeSelect = function bindSelect() {
         var i = document.querySelector('select');
 
@@ -22,6 +33,9 @@
         });
     };
 
+    /**
+     * Sets listener for loop mode select element.
+     */
     Popup.prototype.bindLoopInput = function bindSelect() {
         var i = document.getElementById('input-loop');
 
@@ -32,6 +46,9 @@
         });
     };
 
+    /**
+     * Sets listener for alternate profile page select element.
+     */
     Popup.prototype.bindAlternateProfileInput =
         function bindAlternateProfileInput() {
             var i = document.getElementById('input-alternate-profile');

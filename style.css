@@ -1,207 +1,221 @@
 body, a {
-	-webkit-transition: all .15s ease;
+    -webkit-transition: all .15s ease;
 }
 
 body, html {
-	min-height: 100vh;
+    min-height: 100vh;
 }
 
 .uiButton {
-	color: #aaa;
+    color: #aaa;
 }
 .fullscreen-edit .playerCanvas {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 9;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9;
 }
 
 .fullscreen-edit div#editorWrapper.noFullScreen {
-	position: fixed;
-	right: 2.5%;
-	top: 2.5%;
-	width: 40%;
-	height: 90%;
-	left: auto;
-	z-index: 10;
+    position: fixed;
+    right: 2.5%;
+    top: 2.5%;
+    width: 40%;
+    height: 90%;
+    left: auto;
+    z-index: 10;
 }
 
 .fullscreen-edit .cm-s-default.CodeMirror {
-	background: rgba(255,255,255,.4);
+    background: rgba(255,255,255,.4);
 }
 
 #userPicture {
-	background-size: 100%;
+    background-size: 100%;
 }
 
 .time-slider {
-	height: 32px;
-	margin: 5px 0;
+    height: 32px;
+    margin: 5px 0;
 }
 
 .time-slider:after {
-	clear: both;
-	display: block;
-	content: "";
-	float: none;
+    clear: both;
+    display: block;
+    content: "";
+    float: none;
 }
 
 .time-slider input {
-	float: left;
-	display: block;
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-	height: 24px;
-	line-height: 24px;
+    float: left;
+    display: block;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    height: 24px;
+    line-height: 24px;
 }
 
 .time-slider [type=number] {
-	width: 7%;
-	text-align: center;
-	background: transparent;
-	border: none;
-	color: #888;
+    width: 7%;
+    text-align: center;
+    background: transparent;
+    border: none;
+    color: #888;
 }
 
 .time-slider [type=range] {
-	width: 86%;
+    width: 86%;
 }
 
 .mouse-uniforms {
-	line-height: 24px;
-	margin-bottom: 20px;
+    line-height: 24px;
+    margin-bottom: 20px;
 }
 
 .mouse-uniforms input {
-	float: left;
-	display: block;
-	width: 40%
+    float: left;
+    display: block;
+    width: 40%
 }
 
 .mouse-uniforms:before {
-	content: "iMouse uniform";
-	display: block;
+    content: "iMouse uniform";
+    display: block;
 }
 
 .mouse-uniforms:after {
-	content: "";
-	display: block;
-	float: none;
-	clear: both;
+    content: "";
+    display: block;
+    float: none;
+    clear: both;
 }
 
 .mouse-uniforms span {
-	float: left;
-	display: block;
-	width: 9%;
-	height: 100%;
-	text-align: center;
-	color: #888;
+    float: left;
+    display: block;
+    width: 9%;
+    height: 100%;
+    text-align: center;
+    color: #888;
 }
 
 #divShaders a {
-	line-height: 22px;
-	position: relative;
+    line-height: 22px;
+    position: relative;
 }
 
 #divShaders img.small {
-	height: 22px;
-	margin-right: 5px;
-	float: left;
+    height: 22px;
+    margin-right: 5px;
+    float: left;
 }
 
 #divShaders .bigPreview {
-	opacity: 0;
-	pointer-events: none;
-	display: block;
-	right: 100%;
-	top: -180px;
-	height: 360px;
-	width: 640px;
-	margin-right: 60px;
-	position: fixed;
-	transition: opacity .15s ease;
-	z-index: 3;
-	box-shadow: 5px 5px 20px #000;
+    opacity: 0;
+    pointer-events: none;
+    display: block;
+    right: 100%;
+    top: -180px;
+    height: 360px;
+    width: 640px;
+    margin-right: 60px;
+    position: fixed;
+    transition: opacity .15s ease;
+    z-index: 3;
+    box-shadow: 5px 5px 20px #000;
+}
+
+@media screen and (max-width: 1439px) and (min-width: 1280px) {
+    #divShaders #divShadersTable {
+        height: auto;
+        overflow-y: auto;
+    }
+}
+
+@media screen and (max-width: 1919px) and (min-width: 1440px) {
+    #divShaders #divShadersTable {
+        height: auto;
+        overflow-y: auto;
+    }
 }
 
 #divShaders td:hover .bigPreview {
-	opacity: 1;
-	top: 15px;
-	right: 15px;
+    opacity: 1;
+    top: 15px;
+    right: 15px;
 }
 
 body.alternate-profile {
-	overflow: auto;
-	height: auto;
+    overflow: auto;
+    height: auto;
 }
 
 body.alternate-profile div#footer {
-	position: fixed;
+    position: fixed;
 }
 
 body.alternate-profile, body.alternate-profile div#contentScroll {
-	top: auto;
-	height: auto;
-	overflow: visible;
+    top: auto;
+    height: auto;
+    overflow: visible;
 }
 
 body.alternate-profile div#header {
-	position: fixed;
-	z-index: 3;
-	background: #000;
+    position: fixed;
+    z-index: 3;
+    background: #000;
 }
 
 .tiles-wrapper * {
-	box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 .tiles-wrapper {
-	padding: 50px 0 0;
+    padding: 50px 0 0;
 }
 
 .tiles-wrapper .status {
-	width: 100%;
+    width: 100%;
 }
 
 .tiles-wrapper ul {
-	padding: 0;
-	list-style: none;
-	display: flex;
-	flex-flow: row wrap;
-	justify-content: flex-start;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
 }
 
 .tiles-wrapper .shader {
-	width: 19.5%;
-	margin: 0 auto 30px;
+    width: 19.5%;
+    margin: 0 auto 30px;
 }
 
 .tiles-wrapper .shader-tile {
-	margin: 0 15px;
-	display: block;
-	position: relative;
+    margin: 0 15px;
+    display: block;
+    position: relative;
 }
 
 .tiles-wrapper .shader-tile .shader-name {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	line-height: 1.2em;
-	color: #fff;
-	padding: 5px;
-	background: rgba(0,0,0,.4);
-	display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    line-height: 1.2em;
+    color: #fff;
+    padding: 5px;
+    background: rgba(0,0,0,.4);
+    display: block;
 }
 
 .tiles-wrapper ul ul:before {
-	content: 'Draft';
-	display: block;
-	font-size: 24px;
+    content: 'Draft';
+    display: block;
+    font-size: 24px;
     clear: both;
     width: 100%;
     padding: 15px 0;
@@ -210,24 +224,24 @@ body.alternate-profile div#header {
 }
 
 .tiles-wrapper ul .public:before {
-	content: 'Public';
+    content: 'Public';
 }
 
 .tiles-wrapper ul .publicapi:before {
-	content: 'Public + API';
+    content: 'Public + API';
 }
 
 .tiles-wrapper ul .private:before {
-	content: 'Private';
+    content: 'Private';
 }
 
 .tiles-wrapper .shader-image {
-	width: 100%;
+    width: 100%;
 }
 
 .tiles-wrapper:after {
-	content: "";
-	display: block;
-	float: none;
-	clear: both;
+    content: "";
+    display: block;
+    float: none;
+    clear: both;
 }

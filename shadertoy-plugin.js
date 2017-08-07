@@ -10,7 +10,7 @@
      * @type {number}
      */
     var ARROW_KEY_TIMESHIFT = 5000,
-    
+
         /**
          * Stores ToyPlug instance.
          *
@@ -63,25 +63,17 @@
      *
      * @constructor
      */
-    function ToyPlugCommon() {
-        this.init();
-    }
-
-    /**
-     * Inits common functionality.
-     */
-    ToyPlugCommon.prototype.init = function init() {
-        //this.switchToDarkTheme();
-    };
+    function ToyPlugCommon() { }
 
     ToyPlugCommon.prototype.downloadJson = function downloadJson(filename, data) {
-        var blob = new Blob([data], {type: 'application/json'});
-        var a = window.document.createElement('a');
-        a.href = window.URL.createObjectURL(blob);
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        var blob = new Blob([data], {type: 'application/json'}),
+            link = window.document.createElement('a');
+
+        link.href = window.URL.createObjectURL(blob);
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     /**
@@ -126,7 +118,6 @@
          */
         this.currentDivider = 1;
 
-        //this.switchEditorToDark(window.darkTheme);
         this.bindKeys();
         this.timebar = new Timebar();
         this.mouseUniforms = new MouseUniforms();
@@ -142,7 +133,7 @@
      *
      * @param {number} divider
      */
-    ToyPlugEditPage.prototype.decraseRes = function decraseRes(divider) {
+    ToyPlugEditPage.prototype.decreaseRes = function decreaseRes(divider) {
         var b = this.c.getBoundingClientRect(),
             n = {
                 w: b.width / divider,
@@ -155,8 +146,8 @@
 
     /**
      * Changes time position.
-     * 
-     * @param {number} timeshift. Time change value in ms. 
+     *
+     * @param {number} timeshift. Time change value in ms.
      */
     ToyPlugEditPage.prototype.changeTimePosition = function(timeShift) {
         var destTime = Math.max(0, gShaderToy.mTf + timeShift);
@@ -169,7 +160,7 @@
     /**
      * Increases time position.
      */
-    ToyPlugEditPage.prototype.increaseTimePosition = 
+    ToyPlugEditPage.prototype.increaseTimePosition =
         function increaseTimePosition() {
             this.changeTimePosition(ARROW_KEY_TIMESHIFT);
         };
@@ -177,7 +168,7 @@
     /**
      * Decrease time position.
      */
-    ToyPlugEditPage.prototype.decreaseTimePosition = 
+    ToyPlugEditPage.prototype.decreaseTimePosition =
         function decreaseTimePosition() {
             this.changeTimePosition(-ARROW_KEY_TIMESHIFT);
         };
@@ -198,7 +189,7 @@
 
                 // 1...9 Keys
                 if (which == Math.max(49, Math.min(57, which))) {
-                    self.decraseRes(which - 48);
+                    self.decreaseRes(which - 48);
                 }
 
                 // Alt (or Cmd) + arrow ..
@@ -257,7 +248,7 @@
             document.body.classList[isFS ? 'remove' : 'add'](
                 this.FULLSCREEN_MODE_CLASS
             );
-            this.decraseRes(this.currentDivider);
+            this.decreaseRes(this.currentDivider);
         };
 
     ToyPlugEditPage.prototype.setRenderMode = function setRenderMode(mode) {
@@ -270,7 +261,7 @@
             paused = gShaderToy.mIsPaused;
 
         if (!paused) gShaderToy.pauseTime();
-        this.decraseRes(currentDivider * 0.25);
+        this.decreaseRes(currentDivider * 0.25);
 
         window.setTimeout(function() {
             imageData = gShaderToy.mGLContext.canvas.toDataURL('image/png');
@@ -291,7 +282,7 @@
             link.setAttribute('download', filename);
             link.dispatchEvent(clickEvent);
 
-            this.decraseRes(currentDivider);
+            this.decreaseRes(currentDivider);
             if (!paused) gShaderToy.pauseTime();
         }.bind(this), 1000);
     };
@@ -331,7 +322,7 @@
     };
 
     ToyPlugEditPage.prototype.downloadShader = function downloadShader() {
-        var container = document.getElementById('shaderPublished'),
+        var container = document.getElementById('shaderPublished') || document.getElementById('shaderButtons'),
             download = document.createElement('div');
 
         if (container) {
@@ -352,7 +343,7 @@
         }
     };
 
-    ToyPlugEditPage.prototype.uploadShader = function downloadShader() {
+    ToyPlugEditPage.prototype.uploadShader = function uploadShader() {
         var container = document.getElementById('shaderPublished'),
             upload = document.createElement('div');
 
@@ -366,34 +357,31 @@
             upload.textContent = 'Import';
             container.appendChild(upload);
 
-            upload.addEventListener('click', function() {
-
+            upload.addEventListener('click', function onUploadButtonClick() {
                 var fileInput = document.createElement('input');
-                fileInput.type = 'file';
-                fileInput.addEventListener('change', function() {
-                    var file = this.files[0];
-                    var reader = new FileReader();
 
-                    reader.onload = function(e) {
+                fileInput.type = 'file';
+                fileInput.addEventListener('change', function onInputChange() {
+                    var file = this.files[0],
+                        reader = new FileReader();
+
+                    reader.onload = function onFileLoaded(e) {
                         var text = reader.result;
-                        try
-                        {
+                        try {
                             dataLoadShader(JSON.parse('[' + text + ']'));
+                        } catch (e) {
+                            alert('Failed to load shader!');
+                            console.error(e);
                         }
-                        catch(e)
-                        {
-                            alert("Failed to load shader!");
-                            console.log(e);
-                        }
-                        gShaderToy.mInfo.id = "-1";
-                    }
+                        gShaderToy.mInfo.id = '-1';
+                    };
 
                     reader.readAsText(file);
+                    container.removeChild(fileInput);
                 });
 
                 container.appendChild(fileInput);
                 fileInput.click();
-                container.removeChild(fileInput);
             });
         }
     };
@@ -423,7 +411,7 @@
         this.sliderInput.addEventListener(
             'input',
             function() {
-                updateShaderToyTime(this.sliderInput.value)
+                updateShaderToyTime(this.sliderInput.value);
             }.bind(this)
         );
 
@@ -584,7 +572,7 @@
 
             gShaderToy.pauseTime();
         });
-    };
+    }
 
     /**
      * Updates ShaderToy inputs.
@@ -602,7 +590,7 @@
                 }
             });
         });
-    };
+    }
 
     /**
      * Mouse uniform sliders constructor.

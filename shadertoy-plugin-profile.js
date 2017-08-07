@@ -154,109 +154,123 @@
         this.numShaders = 0;
         this.downloadQueue = [];
         this.downloadResults = [];
-        this.createHTML();
+        this.createDownloadButton();
     }
 
-    ShaderDownload.prototype.createHTML = function() {
-        var me = this;
-        var section = document.getElementById('userData');
-        me.button = document.createElement('div');
-        me.button.className = 'formButtonSmall';
-        me.button.style.width = '200px';
-        me.button.style.marginTop = '10px';
-        me.button.innerHTML = me.downloadCaption;
+    ShaderDownload.prototype.createDownloadButton =
+        function createDownloadButton() {
+            var me = this,
+                section = document.getElementById('userData');
 
-        this.button.onclick = function(e) {
-            if (me.loading)
-            {
-                alert('Please wait while we are processing your request!');
-                return;
-            }
+            me.button = document.createElement('div');
+            me.button.className = 'formButtonSmall';
+            me.button.style.width = '200px';
+            me.button.style.marginTop = '10px';
+            me.button.innerHTML = me.downloadCaption;
 
-            this.innerHTML = me.loadingCaption;
-            var ids = helpers.collectionToArray(document.querySelectorAll('#divShaders tr + tr'))
-                .map(function(tr) {
-                    var linkElement = tr.querySelector('a'),
-                        link = linkElement.getAttribute('href');
-                    return link.replace('/view/', '');
-                }, this);
+            me.button.onclick = function onDownloadButtonClick(e) {
+                var ids = 0,
+                    numRequests = 0,
+                    i = 0;
 
-            me.numShaders = ids.length;
+                if (me.loading) {
+                    alert('Please wait while we are processing your request!');
+                    return;
+                }
 
-            if (ids.length > 0)
-            {
-                me.loading = true;
-                me.downloadQueue = [];
-                me.downloadResults = [];
-                var numRequests = Math.ceil(ids.length / 8);
-                for(var i = 0; i < numRequests; i++) me.downloadQueue.push(ids.slice(i*8, (i+1)*8));
-                me.processQueue();
-            }
-            else
-            {
-                this.innerHTML = me.downloadCaption;
-                alert('No shaders found!');
-            }
+                this.innerHTML = me.loadingCaption;
+                ids = helpers.collectionToArray(
+                    document.querySelectorAll('#divShaders tr + tr'))
+                        .map(function getShaderIdFromURL(tr) {
+                            var linkElement = tr.querySelector('a'),
+                                link = linkElement.getAttribute('href');
+                            return link.replace('/view/', '');
+                        }, this);
+
+                me.numShaders = ids.length;
+
+                if (ids.length > 0) {
+                    me.loading = true;
+                    me.downloadQueue = [];
+                    me.downloadResults = [];
+                    numRequests = Math.ceil(ids.length / 8);
+
+                    for (i = 0; i < numRequests; i++) {
+                        me.downloadQueue.push(ids.slice(i * 8, (i + 1) * 8));
+                    }
+
+                    me.processQueue();
+                } else {
+                    this.innerHTML = me.downloadCaption;
+                    alert('No shaders found!');
+                }
+            };
+            section.appendChild(me.button);
         };
-        section.appendChild(me.button);
-    };
 
-    ShaderDownload.prototype.processQueue = function () {
-        var me = this;
-        var request = me.downloadQueue.shift();
-        me.button.innerHTML = me.loadingCaption + ' ' + me.downloadResults.length + '/' + me.numShaders;
+    ShaderDownload.prototype.processQueue = function processQueue() {
+        var me = this,
+            request = me.downloadQueue.shift(),
+            httpReq,
+            str = '';
 
-        try
-        {
-            var httpReq = new XMLHttpRequest();
-            httpReq.addEventListener('load', function (event) {
+        me.button.innerHTML = me.loadingCaption + ' ' +
+            me.downloadResults.length + '/' + me.numShaders;
+
+        try {
+            httpReq = new XMLHttpRequest();
+            httpReq.addEventListener('load', function onResponse(event) {
                 var json = event.target.response;
 
                 if (json === null) {
                     alert('Error loading shader');
                     return;
-                };
+                }
 
                 me.downloadResults = me.downloadResults.concat(json);
 
                 if (me.downloadQueue.length > 0) {
                     me.processQueue();
-                }
-                else
-                {
+                } else {
                     me.loading = false;
                     me.button.innerHTML = me.downloadCaption;
                     window.ToyPlug.common.downloadJson(me.downloadResults[0].info.username + '.json', JSON.stringify(me.downloadResults));
                 }
-            }, false );
+            }, false);
 
-            httpReq.addEventListener('error', function() {
+            httpReq.addEventListener('error', function onRequestError() {
                 alert('Error loading shader');
             }, false);
 
             httpReq.open('POST', '/shadertoy', true);
             httpReq.responseType = 'json';
             httpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            var str = '{ "shaders" : ["'+ request.join('","') +'"] }';
+            str = '{ "shaders" : ["'+ request.join('","') +'"] }';
             str = 's=' + encodeURIComponent( str );
             httpReq.send(str);
-        }
-        catch(e)
-        {
+        } catch(e) {
             return;
         }
     };
 
     /**
      * Provides additional functionality to ShaderToy's profile page view.
+     * Redirects to login page if user is not logged anymore.
      *
      * @contructor
      */
     function ToyPlugProfilePage() {
         helpers = new Helpers({});
-        this.sortableShaderList = new SortableShaderList();
-        if (window.alternateProfile) this.tilesView = new TilesView();
-        this.shaderDownload = new ShaderDownload();
+
+        if (document.head.innerHTML) {
+            this.sortableShaderList = new SortableShaderList();
+            if (window.alternateProfile) {
+                this.tilesView = new TilesView();
+            }
+            this.shaderDownload = new ShaderDownload();
+        } else {
+            window.location.href = '/signin';
+        }
     }
 
     /**
