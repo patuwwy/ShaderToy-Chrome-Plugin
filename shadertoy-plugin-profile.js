@@ -70,14 +70,10 @@
 
             var link = row.querySelector('a'),
                 id = link.getAttribute('href').substr(6),
-                smallImg = createPreviewImageElementById(id),
                 bigImg = createPreviewImageElementById(id);
 
-            smallImg.classList.add('small');
             bigImg.classList.add('bigPreview');
-
             link.insertBefore(bigImg, link.firstChild);
-            link.insertBefore(smallImg, link.firstChild);
         });
     };
 

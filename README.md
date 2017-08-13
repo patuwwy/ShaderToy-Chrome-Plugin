@@ -22,7 +22,8 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 * Alternative shaders list on profile page.
 
-* Shaders previews on "My profile" page.
+* ~~Shaders previews on "My profile" page.~~
+(feature removed - implemented natively in Shadertoy. Big preview on mouse over is still available)
 
 * Change resolution in windowed and fullscreen mode by pressing keys 1...9.
 
@@ -59,6 +60,10 @@ Fullscreen edit ~~(dark theme)~~
 
 
 ## ShaderToy extension changelog:
+
+* 0.9.1 (13-08-2017)
+Removed shader preview in shaders list on profile page.
+Removed "tabs" permission (browser history)
 
 * 0.9.0 (06-08-2017)
 Export/Import shader (JSON) by [movAX13h](http://blog.thrill-project.com/)
