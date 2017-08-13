@@ -62,7 +62,7 @@ Fullscreen edit ~~(dark theme)~~
 ## ShaderToy extension changelog:
 
 * 0.9.1 (13-08-2017)
-Removed shader preview in shaders list on profile page.
+Removed shader preview in shaders list on profile page. (Provided natively in ShaderToy now).
 Removed "tabs" permission (browser history)
 
 * 0.9.0 (06-08-2017)
@@ -152,12 +152,11 @@ Google Analytics added.
 Moved preview screens to screenshots folder.
 
 * 0.3.2
-Minor update.
 CSS fix for showing user picture on [Profile page](https://www.shadertoy.com/profile) (both themes)
 Extension opens changelog on update/first install.
 
 * 0.3.1
-Exclude running shader on login page.
+Exclude running extension on login page.
 Added Chrome rendering mode select.
 
 * 0.3.0
