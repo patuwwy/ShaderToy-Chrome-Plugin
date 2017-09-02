@@ -245,3 +245,8 @@ body.alternate-profile div#header {
     float: none;
     clear: both;
 }
+
+.fork-shader-btn {
+    width: 60px;
+    margin-top: 15px;
+}

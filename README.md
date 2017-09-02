@@ -9,6 +9,8 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 ## Features:
 
+* Clone any shader.
+
 * Adjustable slider for full control of 'iGlobalTime' uniform and audio/video inputs.
 
 * Four sliders simulating mouse position with the same range.
@@ -60,6 +62,9 @@ Fullscreen edit ~~(dark theme)~~
 
 
 ## ShaderToy extension changelog:
+
+* 0.9.2 (2-09-2017 at Riverwash party)
+Clone any shader.
 
 * 0.9.1 (13-08-2017)
 Removed shader preview in shaders list on profile page. (Provided natively in ShaderToy now).

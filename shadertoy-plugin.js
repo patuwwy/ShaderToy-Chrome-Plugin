@@ -124,6 +124,8 @@
         this.duplicateShader();
         this.uploadShader();
         this.downloadShader();
+
+        this.shaderDuplicator = new ShaderDuplicator();
     };
 
     /**
@@ -593,6 +595,65 @@
     }
 
     /**
+     * Adds forking any shader functionality.
+     */
+    ShaderDuplicator = function() {
+        this.finishShaderFork();
+        this.addButton();
+        this.bindButtonEvents();
+    };
+
+    /**
+     * Loads shader if one is stored.
+     */
+    ShaderDuplicator.prototype.finishShaderFork = function() {
+        var storedShader = window.localStorage.getItem('forkedShaderStorage');
+
+        if (!storedShader) {
+            return;
+        }
+
+        try {
+            dataLoadShader(JSON.parse('[' + storedShader + ']'));
+        } catch (ignore) {}
+
+        window.localStorage.setItem('forkedShaderStorage', '');
+        gShaderToy.mInfo.username = "None";
+        gShaderToy.mInfo.id = "-1";
+        document.getElementById('published').value = "0";
+    }
+
+    /**
+     * Adds "Fork" button.
+     */
+    ShaderDuplicator.prototype.addButton = function() {
+        this.button = document.createElement('div');
+
+        this.button.textContent = 'Fork';
+        this.button.classList.add('formButton');
+        this.button.classList.add('fork-shader-btn');
+        shaderToyElements.shaderInfo.appendChild(this.button);
+    }
+
+    /**
+     * Binds button event.
+     */
+    ShaderDuplicator.prototype.bindButtonEvents = function() {
+        var self = this;
+
+        this.button.addEventListener('click', self.onButtonClick);
+    }
+
+    /**
+     * Handles button's "click" event.
+     * Stores shader in localStorage and loads "new shader" page.
+     */
+    ShaderDuplicator.prototype.onButtonClick = function() {
+        window.localStorage.setItem('forkedShaderStorage', JSON.stringify(gShaderToy.exportToJSON()));
+        window.location.href = 'https://www.shadertoy.com/new';
+    }
+
+    /**
      * Mouse uniform sliders constructor.
      */
     MouseUniforms = function() {
@@ -677,6 +738,5 @@
     };
 
     window.ToyPlug = new ToyPlug();
-
 
 })(document, window);
