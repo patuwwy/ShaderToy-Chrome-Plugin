@@ -613,7 +613,7 @@
     };
 
     /**
-     * Loads shader if one is stored.
+     * Loads shader from LocalStorage if one is stored.
      */
     ShaderDuplicator.prototype.finishShaderFork = function() {
         var storedShader = window.localStorage.getItem(
@@ -631,6 +631,7 @@
         window.localStorage.setItem(LOCALSTORAGE_SHADER_FORK_KEYNAME, '');
         gShaderToy.mInfo.username = 'None';
         gShaderToy.mInfo.id = '-1';
+        gShaderToy.mNeedsSave = true;
         document.getElementById('published').value = "0";
     };
 
@@ -665,6 +666,7 @@
             JSON.stringify(gShaderToy.exportToJSON())
         );
 
+        gShaderToy.mNeedsSave = false;
         window.location.href = 'https://www.shadertoy.com/new';
     };
 
