@@ -248,5 +248,13 @@ body.alternate-profile div#header {
 
 .fork-shader-btn {
     width: 60px;
-    margin-top: 15px;
+    margin-top: 10px;
+    float: right;
+}
+
+#shaderInfo:after {
+    content: "";
+    display: block;
+    float: none;
+    clear: both;
 }

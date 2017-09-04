@@ -3,16 +3,41 @@
 
     'use strict';
 
+    /**
+     * Location of shader previews.
+     *
+     * @const {string}
+     */
     var SHADER_PREVIEW_LOCATION = '/media/shaders/',
 
+        /**
+         * Extension of shader preview.
+         *
+         * @const {string}
+         */
         SHADER_PREVIEW_EXTENSION = '.jpg',
 
+        /**
+         * URL of shader.
+         *
+         * @const {string}
+         */
         SHADER_LOCATION = '/view/',
 
+        /**
+         * Template for single tile on alternate profile page.
+         *
+         * @const {string}
+         */
         TILE_TEMPLATE = '<a href="{shaderUrl}" class="shader-tile">' +
             '<img class="shader-image" src="{previewUrl}"/>' +
             '<span class="shader-name">{shaderTitle}</span></a>',
 
+        /**
+         * HTML for tiles lists.
+         *
+         * @const {string}
+         */
         TILES_CONTAINER = '<ul>' +
             '<li class="status"><ul class="draft"></ul></li>' +
             '<li class="status"><ul class="private"></ul></li>' +
@@ -29,14 +54,32 @@
          */
         helpers = null;
 
+    /**
+     * Gets shader URL by id.
+     *
+     * @param {string} id
+     * @return {string}
+     */
     function getShaderUrlById(id) {
         return SHADER_LOCATION + id;
     }
 
+    /**
+     * Gets location of shader preview by id.
+     *
+     * @param {string} id
+     * @return {string}
+     */
     function getPreviewUrlById(id) {
         return SHADER_PREVIEW_LOCATION + id + SHADER_PREVIEW_EXTENSION;
     }
 
+    /**
+     * Gets shader's preview image by id.
+     *
+     * @param {string} id
+     * @returns {Image}
+     */
     function createPreviewImageElementById(id) {
         var img = new Image();
 
@@ -44,6 +87,9 @@
         return img;
     }
 
+    /**
+     * Adds shader previews to the shaders list.
+     */
     function SortableShaderList() {
         this.rebuildList();
     }
@@ -65,6 +111,7 @@
         this.shadersListHeadRow = this.shadersListRows[0];
 
         // Add small preview images to shaders list.
+        // Images are shown on hover.
         this.shadersListRows.forEach(function(row, i) {
             if (!i) return;
 
@@ -77,6 +124,9 @@
         });
     };
 
+    /**
+     * Initializes Tiles (alternate profile page view).
+     */
     function TilesView() {
         this.init();
     }
@@ -99,7 +149,7 @@
     TilesView.prototype.getShaders = function() {
         return helpers.collectionToArray(
             document.querySelectorAll('#divShaders tr + tr'))
-                .map(function(tr) {
+                .map(function parseRow(tr) {
                     var linkElement = tr.querySelector('a'),
                         link = linkElement.getAttribute('href');
 
@@ -114,12 +164,22 @@
                 }, this);
     };
 
+    /**
+     * ShaderTile constructor.
+     *
+     * @constructor
+     * @param {object} shader
+     * @param {*} tilesView
+     */
     function ShaderTile(shader, tilesView) {
         this.shader = shader;
         this.tilesView = tilesView;
         this.createHTML();
     }
 
+    /**
+     * Creates and adds shader tile element.
+     */
     ShaderTile.prototype.createHTML = function() {
         var li = document.createElement('li');
 

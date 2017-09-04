@@ -1,4 +1,4 @@
-(function() {
+(function definePopupModule() {
 
     'use strict';
 
@@ -53,7 +53,7 @@
         function bindAlternateProfileInput() {
             var i = document.getElementById('input-alternate-profile');
 
-            i.addEventListener('change', function(e) {
+            i.addEventListener('change', function onInputChange(e) {
                 sendMessage({
                     alternateProfile: i.checked
                 });
@@ -78,7 +78,7 @@
     /**
      * Gets stored state of loop option.
      */
-    chrome.storage.sync.get('loopEnabled', function(items) {
+    chrome.storage.sync.get('loopEnabled', function onSync(items) {
         var i = document.getElementById('input-loop');
 
         i.checked = items.loopEnabled;
@@ -87,7 +87,7 @@
     /**
      * Gets stored state of alternate profile page layout.
      */
-    chrome.storage.sync.get('alternateProfile', function(items) {
+    chrome.storage.sync.get('alternateProfile', function onSync(items) {
         var i = document.getElementById('input-alternate-profile');
 
         i.checked = items.alternateProfile;
@@ -96,7 +96,7 @@
     /**
      * Opens all links in new tab.
      */
-    window.addEventListener('click',function(e){
+    window.addEventListener('click', function onLinkClick(e){
         if (e.target.href) {
             chrome.tabs.create({url:e.target.href});
         }

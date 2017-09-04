@@ -79,9 +79,8 @@
 
                 if ('alternateProfile' in request.data) {
                     chrome.storage.sync.set({
-                            alternateProfile: request.data.alternateProfile
-                        }, function() {}
-                    );
+                        alternateProfile: request.data.alternateProfile
+                    }, function() {});
                 }
             }
         );

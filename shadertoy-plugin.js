@@ -12,6 +12,13 @@
     var ARROW_KEY_TIMESHIFT = 5000,
 
         /**
+         * Key name to store shader in LocalStorage.
+         *
+         * @const {string}
+         */
+        LOCALSTORAGE_SHADER_FORK_KEYNAME = 'forkedShaderStorage',
+
+        /**
          * Stores ToyPlug instance.
          *
          * @type {ToyPlug}
@@ -265,16 +272,16 @@
         if (!paused) gShaderToy.pauseTime();
         this.decreaseRes(currentDivider * 0.25);
 
-        window.setTimeout(function() {
+        window.setTimeout(function getImageData() {
             imageData = gShaderToy.mGLContext.canvas.toDataURL('image/png');
         }, 100);
 
         window.setTimeout(function() {
             var link = document.createElement('a'),
-                clickEvent = new MouseEvent("click", {
-                    "view": window,
-                    "bubbles": true,
-                    "cancelable": false
+                clickEvent = new MouseEvent('click', {
+                    'view': window,
+                    'bubbles': true,
+                    'cancelable': false
                 }),
                 filename = document.getElementById('shaderTitle').value +
                     '_' + new Date().toJSON().slice(0,10) +
@@ -290,7 +297,7 @@
     };
 
     ToyPlugEditPage.prototype.switchRecording = function switchRecording() {
-        if (gShaderToy.mMediaRecorder.state == "inactive") {
+        if (gShaderToy.mMediaRecorder.state == 'inactive') {
             gShaderToy.mMediaRecorder.start();
         }
         else {
@@ -305,7 +312,7 @@
         if (publishWrapper) {
             duplicate.classList.add('formButton');
             duplicate.style.marginLeft = "12px";
-            duplicate.style.display = "inline-block";
+            duplicate.style.display = 'inline-block';
             duplicate.textContent = 'Save as new draft';
 
             publishWrapper.appendChild(duplicate);
@@ -314,9 +321,9 @@
                     (gShaderToy.mNeedsSave &&
                         window.confirm('Current shader will be saved as new draft. Page will be reloaded. Continue?')
                     ) || !gShaderToy.mNeedsSave) {
-                        gShaderToy.mInfo.username = "None";
-                        gShaderToy.mInfo.id = "-1";
-                        document.getElementById('published').value = "0";
+                        gShaderToy.mInfo.username = 'None';
+                        gShaderToy.mInfo.id = '-1';
+                        document.getElementById('published').value = '0';
                         window.openSubmitShaderForm(false);
                     }
             });
@@ -339,7 +346,9 @@
             container.appendChild(download);
             download.addEventListener('click', function onDownloadButtonClick() {
                 var name = gShaderToy.mInfo.id;
-                if (name == '-1') name = 'default';
+                if (name == '-1') {
+                    name = 'default';
+                }
                 window.ToyPlug.common.downloadJson(name + '.json', JSON.stringify(gShaderToy.exportToJSON()));
             });
         }
@@ -607,7 +616,9 @@
      * Loads shader if one is stored.
      */
     ShaderDuplicator.prototype.finishShaderFork = function() {
-        var storedShader = window.localStorage.getItem('forkedShaderStorage');
+        var storedShader = window.localStorage.getItem(
+                LOCALSTORAGE_SHADER_FORK_KEYNAME
+            );
 
         if (!storedShader) {
             return;
@@ -617,11 +628,11 @@
             dataLoadShader(JSON.parse('[' + storedShader + ']'));
         } catch (ignore) {}
 
-        window.localStorage.setItem('forkedShaderStorage', '');
-        gShaderToy.mInfo.username = "None";
-        gShaderToy.mInfo.id = "-1";
+        window.localStorage.setItem(LOCALSTORAGE_SHADER_FORK_KEYNAME, '');
+        gShaderToy.mInfo.username = 'None';
+        gShaderToy.mInfo.id = '-1';
         document.getElementById('published').value = "0";
-    }
+    };
 
     /**
      * Adds "Fork" button.
@@ -633,25 +644,29 @@
         this.button.classList.add('formButton');
         this.button.classList.add('fork-shader-btn');
         shaderToyElements.shaderInfo.appendChild(this.button);
-    }
+    };
 
     /**
-     * Binds button event.
+     * Binds "Fork" button event.
      */
     ShaderDuplicator.prototype.bindButtonEvents = function() {
         var self = this;
 
         this.button.addEventListener('click', self.onButtonClick);
-    }
+    };
 
     /**
      * Handles button's "click" event.
-     * Stores shader in localStorage and loads "new shader" page.
+     * Stores shader in localStorage and redirect to "new shader" page.
      */
     ShaderDuplicator.prototype.onButtonClick = function() {
-        window.localStorage.setItem('forkedShaderStorage', JSON.stringify(gShaderToy.exportToJSON()));
+        window.localStorage.setItem(
+            LOCALSTORAGE_SHADER_FORK_KEYNAME,
+            JSON.stringify(gShaderToy.exportToJSON())
+        );
+
         window.location.href = 'https://www.shadertoy.com/new';
-    }
+    };
 
     /**
      * Mouse uniform sliders constructor.
