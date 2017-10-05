@@ -29,16 +29,23 @@
          * Stores references to ShaderToy HTML elements.
          */
         shaderToyElements = {
-            shaderInfo: document.getElementById('shaderInfo')
+            shaderInfo: document.getElementById('shaderInfo'),
+        },
+
+        extensionElements = {
         };
 
     /**
-     * ToyPlug. Plugin.
+     * ToyPlug.
      *
      * @contructor
      */
     function ToyPlug() {
-        this.init();
+        if (!this.initialized) {
+            this.init();
+        }
+
+        this.initialized = true;
     }
 
     /**
@@ -126,13 +133,31 @@
         this.currentDivider = 1;
 
         this.bindKeys();
-        this.timebar = new Timebar();
-        this.mouseUniforms = new MouseUniforms();
+        this.createContainers();
+
+        this.timebar = new Timebar(this);
+        this.mouseUniforms = new MouseUniforms(this);
         this.duplicateShader();
         this.uploadShader();
         this.downloadShader();
 
         this.shaderDuplicator = new ShaderDuplicator();
+    };
+
+    /**
+     * Creates containers for extension elements.
+     */
+    ToyPlugEditPage.prototype.createContainers = function() {
+        var controlsContainer = document.createElement('div');
+
+        controlsContainer.classList.add('toyplug-controls-container');
+
+        shaderToyElements.shaderInfo.insertBefore(
+            controlsContainer,
+            shaderToyElements.shaderInfo.querySelector('#shaderInfoHeader')
+        );
+
+        extensionElements.controlsContainer = controlsContainer;
     };
 
     /**
@@ -142,7 +167,7 @@
      *
      * @param {number} divider
      */
-    ToyPlugEditPage.prototype.decreaseRes = function decreaseRes(divider) {
+    ToyPlugEditPage.prototype.decreaseRes = function (divider) {
         var b = this.c.getBoundingClientRect(),
             n = {
                 w: b.width / divider,
@@ -158,7 +183,7 @@
      *
      * @param {number} timeshift. Time change value in ms.
      */
-    ToyPlugEditPage.prototype.changeTimePosition = function(timeShift) {
+    ToyPlugEditPage.prototype.changeTimePosition = function (timeShift) {
         var destTime = Math.max(0, gShaderToy.mTf + timeShift);
 
         updateShaderToyTime(destTime);
@@ -311,6 +336,7 @@
 
         if (publishWrapper) {
             duplicate.classList.add('formButton');
+            duplicate.classList.add('formButton-extension');
             duplicate.style.marginLeft = "12px";
             duplicate.style.display = 'inline-block';
             duplicate.textContent = 'Save as new draft';
@@ -336,6 +362,7 @@
 
         if (container) {
             download.classList.add('formButton');
+            download.classList.add('formButton-extension');
             download.style.marginLeft = '12px';
             download.style.float = 'right';
             download.style.width = '60px';
@@ -360,6 +387,7 @@
 
         if (container) {
             upload.classList.add('formButton');
+            upload.classList.add('formButton-extension');
             upload.style.marginLeft = '12px';
             upload.style.float = 'right';
             upload.style.width = '60px';
@@ -380,9 +408,8 @@
                         var text = reader.result;
                         try {
                             dataLoadShader(JSON.parse('[' + text + ']'));
-                        } catch (e) {
+                        } catch (error) {
                             alert('Failed to load shader!');
-                            console.error(e);
                         }
                         gShaderToy.mInfo.id = '-1';
                     };
@@ -402,7 +429,9 @@
      *
      * @contructor
      */
-    function Timebar() {
+    function Timebar(toyPlug) {
+        this.ToyPlug = toyPlug;
+
         this.loop = window.TimebarLoop;
         this.busy = false;
         this.wasPaused = false;
@@ -437,20 +466,53 @@
         );
 
         this.updateSlider();
+
+        this.controlsExpandTrigger.addEventListener(
+            'click',
+            this.onControlsExpandTriggerClick.bind(this)
+        );
+
+        this.setControlsVisibility(
+            this.getControlsVisibilitySavedState()
+        );
     }
+
+    Timebar.prototype.getControlsVisibilitySavedState = function() {
+        return JSON.parse(localStorage.getItem('controlsExpanded'));
+    };
+
+    Timebar.prototype.setControlsVisibility = function(expand) {
+        this.controlsExpandTrigger.classList[expand ? 'add' : 'remove']('expanded');
+    };
+
+    Timebar.prototype.onControlsExpandTriggerClick = function() {
+        var isExpanded = this.getControlsVisibilitySavedState();
+
+        this.setControlsVisibility(!isExpanded);
+        localStorage.setItem('controlsExpanded', !isExpanded);
+    };
 
     /**
      * Creates and appends timebar elements to ShaderToy.
      */
     Timebar.prototype.createElements = function createElements() {
+        this.controlsExpandTrigger = document.createElement('div');
         this.sliderBar = document.createElement('div');
         this.minValueInput = document.createElement('input');
         this.sliderInput = document.createElement('input');
         this.maxValueInput = document.createElement('input');
 
-        shaderToyElements.shaderInfo.insertBefore(
-            this.sliderBar,
-            shaderToyElements.shaderInfo.childNodes[0]
+        this.controlsExpandTrigger.textContent = 'Toggle controls';
+        this.controlsExpandTrigger.classList.add('expand-trigger');
+        this.controlsExpandTrigger.classList.add('formButton');
+        this.controlsExpandTrigger.classList.add('formButton-extension');
+
+        extensionElements.controlsContainer.appendChild(
+            this.controlsExpandTrigger
+        );
+
+        extensionElements.controlsContainer.appendChild(
+            this.sliderBar
         );
 
         this.sliderBar.classList.add('time-slider');
@@ -643,6 +705,7 @@
 
         this.button.textContent = 'Fork';
         this.button.classList.add('formButton');
+        this.button.classList.add('formButton-extension');
         this.button.classList.add('fork-shader-btn');
         shaderToyElements.shaderInfo.appendChild(this.button);
     };
@@ -712,9 +775,8 @@
             return slider;
         }, this);
 
-        shaderToyElements.shaderInfo.insertBefore(
-            this.slidersWrapper,
-            document.getElementById('shaderInfoHeader')
+        extensionElements.controlsContainer.appendChild(
+            this.slidersWrapper
         );
     };
 

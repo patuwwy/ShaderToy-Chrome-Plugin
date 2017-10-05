@@ -131,6 +131,9 @@
         this.init();
     }
 
+    /**
+     * Initializes component.
+     */
     TilesView.prototype.init = function tilesViewInit () {
         document.body.classList.add('alternate-profile');
 
@@ -146,6 +149,11 @@
         this.userShaders = this.getShaders();
     };
 
+    /**
+     * Parses all shaders from table and converts each to ShaderTile instance.
+     *
+     * @returns {ShaderTile[]}
+     */
     TilesView.prototype.getShaders = function() {
         return helpers.collectionToArray(
             document.querySelectorAll('#divShaders tr + tr'))
@@ -219,7 +227,8 @@
                 section = document.getElementById('userData');
 
             me.button = document.createElement('div');
-            me.button.className = 'formButtonSmall';
+            me.button.classList.add('formButtonSmall');
+            me.button.classList.add('formButton-extension');
             me.button.style.width = '200px';
             me.button.style.marginTop = '10px';
             me.button.innerHTML = me.downloadCaption;

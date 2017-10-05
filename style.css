@@ -9,6 +9,7 @@ body, html {
 .uiButton {
     color: #aaa;
 }
+
 .fullscreen-edit .playerCanvas {
     position: fixed;
     top: 0;
@@ -36,7 +37,17 @@ body, html {
     background-size: 100%;
 }
 
+.expand-trigger {
+    float: left;
+    margin-bottom: 8px;
+}
+
+.expand-trigger:not(.expanded) ~ * {
+    display: none;
+}
+
 .time-slider {
+    clear: both;
     height: 32px;
     margin: 5px 0;
 }
@@ -257,4 +268,11 @@ body.alternate-profile div#header {
     display: block;
     float: none;
     clear: both;
+}
+
+.formButton.formButton-extension,
+.formButtonSmall.formButton-extension {
+    background-color: #1967a0;
+    color: #fff;
+    transition: all .25s ease;
 }

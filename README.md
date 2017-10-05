@@ -11,7 +11,7 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 * Clone any shader.
 
-* Adjustable slider for full control of 'iGlobalTime' uniform and audio/video inputs.
+* Adjustable slider for full control of 'iTime' uniform and audio/video inputs.
 
 * Four sliders simulating mouse position with the same range.
   This can be used to tweaking variables with iMouse.xyzw uniform.
@@ -63,12 +63,16 @@ Fullscreen edit ~~(dark theme)~~
 
 ## ShaderToy extension changelog:
 
+* 0.9.3 (6-10.2017)
+Foldable controls.
+Extension's buttons colorized.
+
 * 0.9.2 (2-09-2017 at Riverwash party)
 Clone any shader.
 
 * 0.9.1 (13-08-2017)
 Removed shader preview in shaders list on profile page. (Provided natively in ShaderToy now).
-Removed "tabs" permission (browser history)
+Removed "tabs" permission (browser history).
 
 * 0.9.0 (06-08-2017)
 Export/Import shader (JSON) by [movAX13h](http://blog.thrill-project.com/)

@@ -123,7 +123,6 @@
      * Gets stored variables from google cloud.
      */
     function synchronizeChrome() {
-
         chrome.storage.sync.get('alternateProfile', function(items) {
             setWindowVariable('alternateProfile', items.alternateProfile);
         });
