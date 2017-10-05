@@ -49,6 +49,8 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 ## Screenshots
 
+![](./screenshots/list-preview.jpg)
+
 ![](./screenshots/screen3.jpg)
 
 ![](./screenshots/alt-profile.jpg)
