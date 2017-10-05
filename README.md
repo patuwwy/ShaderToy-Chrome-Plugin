@@ -50,6 +50,7 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 ## Screenshots
 
 ![](./screenshots/list-preview.jpg)
+Preview images on profile page with detail overlay on mouse hover
 
 ![](./screenshots/screen3.jpg)
 
@@ -57,7 +58,6 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 Alternative shader list
 
 ![](./screenshots/previews.jpg)
-Preview images on profile page with detail overlay on mouse hover
 
 ![](./screenshots/screen2.jpg)
 Fullscreen edit ~~(dark theme)~~
