@@ -142,6 +142,7 @@
         this.downloadShader();
 
         this.shaderDuplicator = new ShaderDuplicator();
+        this.anchorsMaker = new AnchorsMaker();
     };
 
     /**
@@ -814,6 +815,75 @@
             slider.max = sizes[slider.getAttribute('data-size')];
             this.onSliderChange({target: slider});
         }, this);
+    };
+
+    /**
+     * Class to wrap http/https url into HTML <a> tags.
+     */
+    AnchorsMaker = function() {
+        this.NOT_ANCHOR_URL_REGEXP = /((http?|https?):\/\/[^"<\s]+)(?![^<>]*>|[^"]*?<\/a)/g;
+        this.init();
+    };
+
+    /**
+     * Initializes instance.
+     * Runs replacing for shaderToy elements.
+     */
+    AnchorsMaker.prototype.init = function() {
+        try {
+            this.makeCommentsLinks();
+            this.makeDescriptionLinks();
+        } catch (ignore) {}
+    };
+
+    /**
+     * Wraps all http/https urls in element content into HTML <a> tags.
+     *
+     * @param {element} Element to replace urls in.
+     */
+    AnchorsMaker.prototype._makeLink = function(element) {
+        element.innerHTML = element.innerHTML.replace(
+            this.NOT_ANCHOR_URL_REGEXP,
+            '<a target="_blank" class="regular" href="$1">$1</a>'
+        );
+    };
+
+    /**
+     * Waits to description load.
+     * Replaces urls if loaded.
+     */
+    AnchorsMaker.prototype.makeDescriptionLinks = function() {
+        var SELECTOR = '#shaderDescription';
+            descriptionElement = document.querySelector(SELECTOR);
+
+        if (descriptionElement.tagName == 'TEXTAREA') {
+            return;
+        }
+
+        if (descriptionElement.innerHTML) {
+            this._makeLink(descriptionElement);
+        } else {
+            setTimeout(this.makeDescriptionLinks.bind(this), 200, this);
+        }
+    };
+
+    /**
+     * Waits for comments load.
+     * Replaces urls if loaded.
+     */
+    AnchorsMaker.prototype.makeCommentsLinks = function() {
+        var SELECTOR = '#myComments .commentContent',
+            commentsContents = document.querySelectorAll(SELECTOR);
+
+        if (commentsContents.length) {
+            Array.prototype.slice.apply(
+                commentsContents
+            ).forEach(function(commentContentElement) {
+                this._makeLink(commentContentElement);
+            }.bind(this));
+        } else {
+            setTimeout(this.makeCommentsLinks.bind(this), 200, this);
+        }
     };
 
     window.ToyPlug = new ToyPlug();

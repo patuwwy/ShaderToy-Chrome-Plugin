@@ -47,6 +47,8 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 * Export/Import shaders (json)
 
+* Show links in description/comments even if not inserted with BBCode.
+
 ## Screenshots
 
 ![](./screenshots/list-preview.jpg)
@@ -65,7 +67,10 @@ Fullscreen edit ~~(dark theme)~~
 
 ## ShaderToy extension changelog:
 
-* 0.9.3 (6-10.2017)
+* 0.9.4 (7-10-2017)
+Make links for URLs if not inserted with BBCode in description and comments.
+
+* 0.9.3 (6-10-2017)
 Foldable controls.
 Extension's buttons colorized.
 
