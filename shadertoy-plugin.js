@@ -886,6 +886,6 @@
         }
     };
 
-    window.ToyPlug = new ToyPlug();
+    window.ToyPlug = window.ToyPlug || new ToyPlug();
 
 })(document, window);

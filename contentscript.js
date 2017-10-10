@@ -14,7 +14,14 @@
          *
          * @type {string}
          */
-        PROFILE_EXTENSION_FILENAME = 'shadertoy-plugin-profile.js';
+        PROFILE_EXTENSION_FILENAME = 'shadertoy-plugin-profile.js',
+
+        /**
+         * Home page script filename.
+         *
+         * @type {string}
+         */
+        HOME_EXTENSION_FILENAME = 'shadertoy-plugin-home.js';
 
     /**
      * Loads main ToyPlug script and attaches it to ShaderToy.
@@ -156,12 +163,24 @@
     }
 
     /**
+     * Loads profile script on profile page.
+     */
+    function initializeHomePage() {
+        if (document.location.href.match(/shadertoy.com$|shadertoy.com\//)) {
+            loadScript(HOME_EXTENSION_FILENAME);
+        }
+    }
+
+    /**
      * Initializes extension.
      */
     function init() {
         synchronizeChrome();
         loadScript(MAIN_EXTENSION_FILENAME);
+
         initializeProfilePage();
+        initializeHomePage();
+
         bindMessagesListener();
         bindStorageListener();
         sendInitialMessage();

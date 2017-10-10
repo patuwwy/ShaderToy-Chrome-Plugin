@@ -35,6 +35,7 @@
     "web_accessible_resources": [
         "popup.js",
         "shadertoy-plugin.js",
-        "shadertoy-plugin-profile.js"
+        "shadertoy-plugin-profile.js",
+        "shadertoy-plugin-home.js"
     ]
 }
