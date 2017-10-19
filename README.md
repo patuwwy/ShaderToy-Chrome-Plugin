@@ -67,28 +67,32 @@ Fullscreen edit ~~(dark theme)~~
 
 ## ShaderToy extension changelog:
 
-* 0.9.4 (7-10-2017)
+* 0.9.5 (20-Oct-2017)
+Fixed font color for auto-links.
+Fixed shader titles on tiles.
+
+* 0.9.4 (7-Oct-2017)
 Make links for URLs if not inserted with BBCode in description and comments.
 
-* 0.9.3 (6-10-2017)
+* 0.9.3 (6-Oct-2017)
 Foldable controls.
 Extension's buttons colorized.
 
-* 0.9.2 (2-09-2017 at Riverwash party)
+* 0.9.2 (2-Sep-2017 at Riverwash party)
 Clone any shader.
 
-* 0.9.1 (13-08-2017)
+* 0.9.1 (13-Aug-2017)
 Removed shader preview in shaders list on profile page. (Provided natively in ShaderToy now).
 Removed "tabs" permission (browser history).
 
-* 0.9.0 (06-08-2017)
+* 0.9.0 (06-Aug-2017)
 Export/Import shader (JSON) by [movAX13h](http://blog.thrill-project.com/)
 Backup all user's shaders (JSON) by [movAX13h](http://blog.thrill-project.com/)
 Bigger shaders list on Profile page.
 Redirect to login page when user visit own profile but is not logged anymore.
 Code style clean up.
 
-* 0.8.4 (04-08-2017)
+* 0.8.4 (04-Aug-2017)
 Rewind/Forward with arrow keys when shader is active.
 Removed shaders sorting on Profile page (Sorting is provided natively in ShaderToy now).
 Minor fixes.

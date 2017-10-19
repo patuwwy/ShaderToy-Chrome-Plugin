@@ -158,7 +158,7 @@
         return helpers.collectionToArray(
             document.querySelectorAll('#divShaders tr + tr'))
                 .map(function parseRow(tr) {
-                    var linkElement = tr.querySelector('a'),
+                    var linkElement = tr.querySelector('td + td a'),
                         link = linkElement.getAttribute('href');
 
                     return new ShaderTile({
