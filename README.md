@@ -67,6 +67,10 @@ Fullscreen edit ~~(dark theme)~~
 
 ## ShaderToy extension changelog:
 
+* 0.9.6 (10-Nov-2017)
+Fix for 'private' -> 'unlisted' change.
+Key bindings change.
+
 * 0.9.5 (20-Oct-2017)
 Fixed font color for auto-links.
 Fixed shader titles on tiles.

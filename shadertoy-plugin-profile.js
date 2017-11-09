@@ -40,7 +40,7 @@
          */
         TILES_CONTAINER = '<ul>' +
             '<li class="status"><ul class="draft"></ul></li>' +
-            '<li class="status"><ul class="private"></ul></li>' +
+            '<li class="status"><ul class="unlisted"></ul></li>' +
             '<li class="status"><ul class="public"></ul></li>' +
             '<li class="status"><ul class="publicapi"></ul></li>' +
             '</ul>',

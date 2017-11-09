@@ -222,22 +222,28 @@
 
             if (e.target.id === self.MAIN_SHADERTOY_DEMO_ID) {
 
-                // 1...9 Keys
-                if (which == Math.max(49, Math.min(57, which))) {
-                    self.decreaseRes(which - 48);
-                }
-
-                // Alt (or Cmd) + arrow ..
+                // Alt (or Cmd) + ...
                 if (e.altKey || e.metaKey) {
 
-                    // ... up
-                    if (which == 38) {
+                    // 1...9 Keys
+                    if (which == Math.max(49, Math.min(57, which))) {
+                        self.decreaseRes(which - 48);
+                    }
+
+                    if (e.key === 'ArrowUp') {
                         gShaderToy.pauseTime();
                     }
 
-                    // ... down
-                    if (which == 40) {
+                    if (e.key === 'ArrowDown') {
                         gShaderToy.resetTime();
+                    }
+
+                    if (e.key === 'ArrowRight') {
+                        self.increaseTimePosition();
+                    }
+
+                    if (e.key === 'ArrowLeft') {
+                        self.decreaseTimePosition();
                     }
 
                 }
@@ -247,16 +253,9 @@
                     self.takeScreenShot();
                 }
 
+                // shift + ctrl + r
                 if (e.ctrlKey && e.shiftKey && code === 'KeyR') {
                     self.switchRecording();
-                }
-
-                if (e.key === 'ArrowRight') {
-                    self.increaseTimePosition();
-                }
-
-                if (e.key === 'ArrowLeft') {
-                    self.decreaseTimePosition();
                 }
 
             }
