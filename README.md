@@ -67,6 +67,13 @@ Fullscreen edit ~~(dark theme)~~
 
 ## ShaderToy extension changelog:
 
+* 0.9.8 (27-Now-2017)
+[issue#40](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/40)
+[issue#41](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/41)
+
+* 0.9.7 (24-Nov-2017)
+Forked shader's banner. [issue#40](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/40)
+
 * 0.9.6 (10-Nov-2017)
 Fix for 'private' -> 'unlisted' change.
 Key bindings change.

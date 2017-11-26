@@ -675,22 +675,30 @@
     };
 
     /**
-     * Loads shader from LocalStorage if one is stored.
+     * Loads shader from LocalStorage if there is is stored one.
      */
     ShaderDuplicator.prototype.finishShaderFork = function() {
         var storedShader = window.localStorage.getItem(
                 LOCALSTORAGE_SHADER_FORK_KEYNAME
-            );
+            ),
+            ctx = gShaderToy.mGLContext;
 
         if (!storedShader) {
             return;
         }
 
         try {
-            dataLoadShader(JSON.parse('[' + storedShader + ']'));
+            gShaderToy.mGLContext = null;
+
+            setTimeout(function() {
+                dataLoadShader(JSON.parse('[' + storedShader + ']'));
+                gShaderToy.mGLContext = ctx;
+                gShaderToy.startRendering();
+            }, 50);
         } catch (ignore) {}
 
         window.localStorage.setItem(LOCALSTORAGE_SHADER_FORK_KEYNAME, '');
+
         gShaderToy.mInfo.username = 'None';
         gShaderToy.mInfo.id = '-1';
         gShaderToy.mNeedsSave = true;
@@ -716,17 +724,35 @@
     ShaderDuplicator.prototype.bindButtonEvents = function() {
         var self = this;
 
-        this.button.addEventListener('click', self.onButtonClick);
+        this.button.addEventListener('click', self.onButtonClick.bind(self));
     };
+
+    ShaderDuplicator.prototype.createBanner = function(shaderInfo) {
+        banner = '// Fork of ' +
+            '"' + shaderInfo.name + '" by ' + shaderInfo.username +
+            '. https://shadertoy.com/view/' + shaderInfo.id +
+            '\n// ' + new Date().toISOString().replace('T',' ').replace(/(\..*)/g, '') + '\n\n';
+
+        return banner;
+    }
 
     /**
      * Handles button's "click" event.
      * Stores shader in localStorage and redirect to "new shader" page.
      */
     ShaderDuplicator.prototype.onButtonClick = function() {
+        var shaderData = gShaderToy.exportToJSON(),
+            banner = this.createBanner(shaderData.info);
+
+        shaderData.renderpass.forEach(function (pass) {
+            if (pass.name === 'Image') {
+                pass.code = banner + pass.code;
+            }
+        })
+
         window.localStorage.setItem(
             LOCALSTORAGE_SHADER_FORK_KEYNAME,
-            JSON.stringify(gShaderToy.exportToJSON())
+            JSON.stringify(shaderData)
         );
 
         gShaderToy.mNeedsSave = false;

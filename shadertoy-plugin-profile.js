@@ -147,6 +147,7 @@
             contentWrapper);
 
         this.userShaders = this.getShaders();
+        document.body.style = "overflow: visible";
     };
 
     /**
