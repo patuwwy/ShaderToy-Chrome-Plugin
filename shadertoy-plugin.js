@@ -694,15 +694,18 @@
                 dataLoadShader(JSON.parse('[' + storedShader + ']'));
                 gShaderToy.mGLContext = ctx;
                 gShaderToy.startRendering();
+                window.localStorage.setItem(LOCALSTORAGE_SHADER_FORK_KEYNAME, '');
+
+                gShaderToy.mInfo.username = 'None';
+                gShaderToy.mInfo.id = '-1';
+                gShaderToy.mNeedsSave = true;
+                if (document.getElementById('published')) {
+                    document.getElementById('published').value = "0";
+                }
             }, 50);
         } catch (ignore) {}
 
-        window.localStorage.setItem(LOCALSTORAGE_SHADER_FORK_KEYNAME, '');
 
-        gShaderToy.mInfo.username = 'None';
-        gShaderToy.mInfo.id = '-1';
-        gShaderToy.mNeedsSave = true;
-        document.getElementById('published').value = "0";
     };
 
     /**
@@ -734,7 +737,7 @@
             '\n// ' + new Date().toISOString().replace('T',' ').replace(/(\..*)/g, '') + '\n\n';
 
         return banner;
-    }
+    };
 
     /**
      * Handles button's "click" event.
@@ -748,7 +751,9 @@
             if (pass.name === 'Image') {
                 pass.code = banner + pass.code;
             }
-        })
+        });
+
+        console.log(shaderData);
 
         window.localStorage.setItem(
             LOCALSTORAGE_SHADER_FORK_KEYNAME,
