@@ -67,7 +67,10 @@ Fullscreen edit ~~(dark theme)~~
 
 ## ShaderToy extension changelog:
 
-* 0.9.8 (27-Now-2017)
+* 0.9.10 (10-Jan-2018)
+Alternamite Profile page hot fix.
+
+* 0.9.8 (27-Nov-2017)
 [issue#40](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/40)
 [issue#41](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/41)
 

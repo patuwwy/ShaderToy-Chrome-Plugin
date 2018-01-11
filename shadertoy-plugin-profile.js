@@ -91,6 +91,16 @@
      * Adds shader previews to the shaders list.
      */
     function SortableShaderList() {
+
+        // Need to wait for user's shaders to load.
+        // This is a hot fix.
+        (function waitForShaders() {
+            if (document.querySelectorAll('#divShaders tr + tr').length) {
+                this.rebuildList();
+            } else {
+                setTimeout(waitForShaders.bind(this), 200);
+            }
+        }).call(this);
         this.rebuildList();
     }
 
@@ -147,6 +157,18 @@
             contentWrapper);
 
         this.userShaders = this.getShaders();
+
+        // Need to wait for user's shaders to load.
+        // This is a hot fix.
+        (function waitForShaders() {
+            if (document.querySelectorAll('#divShaders tr + tr').length) {
+                this.userShaders = this.getShaders();
+            } else {
+                setTimeout(waitForShaders.bind(this), 200);
+            }
+        }).call(this);
+
+
         document.body.style = "overflow: visible";
     };
 

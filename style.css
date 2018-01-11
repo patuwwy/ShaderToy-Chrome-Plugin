@@ -242,8 +242,8 @@ body.alternate-profile div#header {
     content: 'Public + API';
 }
 
-.tiles-wrapper ul .private:before {
-    content: 'Private';
+.tiles-wrapper ul .unlisted:before {
+    content: 'Unlisted';
 }
 
 .tiles-wrapper .shader-image {
