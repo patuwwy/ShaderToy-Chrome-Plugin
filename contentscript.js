@@ -1,6 +1,5 @@
 (function() {
-
-    'strict mode';
+    'use strict';
 
     /**
      * Main extension script filename.
@@ -42,7 +41,7 @@
      * @param {function} callback
      */
     function loadFile(file, callback) {
-        var oReq = new XMLHttpRequest();
+        var oReq = new window.XMLHttpRequest();
 
         oReq.onload = callback;
         oReq.open('get', file, true);
@@ -79,8 +78,8 @@
                     );
 
                     chrome.storage.sync.set({
-                            loopEnabled: request.data.loopEnabled
-                        }, function() {}
+                        loopEnabled: request.data.loopEnabled
+                    }, function() {}
                     );
                 }
 
@@ -97,12 +96,10 @@
      * Sets extension variables changes listener.
      */
     function bindStorageListener() {
-        chrome.storage.onChanged.addListener(function(changes, namespace) {
+        chrome.storage.onChanged.addListener(function(changes) {
             var key;
 
             for (key in changes) {
-                var storageChange = changes[key];
-
                 if (key === 'loopEnabled') {
                     executeScriptOnPage(
                         'window.TimebarLoop = ' + changes[key].newValue + ';'
@@ -117,7 +114,7 @@
      */
     function setWindowVariable(variable, value) {
         var
-            isString = typeof(value) == 'string',
+            isString = typeof (value) === 'string',
             code;
 
         value = isString ? ('\'' + value + '\';') : value;
@@ -150,7 +147,7 @@
     function sendInitialMessage() {
         chrome.extension.sendMessage({
             present: true
-        }, function (response) {});
+        }, function() {});
     }
 
     /**

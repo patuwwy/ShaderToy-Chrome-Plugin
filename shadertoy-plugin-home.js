@@ -1,4 +1,4 @@
-/* global gShaderToy, window, document */
+/* global window, document */
 
 /**
  * Extended functionality for Shadertoy home page.

@@ -1,6 +1,5 @@
 /* global window, document */
 (function shadertoyPluginProfilePage() {
-
     'use strict';
 
     /**
@@ -81,7 +80,7 @@
      * @returns {Image}
      */
     function createPreviewImageElementById(id) {
-        var img = new Image();
+        var img = new window.Image();
 
         img.src = getPreviewUrlById(id);
         return img;
@@ -91,7 +90,6 @@
      * Adds shader previews to the shaders list.
      */
     function SortableShaderList() {
-
         // Need to wait for user's shaders to load.
         // This is a hot fix.
         (function waitForShaders() {
@@ -110,9 +108,6 @@
      * Loads preview images of all shaders.
      */
     SortableShaderList.prototype.rebuildList = function shadersList() {
-        var tp = this,
-            i = 1;
-
         this.shadersListContainer = document.getElementById('divShaders');
         this.shadersTable = this.shadersListContainer.querySelector('table');
         this.shadersListRows = helpers.collectionToArray(
@@ -123,7 +118,9 @@
         // Add small preview images to shaders list.
         // Images are shown on hover.
         this.shadersListRows.forEach(function(row, i) {
-            if (!i) return;
+            if (!i) {
+                return;
+            }
 
             var link = row.querySelector('a'),
                 id = link.getAttribute('href').substr(6),
@@ -144,7 +141,7 @@
     /**
      * Initializes component.
      */
-    TilesView.prototype.init = function tilesViewInit () {
+    TilesView.prototype.init = function tilesViewInit() {
         document.body.classList.add('alternate-profile');
 
         this.tilesWrapper = document.createElement('div');
@@ -168,8 +165,7 @@
             }
         }).call(this);
 
-
-        document.body.style = "overflow: visible";
+        document.body.style = 'overflow: visible';
     };
 
     /**
@@ -179,20 +175,20 @@
      */
     TilesView.prototype.getShaders = function() {
         return helpers.collectionToArray(
-            document.querySelectorAll('#divShaders tr + tr'))
-                .map(function parseRow(tr) {
-                    var linkElement = tr.querySelector('td + td a'),
-                        link = linkElement.getAttribute('href');
+            document.querySelectorAll('#divShaders tr + tr')
+        ).map(function parseRow(tr) {
+            var linkElement = tr.querySelector('td + td a'),
+                link = linkElement.getAttribute('href');
 
-                    return new ShaderTile({
-                        id: link.replace('/view/', ''),
-                        link: link,
-                        title: linkElement.textContent,
-                        status: tr.lastElementChild
-                            .previousElementSibling
-                            .textContent.replace(/(\s+|\+)/g, '').toLowerCase()
-                    }, this);
-                }, this);
+            return new ShaderTile({
+                id: link.replace('/view/', ''),
+                link: link,
+                title: linkElement.textContent,
+                status: tr.lastElementChild
+                    .previousElementSibling
+                    .textContent.replace(/(\s+|\+)/g, '').toLowerCase()
+            }, this);
+        }, this);
     };
 
     /**
@@ -221,8 +217,8 @@
             )
             .replace(
                 '{shaderUrl}', getShaderUrlById(this.shader.id)
-            ).
-            replace(
+            )
+            .replace(
                 '{shaderTitle}', this.shader.title
             );
 
@@ -256,24 +252,26 @@
             me.button.style.marginTop = '10px';
             me.button.innerHTML = me.downloadCaption;
 
-            me.button.onclick = function onDownloadButtonClick(e) {
+            me.button.onclick = function onDownloadButtonClick() {
                 var ids = 0,
                     numRequests = 0,
                     i = 0;
 
                 if (me.loading) {
-                    alert('Please wait while we are processing your request!');
+                    window.alert('Please wait while we are processing your request!');
+
                     return;
                 }
 
                 this.innerHTML = me.loadingCaption;
                 ids = helpers.collectionToArray(
-                    document.querySelectorAll('#divShaders tr + tr'))
-                        .map(function getShaderIdFromURL(tr) {
-                            var linkElement = tr.querySelector('a'),
-                                link = linkElement.getAttribute('href');
-                            return link.replace('/view/', '');
-                        }, this);
+                    document.querySelectorAll('#divShaders tr + tr')
+                ).map(function getShaderIdFromURL(tr) {
+                    var linkElement = tr.querySelector('a'),
+                        link = linkElement.getAttribute('href');
+
+                    return link.replace('/view/', '');
+                }, this);
 
                 me.numShaders = ids.length;
 
@@ -290,7 +288,7 @@
                     me.processQueue();
                 } else {
                     this.innerHTML = me.downloadCaption;
-                    alert('No shaders found!');
+                    window.alert('No shaders found!');
                 }
             };
             section.appendChild(me.button);
@@ -306,12 +304,13 @@
             me.downloadResults.length + '/' + me.numShaders;
 
         try {
-            httpReq = new XMLHttpRequest();
+            httpReq = new window.XMLHttpRequest();
             httpReq.addEventListener('load', function onResponse(event) {
                 var json = event.target.response;
 
                 if (json === null) {
-                    alert('Error loading shader');
+                    window.alert('Error loading shader');
+
                     return;
                 }
 
@@ -327,18 +326,16 @@
             }, false);
 
             httpReq.addEventListener('error', function onRequestError() {
-                alert('Error loading shader');
+                window.alert('Error loading shader');
             }, false);
 
             httpReq.open('POST', '/shadertoy', true);
             httpReq.responseType = 'json';
             httpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            str = '{ "shaders" : ["'+ request.join('","') +'"] }';
-            str = 's=' + encodeURIComponent( str );
+            str = '{ "shaders" : ["' + request.join('","') + '"] }';
+            str = 's=' + encodeURIComponent(str);
             httpReq.send(str);
-        } catch(e) {
-            return;
-        }
+        } catch (ignore) { }
     };
 
     /**
@@ -352,9 +349,11 @@
 
         if (document.head.innerHTML) {
             this.sortableShaderList = new SortableShaderList();
+
             if (window.alternateProfile) {
                 this.tilesView = new TilesView();
             }
+
             this.shaderDownload = new ShaderDownload();
         } else {
             window.location.href = '/signin';

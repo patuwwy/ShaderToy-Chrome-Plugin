@@ -1,8 +1,7 @@
-/* global gShaderToy, window, document */
+/* global gShaderToy, dataLoadShader, window, document */
 
 (function shadertoyPlugin() {
-
-    'strict mode';
+    'use strict';
 
     /**
      * Arrow keys time change (ms).
@@ -19,17 +18,11 @@
         LOCALSTORAGE_SHADER_FORK_KEYNAME = 'forkedShaderStorage',
 
         /**
-         * Stores ToyPlug instance.
-         *
-         * @type {ToyPlug}
-         */
-        tp,
-
-        /**
          * Stores references to ShaderToy HTML elements.
          */
         shaderToyElements = {
             shaderInfo: document.getElementById('shaderInfo'),
+            shaderPlayer: document.getElementById('player')
         },
 
         extensionElements = {
@@ -80,7 +73,7 @@
     function ToyPlugCommon() { }
 
     ToyPlugCommon.prototype.downloadJson = function downloadJson(filename, data) {
-        var blob = new Blob([data], {type: 'application/json'}),
+        var blob = new window.Blob([data], {type: 'application/json'}),
             link = window.document.createElement('a');
 
         link.href = window.URL.createObjectURL(blob);
@@ -103,7 +96,6 @@
      * Initializes.
      */
     ToyPlugEditPage.prototype.init = function init() {
-
         /**
          * Body class name for fullscreen edit.
          *
@@ -168,7 +160,7 @@
      *
      * @param {number} divider
      */
-    ToyPlugEditPage.prototype.decreaseRes = function (divider) {
+    ToyPlugEditPage.prototype.decreaseRes = function(divider) {
         var b = this.c.getBoundingClientRect(),
             n = {
                 w: b.width / divider,
@@ -184,7 +176,7 @@
      *
      * @param {number} timeshift. Time change value in ms.
      */
-    ToyPlugEditPage.prototype.changeTimePosition = function (timeShift) {
+    ToyPlugEditPage.prototype.changeTimePosition = function(timeShift) {
         var destTime = Math.max(0, gShaderToy.mTf + timeShift);
 
         updateShaderToyTime(destTime);
@@ -212,21 +204,17 @@
      * Attaches additional keys support.
      */
     ToyPlugEditPage.prototype.bindKeys = function bindKeys() {
-
         var self = this;
 
         document.addEventListener('keydown', function(e) {
-
             var which = e.which,
                 code = e.code;
 
             if (e.target.id === self.MAIN_SHADERTOY_DEMO_ID) {
-
                 // Alt (or Cmd) + ...
                 if (e.altKey || e.metaKey) {
-
                     // 1...9 Keys
-                    if (which == Math.max(49, Math.min(57, which))) {
+                    if (which === Math.max(49, Math.min(57, which))) {
                         self.decreaseRes(which - 48);
                     }
 
@@ -245,11 +233,10 @@
                     if (e.key === 'ArrowLeft') {
                         self.decreaseTimePosition();
                     }
-
                 }
 
                 // shift + ctrl + s
-                if (e.ctrlKey && e.shiftKey && e.which == '83') {
+                if (e.ctrlKey && e.shiftKey && e.which === 83) {
                     self.takeScreenShot();
                 }
 
@@ -257,11 +244,10 @@
                 if (e.ctrlKey && e.shiftKey && code === 'KeyR') {
                     self.switchRecording();
                 }
-
             }
 
             // shift + ctrl + enter
-            if (e.which == 13 && e.shiftKey && e.ctrlKey) {
+            if (e.which === 13 && e.shiftKey && e.ctrlKey) {
                 self.toggleFullScreenEdit();
             }
         });
@@ -273,7 +259,7 @@
     ToyPlugEditPage.prototype.toggleFullScreenEdit =
         function toggleFullScreenEdit() {
             var isFS = document.body.classList
-                    .contains(this.FULLSCREEN_MODE_CLASS);
+                .contains(this.FULLSCREEN_MODE_CLASS);
 
             if (document.webkitIsFullScreen) {
                 document.webkitExitFullscreen();
@@ -294,7 +280,10 @@
             currentDivider = this.currentDivider,
             paused = gShaderToy.mIsPaused;
 
-        if (!paused) gShaderToy.pauseTime();
+        if (!paused) {
+            gShaderToy.pauseTime();
+        }
+
         this.decreaseRes(currentDivider * 0.25);
 
         window.setTimeout(function getImageData() {
@@ -303,13 +292,13 @@
 
         window.setTimeout(function() {
             var link = document.createElement('a'),
-                clickEvent = new MouseEvent('click', {
+                clickEvent = new window.MouseEvent('click', {
                     'view': window,
                     'bubbles': true,
                     'cancelable': false
                 }),
                 filename = document.getElementById('shaderTitle').value +
-                    '_' + new Date().toJSON().slice(0,10) +
+                    '_' + new Date().toJSON().slice(0, 10) +
                     ' ' + new Date(new Date()).toString().split(' ')[4];
 
             link.setAttribute('href', imageData);
@@ -317,15 +306,16 @@
             link.dispatchEvent(clickEvent);
 
             this.decreaseRes(currentDivider);
-            if (!paused) gShaderToy.pauseTime();
+            if (!paused) {
+                gShaderToy.pauseTime();
+            }
         }.bind(this), 1000);
     };
 
     ToyPlugEditPage.prototype.switchRecording = function switchRecording() {
-        if (gShaderToy.mMediaRecorder.state == 'inactive') {
+        if (gShaderToy.mMediaRecorder.state === 'inactive') {
             gShaderToy.mMediaRecorder.start();
-        }
-        else {
+        } else {
             gShaderToy.mMediaRecorder.stop();
         }
     };
@@ -337,7 +327,7 @@
         if (publishWrapper) {
             duplicate.classList.add('formButton');
             duplicate.classList.add('formButton-extension');
-            duplicate.style.marginLeft = "12px";
+            duplicate.style.marginLeft = '12px';
             duplicate.style.display = 'inline-block';
             duplicate.textContent = 'Save as new draft';
 
@@ -347,11 +337,11 @@
                     (gShaderToy.mNeedsSave &&
                         window.confirm('Current shader will be saved as new draft. Page will be reloaded. Continue?')
                     ) || !gShaderToy.mNeedsSave) {
-                        gShaderToy.mInfo.username = 'None';
-                        gShaderToy.mInfo.id = '-1';
-                        document.getElementById('published').value = '0';
-                        window.openSubmitShaderForm(false);
-                    }
+                    gShaderToy.mInfo.username = 'None';
+                    gShaderToy.mInfo.id = '-1';
+                    document.getElementById('published').value = '0';
+                    window.openSubmitShaderForm(false);
+                }
             });
         }
     };
@@ -373,7 +363,7 @@
             container.appendChild(download);
             download.addEventListener('click', function onDownloadButtonClick() {
                 var name = gShaderToy.mInfo.id;
-                if (name == '-1') {
+                if (name === '-1') {
                     name = 'default';
                 }
                 window.ToyPlug.common.downloadJson(name + '.json', JSON.stringify(gShaderToy.exportToJSON()));
@@ -402,14 +392,14 @@
                 fileInput.type = 'file';
                 fileInput.addEventListener('change', function onInputChange() {
                     var file = this.files[0],
-                        reader = new FileReader();
+                        reader = new window.FileReader();
 
-                    reader.onload = function onFileLoaded(e) {
+                    reader.onload = function onFileLoaded() {
                         var text = reader.result;
                         try {
                             dataLoadShader(JSON.parse('[' + text + ']'));
                         } catch (error) {
-                            alert('Failed to load shader!');
+                            window.alert('Failed to load shader!');
                         }
                         gShaderToy.mInfo.id = '-1';
                     };
@@ -478,7 +468,7 @@
     }
 
     Timebar.prototype.getControlsVisibilitySavedState = function() {
-        return JSON.parse(localStorage.getItem('controlsExpanded'));
+        return JSON.parse(window.localStorage.getItem('controlsExpanded'));
     };
 
     Timebar.prototype.setControlsVisibility = function(expand) {
@@ -489,7 +479,7 @@
         var isExpanded = this.getControlsVisibilitySavedState();
 
         this.setControlsVisibility(!isExpanded);
-        localStorage.setItem('controlsExpanded', !isExpanded);
+        window.localStorage.setItem('controlsExpanded', !isExpanded);
     };
 
     /**
@@ -602,9 +592,11 @@
      * Handles relase slider click.
      */
     Timebar.prototype.sliderOnMouseUp = function sliderOnMouseUp() {
-        if (!this.wasPaused) gShaderToy.pauseTime();
+        if (!this.wasPaused) {
+            gShaderToy.pauseTime();
+        }
 
-        requestAnimationFrame(function() {
+        window.requestAnimationFrame(function() {
             updateShaderToyTime(this.sliderInput.value, !this.wasPaused);
             updateInputsTime(this.sliderInput.value);
             this.busy = false;
@@ -621,7 +613,7 @@
     /**
      * Updates ShaderToy with provided time value.
      */
-    function updateShaderToyTime(time, togglePause) {
+    function updateShaderToyTime(time) {
         var value = parseInt(time, 10),
             i = 0;
 
@@ -633,15 +625,17 @@
         gShaderToy.mFpsTo = gShaderToy.mTo;
         gShaderToy.mEffect.mFrame = gShaderToy.mFpsFrame;
 
-        for (i; i < gShaderToy.mEffect.mPasses.length; i++ ) {
+        for (i; i < gShaderToy.mEffect.mPasses.length; i++) {
             gShaderToy.mEffect.mPasses[i].mFrame = gShaderToy.mFpsFrame;
         }
 
-        requestAnimationFrame(function() {
+        window.requestAnimationFrame(function() {
             gShaderToy.mTOffset = value;
-            gShaderToy.mTo = getRealTime();
+            gShaderToy.mTo = window.getRealTime();
             gShaderToy.mTf = value;
-            gShaderToy.mEffect.mAudioContext.currentTime = value;
+            try {
+                gShaderToy.mEffect.mAudioContext.currentTime = value;
+            } catch (ignore) {}
 
             gShaderToy.pauseTime();
         });
@@ -652,7 +646,7 @@
      */
     function updateInputsTime(value) {
         gShaderToy.mEffect.mPasses.forEach(function mPass(pass) {
-            pass.mInputs.forEach(function mInput(input){
+            pass.mInputs.forEach(function mInput(input) {
                 var media = null;
                 if (input) {
                     media = input.audio || input.video;
@@ -668,11 +662,11 @@
     /**
      * Adds forking any shader functionality.
      */
-    ShaderDuplicator = function() {
+    function ShaderDuplicator() {
         this.finishShaderFork();
         this.addButton();
         this.bindButtonEvents();
-    };
+    }
 
     /**
      * Loads shader from LocalStorage if there is is stored one.
@@ -700,12 +694,10 @@
                 gShaderToy.mInfo.id = '-1';
                 gShaderToy.mNeedsSave = true;
                 if (document.getElementById('published')) {
-                    document.getElementById('published').value = "0";
+                    document.getElementById('published').value = '0';
                 }
             }, 50);
         } catch (ignore) {}
-
-
     };
 
     /**
@@ -731,10 +723,10 @@
     };
 
     ShaderDuplicator.prototype.createBanner = function(shaderInfo) {
-        banner = '// Fork of ' +
+        var banner = '// Fork of ' +
             '"' + shaderInfo.name + '" by ' + shaderInfo.username +
             '. https://shadertoy.com/view/' + shaderInfo.id +
-            '\n// ' + new Date().toISOString().replace('T',' ').replace(/(\..*)/g, '') + '\n\n';
+            '\n// ' + new Date().toISOString().replace('T', ' ').replace(/(\..*)/g, '') + '\n\n';
 
         return banner;
     };
@@ -747,13 +739,11 @@
         var shaderData = gShaderToy.exportToJSON(),
             banner = this.createBanner(shaderData.info);
 
-        shaderData.renderpass.forEach(function (pass) {
+        shaderData.renderpass.forEach(function(pass) {
             if (pass.name === 'Image') {
                 pass.code = banner + pass.code;
             }
         });
-
-        console.log(shaderData);
 
         window.localStorage.setItem(
             LOCALSTORAGE_SHADER_FORK_KEYNAME,
@@ -767,17 +757,17 @@
     /**
      * Mouse uniform sliders constructor.
      */
-    MouseUniforms = function() {
+    function MouseUniforms() {
         this.config = [
-            { gS: 'PosX', vPart: 'x', size: 'width'},
-            { gS: 'PosY', vPart: 'y', size: 'height'},
-            { gS: 'OriX', vPart: 'z', size: 'width'},
-            { gS: 'OriY', vPart: 'w', size: 'height'}
+            {gS: 'PosX', vPart: 'x', size: 'width'},
+            {gS: 'PosY', vPart: 'y', size: 'height'},
+            {gS: 'OriX', vPart: 'z', size: 'width'},
+            {gS: 'OriY', vPart: 'w', size: 'height'}
         ];
         this.addSliders();
         this.onResize();
         window.addEventListener('resize', this.onResize.bind(this));
-    };
+    }
 
     /**
      * Adds sliders to page.
@@ -850,10 +840,10 @@
     /**
      * Class to wrap http/https url into HTML <a> tags.
      */
-    AnchorsMaker = function() {
+    function AnchorsMaker() {
         this.NOT_ANCHOR_URL_REGEXP = /((http?|https?):\/\/[^"<\s]+)(?![^<>]*>|[^"]*?<\/a)/g;
         this.init();
-    };
+    }
 
     /**
      * Initializes instance.
@@ -883,10 +873,10 @@
      * Replaces urls if loaded.
      */
     AnchorsMaker.prototype.makeDescriptionLinks = function() {
-        var SELECTOR = '#shaderDescription';
+        var SELECTOR = '#shaderDescription',
             descriptionElement = document.querySelector(SELECTOR);
 
-        if (descriptionElement.tagName == 'TEXTAREA') {
+        if (descriptionElement.tagName === 'TEXTAREA') {
             return;
         }
 
@@ -917,5 +907,4 @@
     };
 
     window.ToyPlug = window.ToyPlug || new ToyPlug();
-
 })(document, window);

@@ -1,5 +1,4 @@
 (function definePopupModule() {
-
     'use strict';
 
     /**
@@ -7,7 +6,7 @@
      *
      * @constructor
      */
-    function Popup () {
+    function Popup() {
         this.init();
     }
 
@@ -58,7 +57,7 @@
                     alternateProfile: i.checked
                 });
             });
-    };
+        };
 
     /**
      * Sends chrome message.
@@ -96,9 +95,9 @@
     /**
      * Opens all links in new tab.
      */
-    window.addEventListener('click', function onLinkClick(e){
+    window.addEventListener('click', function onLinkClick(e) {
         if (e.target.href) {
-            chrome.tabs.create({url:e.target.href});
+            chrome.tabs.create({ url: e.target.href });
         }
     });
 
@@ -109,5 +108,4 @@
         chrome.runtime.getManifest().version;
 
     return new Popup();
-
 })();
