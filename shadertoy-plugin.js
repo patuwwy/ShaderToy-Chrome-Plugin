@@ -22,11 +22,27 @@
          */
         shaderToyElements = {
             shaderInfo: document.getElementById('shaderInfo'),
-            shaderPlayer: document.getElementById('player')
+            shaderPlayer: document.getElementById('player'),
+            shaderTags: document.getElementById('shaderTags'),
+            shaderDescription: document.getElementById('shaderDescription')
         },
 
         extensionElements = {
-        };
+        },
+
+        /**
+         * Template for the readme.txt when you download a ZIP of a
+         * single shader.
+         *
+         * @const {string}
+         */
+        ZIP_README_TEMPLATE = '"{friendlyName}" provided by {userName}\n' +
+            '{href}\n' +
+            '-------------------------------------------------------------\n' +
+            '{tags}\n{description}\n' +
+            '-------------------------------------------------------------\n' +
+            'You can upload the JSON file of the shader using\n' +
+            'https://github.com/patuwwy/ShaderToy-Chrome-Plugin\n';
 
     /**
      * ToyPlug.
@@ -40,6 +56,38 @@
 
         this.initialized = true;
     }
+
+    /**
+     * Render a template by substituting {tag}s in #template from #values.
+     * Tags in #template will be replaced only if there is a corresponding
+     * element in #values.  Other tags will be left untouched.
+     *
+     * @param template {String} the template to fill in
+     * @param values {Object} the values to fill in.
+     */
+    ToyPlug.prototype.renderTemplate = function renderTemplate(template, values) {
+        if (!template || typeof template !== 'string') {
+            // Sane output for invalid input
+            return '';
+        }
+
+        values = values || {};
+        if (typeof values !== 'object') {
+            // If invalid input, no changes.
+            return template;
+        }
+
+        var result = template.replace(/{([^}]+)}/g,
+            function(match, key) {
+                return values[key] || match;
+            }
+        );
+
+        // Regularize line endings, in case one of the inputs used \r\n
+        result = result.replace(/\r\n|\r/g, '\n');
+
+        return result;
+    };
 
     /**
      * @returns {boolean} True if current page is editor page.
@@ -72,15 +120,28 @@
      */
     function ToyPlugCommon() { }
 
-    ToyPlugCommon.prototype.downloadJson = function downloadJson(filename, data) {
-        var blob = new window.Blob([data], {type: 'application/json'}),
-            link = window.document.createElement('a');
+    /**
+     * Download a blob to the user's disk.
+     * @param filename {String} The filename to save
+     * @param blob {Blob} The data to save
+     */
+    ToyPlugCommon.prototype.downloadBlob = function downloadBlob(filename, blob) {
+        var link = window.document.createElement('a');
 
         link.href = window.URL.createObjectURL(blob);
         link.download = filename;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    };
+
+    /**
+     * Download a JSON file of the provided data
+     */
+    ToyPlugCommon.prototype.downloadJson = function downloadJson(filename, data) {
+        var blob = new window.Blob([data], {type: 'application/json'});
+
+        this.downloadBlob(filename, blob);
     };
 
     /**
@@ -127,11 +188,13 @@
         this.bindKeys();
         this.createContainers();
 
+        // Create new UI controls
         this.timebar = new Timebar(this);
         this.mouseUniforms = new MouseUniforms(this);
         this.duplicateShader();
         this.uploadShader();
         this.downloadShader();
+        this.downloadShaderAsZip();
 
         this.shaderDuplicator = new ShaderDuplicator();
         this.anchorsMaker = new AnchorsMaker();
@@ -346,6 +409,9 @@
         }
     };
 
+    /**
+     * Create the UI controls to download the JSON file of the current shader
+     */
     ToyPlugEditPage.prototype.downloadShader = function downloadShader() {
         var container = document.getElementById('shaderPublished') || document.getElementById('shaderButtons'),
             download = document.createElement('div');
@@ -368,6 +434,105 @@
                 }
                 window.ToyPlug.common.downloadJson(name + '.json', JSON.stringify(gShaderToy.exportToJSON()));
             });
+        }
+    };
+
+    /**
+     * Create the UI controls to download a ZIP of the current shader
+     */
+    ToyPlugEditPage.prototype.downloadShaderAsZip = function downloadShaderAsZip() {
+        /**
+         * Callback to prepare and download a ZIP of the current shader
+         */
+        function onDownloadAsZipClick() {
+            var id = gShaderToy.mInfo.id,
+                friendlyName = gShaderToy.mInfo.name || ('ShaderToy shader ' + id),
+                username = gShaderToy.mInfo.username || 'unknown',
+                filename = window.sanitizeFilename(username) + ' - ' +
+                    window.sanitizeFilename(friendlyName),
+                tags = [],
+                tagsString = '',
+                description,
+                readme,
+                zip;
+
+            if (id === '-1') {
+                id = 'default';
+            }
+
+            // Pull from the live tags and description fields, if provided,
+            // rather than just from mInfo.  This permits
+            // stuffing information (e.g., release party) into the
+            // readme without having to hand-edit, and without needing
+            // write access to the shader.
+
+            // Get the tags from the tag box, with a fallback to the
+            // ShaderToy info.
+            if (shaderToyElements.shaderTags &&
+                                    shaderToyElements.shaderTags.value) {
+                tags = shaderToyElements.shaderTags.value.split(/\s*,\s*/);
+            }
+            if (tags.length === 0) {
+                tags = gShaderToy.mInfo.tags;
+            }
+
+            // Add the tags to the README
+            if (Array.isArray(tags) && tags.length !== 0) {
+                tagsString = 'Tags: ' + tags.join(', ') + '\n';
+            }
+
+            // Get the description from the textarea, with a fallback
+            // to the ShaderToy info
+            if (shaderToyElements.shaderDescription &&
+                    shaderToyElements.shaderDescription.value) {
+                description = shaderToyElements.shaderDescription.value;
+            } else {
+                description = gShaderToy.mInfo.description;
+            }
+
+            readme = window.ToyPlug.renderTemplate(ZIP_README_TEMPLATE, {
+                friendlyName: friendlyName,
+                userName: username,
+                href: window.location.href,
+                tags: tagsString,
+                description: description
+            });
+
+            // Build the ZIP.  Tweaked from the JSZip example.
+            zip = new window.JSZip();
+            zip.file('readme.txt', readme, {binary: false});
+
+            zip.file(id + '.json',
+                JSON.stringify(gShaderToy.exportToJSON()),
+                {binary: false});
+
+            // Save the ZIP
+            zip.generateAsync({type: 'blob'}).then(
+                function(content) {
+                    window.ToyPlug.common.downloadBlob(filename + '.zip', content);
+                },
+                function() {
+                    window.alert("Couldn't save ZIP"); // jshint ignore: line
+                }
+            );
+        } // onDownloadAsZipClick()
+
+        var download = document.createElement('div');
+
+        // Put it down by the Fork button since it is a less-common function
+        if (shaderToyElements.shaderInfo) {
+            download.id = 'dl-shader-zip';
+            download.classList.add('formButton');
+            download.classList.add('formButton-extension');
+            download.style.marginLeft = '12px';
+            download.style.marginTop = '10px';
+            download.style.float = 'right';
+            download.style.width = '100px';
+            download.textContent = 'Export ZIP';
+            download.style.display = (window.enableZip ? 'block' : 'none');
+
+            shaderToyElements.shaderInfo.appendChild(download);
+            download.addEventListener('click', onDownloadAsZipClick);
         }
     };
 

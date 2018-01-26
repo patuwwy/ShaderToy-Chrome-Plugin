@@ -17,6 +17,7 @@
         this.bindLoopInput();
         this.bindRenderModeSelect();
         this.bindAlternateProfileInput();
+        this.bindEnableZipSupport();
     };
 
     /**
@@ -25,7 +26,7 @@
     Popup.prototype.bindRenderModeSelect = function bindSelect() {
         var i = document.querySelector('select');
 
-        i.addEventListener('change', function(e) {
+        i.addEventListener('change', function(/* e */) {
             sendMessage({
                 renderMode: i.value
             });
@@ -38,7 +39,7 @@
     Popup.prototype.bindLoopInput = function bindSelect() {
         var i = document.getElementById('input-loop');
 
-        i.addEventListener('change', function(e) {
+        i.addEventListener('change', function(/* e */) {
             sendMessage({
                 loopEnabled: i.checked
             });
@@ -52,12 +53,25 @@
         function bindAlternateProfileInput() {
             var i = document.getElementById('input-alternate-profile');
 
-            i.addEventListener('change', function onInputChange(e) {
+            i.addEventListener('change', function onInputChange(/* e */) {
                 sendMessage({
                     alternateProfile: i.checked
                 });
             });
         };
+
+    /**
+     * Sets listener for enable-ZIP-download option
+     */
+    Popup.prototype.bindEnableZipSupport = function bindEnableZipSupport() {
+        var i = document.getElementById('enable-zip-downloads');
+
+        i.addEventListener('change', function onInputChange(/* e */) {
+            sendMessage({
+                enableZip: !!i.checked
+            });
+        });
+    };
 
     /**
      * Sends chrome message.
@@ -90,6 +104,15 @@
         var i = document.getElementById('input-alternate-profile');
 
         i.checked = items.alternateProfile;
+    });
+
+    /**
+     * Gets stored state of ZIP enablement
+     */
+    chrome.storage.sync.get('enableZip', function onSync(items) {
+        var i = document.getElementById('enable-zip-downloads');
+
+        i.checked = !!items.enableZip;
     });
 
     /**

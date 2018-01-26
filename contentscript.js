@@ -4,52 +4,72 @@
     /**
      * Main extension script filename.
      *
-     * @type {string}
+     * @const {string}
      */
     var MAIN_EXTENSION_FILENAME = 'shadertoy-plugin.js',
 
         /**
          * Profile page script filename.
          *
-         * @type {string}
+         * @const {string}
          */
         PROFILE_EXTENSION_FILENAME = 'shadertoy-plugin-profile.js',
 
         /**
          * Home page script filename.
          *
-         * @type {string}
+         * @const {string}
          */
-        HOME_EXTENSION_FILENAME = 'shadertoy-plugin-home.js';
+        HOME_EXTENSION_FILENAME = 'shadertoy-plugin-home.js',
+
+        /**
+         * ZIP export script filename, used by the main extension script.
+         *
+         * @const {string}
+         */
+        JSZIP_FILENAME = '/lib/jszip-3.1.5.js',
+
+        /**
+         * script to sanitize filenames, used by the main extension script.
+         * Defines window.sanitize_filename().
+         * Bundled using webpack from:
+         * https://github.com/parshap/truncate-utf8-bytes/blob/master/lib/truncate.js
+         * https://github.com/parshap/utf8-byte-length/blob/master/browser.js
+         * https://github.com/parshap/truncate-utf8-bytes/blob/master/browser.js
+         *
+         * @const {string}
+         */
+        SANITIZE_FILENAME = '/lib/node-sanitize-filename.js',
+
+        /**
+         * Whether or not ZIP support is currently enabled.
+         * Initially null to indicate "not initialized"
+         * @type {mixed} null, true, or false
+         */
+        isZipEnabled = null;
 
     /**
-     * Loads main ToyPlug script and attaches it to ShaderToy.
-     */
-    function loadScript(file) {
-        loadFile(chrome.runtime.getURL(file), function() {
-            var script = document.createElement('script');
-
-            script.innerHTML = this.responseText;
-            document.body.appendChild(script);
-        });
-    }
-
-    /**
-     * Load file and calls callback when file is loaded.
+     * Load a script directly from our extension.  The script should be
+     * listed in the manifest as a web_accessible_resource.
+     * The script runs in the page's world, not in the extension's world.
      *
-     * @param {string} file
-     * @param {function} callback
+     * @param filename {String} the filename of the script within our extension
+     * @param id {String} optional ID to assign to the <script> tag
      */
-    function loadFile(file, callback) {
-        var oReq = new window.XMLHttpRequest();
+    function loadScript(filename, id) {
+        var script = document.createElement('script');
 
-        oReq.onload = callback;
-        oReq.open('get', file, true);
-        oReq.send();
+        script.src = chrome.runtime.getURL(filename);
+        script.async = true;
+        if (id) {
+            script.id = id;
+        }
+        document.head.appendChild(script);
     }
 
     /**
-     * Injects script into Shadertoy page.
+     * Injects script code into Shadertoy page.  The code runs in the page's
+     * world, not in this extension's world.
      */
     function executeScriptOnPage(javascriptCode) {
         var script = document.createElement('script');
@@ -63,7 +83,7 @@
      */
     function bindMessagesListener() {
         chrome.runtime.onMessage.addListener(
-            function(request, sender, sendResponse) {
+            function(request /*, sender, sendResponse */) {
                 if (request.data.renderMode) {
                     executeScriptOnPage(
                         'ToyPlug.setRenderMode(\'' +
@@ -88,8 +108,52 @@
                         alternateProfile: request.data.alternateProfile
                     }, function() {});
                 }
+
+                if ('enableZip' in request.data) {
+                    chrome.storage.sync.set({
+                        enableZip: !!request.data.enableZip
+                    }, function() {});
+                    setZipEnabled(!!request.data.enableZip);
+                }
             }
         );
+    }
+
+    /**
+     * Set whether or not ZIP support is enabled.  Loads the scripts when
+     * enabling support.
+     * @param enable {Boolean} truthy to enable; falsy to disable
+     */
+    function setZipEnabled(enable) {
+        if (enable === isZipEnabled) {
+            // No change => nothing to do
+            return;
+        }
+
+        var elem;
+
+        enable = !!enable;
+        isZipEnabled = enable;
+        setWindowVariable('enableZip', enable);
+
+        if (!enable) {
+            // Hide the ZIP controls.  Do this here because the plugins cannot
+            // watch for changes using chrome.storage.onChanged.
+
+            // On the shader page
+            elem = document.getElementById('dl-shader-zip');
+            if (elem) {
+                elem.style.display = 'none';
+            }
+        } else {
+            loadZipScripts();
+
+            // Enable button on the shader page
+            elem = document.getElementById('dl-shader-zip');
+            if (elem) {
+                elem.style.display = 'block';
+            }
+        }
     }
 
     /**
@@ -104,6 +168,8 @@
                     executeScriptOnPage(
                         'window.TimebarLoop = ' + changes[key].newValue + ';'
                     );
+                } else if (key === 'enableZip') {
+                    setZipEnabled(!!changes[key].newValue);
                 }
             }
         });
@@ -111,6 +177,8 @@
 
     /**
      * Injects short script which sets variable in window context.
+     * We can't set it directly because our global scope is different from
+     * the page's global scope (isolated worlds).
      */
     function setWindowVariable(variable, value) {
         var
@@ -131,6 +199,10 @@
             setWindowVariable('alternateProfile', items.alternateProfile);
         });
 
+        chrome.storage.sync.get('enableZip', function(items) {
+            setZipEnabled(items.enableZip);
+        });
+
         chrome.storage.sync.get('loopEnabled', function(items) {
             var code = '';
 
@@ -148,6 +220,18 @@
         chrome.extension.sendMessage({
             present: true
         }, function() {});
+    }
+
+    /**
+     * Loads the scripts for ZIP support, if they haven't already been loaded.
+     */
+    function loadZipScripts() {
+        if (document.getElementById('script-jszip')) {
+            return; // Don't reload if the scripts are already there
+        }
+
+        loadScript(JSZIP_FILENAME, 'script-jszip');
+        loadScript(SANITIZE_FILENAME);
     }
 
     /**
@@ -172,7 +256,10 @@
      * Initializes extension.
      */
     function init() {
+        // Must be before any loadScript calls to set window.* variables
+        // with the configuration from chrome.storage.
         synchronizeChrome();
+
         loadScript(MAIN_EXTENSION_FILENAME);
 
         initializeProfilePage();

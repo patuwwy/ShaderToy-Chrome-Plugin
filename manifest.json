@@ -36,6 +36,8 @@
         "popup.js",
         "shadertoy-plugin.js",
         "shadertoy-plugin-profile.js",
-        "shadertoy-plugin-home.js"
+        "shadertoy-plugin-home.js",
+        "/lib/jszip-3.1.5.js",
+        "/lib/node-sanitize-filename.js"
     ]
 }
