@@ -16,11 +16,11 @@
         PROFILE_EXTENSION_FILENAME = 'shadertoy-plugin-profile.js',
 
         /**
-         * Home page script filename.
+         * Home page script filename.  Not yet used.
          *
          * @const {string}
          */
-        HOME_EXTENSION_FILENAME = 'shadertoy-plugin-home.js',
+        // HOME_EXTENSION_FILENAME = 'shadertoy-plugin-home.js',
 
         /**
          * ZIP export script filename, used by the main extension script.
@@ -179,13 +179,21 @@
      * Injects short script which sets variable in window context.
      * We can't set it directly because our global scope is different from
      * the page's global scope (isolated worlds).
+     *
+     * @param variable {String} The variable name.  Must be a valid
+     *                          JavaScript identifier.
+     * @param value {mixed} The new value.
      */
     function setWindowVariable(variable, value) {
-        var
-            isString = typeof (value) === 'string',
+        var isString = typeof (value) === 'string',
             code;
 
-        value = isString ? ('\'' + value + '\';') : value;
+        if (isString) {
+            // Make a proper single-quoted, escaped representation
+            value = value.replace(/[\\]/g, '\\\\').replace(/[']/g, '\\\'');
+            value = '\'' + value + '\'';
+        }
+
         code = 'window.' + variable + ' = ' + value + ';';
 
         executeScriptOnPage(code);
@@ -247,8 +255,11 @@
      * Loads profile script on profile page.
      */
     function initializeHomePage() {
-        if (document.location.href.match(/shadertoy.com$|shadertoy.com\//)) {
-            loadScript(HOME_EXTENSION_FILENAME);
+        if (document.location.href.match(/shadertoy.com\/?$/)) {
+            void 0; // jshint ignore: line
+            // The Home script doesn't do anything yet --- uncomment this
+            // if you add code to it.
+            // loadScript(HOME_EXTENSION_FILENAME);
         }
     }
 
