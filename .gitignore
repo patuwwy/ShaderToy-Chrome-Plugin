@@ -2,3 +2,6 @@
 ./screenshots
 [Tt]humbs.db
 *.DS_Store
+*.swp
+*~
+~*
