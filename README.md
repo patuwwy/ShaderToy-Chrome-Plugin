@@ -9,7 +9,9 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 ## Features:
 
-* Clone any shader.
+* Fork any shader.
+
+* Save as new draft (for owned shaders).
 
 * Adjustable slider for full control of 'iTime' uniform and audio/video inputs.
 
@@ -45,7 +47,9 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 * Cloning own shaders with one click!
 
-* Export/Import shaders (json)
+* Export shaders (single JSON or ZIP archive with JSON and readme.txt)
+
+* Import JSON
 
 * Show links in description/comments even if not inserted with BBCode.
 
@@ -67,8 +71,11 @@ Fullscreen edit ~~(dark theme)~~
 
 ## ShaderToy extension changelog:
 
+* 0.9.11
+Export to ZIP by [Chris White cxw42](https://github.com/cxw42)
+
 * 0.9.10 (10-Jan-2018)
-Alternamite Profile page hot fix.
+Alternative Profile page hot fix.
 
 * 0.9.8 (27-Nov-2017)
 [issue#40](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/40)
@@ -230,3 +237,4 @@ Change resolution by keys 1...9
 ## Contributors:
 
 [movAX13h](http://blog.thrill-project.com/)
+[Chris White cxw42](https://github.com/cxw42)
