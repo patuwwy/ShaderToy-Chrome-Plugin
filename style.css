@@ -224,7 +224,7 @@ body.alternate-profile div#header {
 }
 
 .tiles-wrapper ul ul:before {
-    content: 'Draft';
+    content: 'Private';
     display: block;
     font-size: 24px;
     clear: both;
