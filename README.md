@@ -45,8 +45,6 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 * Fullscreen edit mode.
 
-* Cloning own shaders with one click!
-
 * Export shaders (single JSON or ZIP archive with JSON and readme.txt)
 
 * Import JSON

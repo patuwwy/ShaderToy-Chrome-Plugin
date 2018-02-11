@@ -32,18 +32,6 @@
             '<img class="shader-image" src="{previewUrl}"/>' +
             '<span class="shader-name">{shaderTitle}</span></a>',
 
-        /**
-         * HTML for tiles lists.
-         *
-         * @const {string}
-         */
-        TILES_CONTAINER = '<ul>' +
-            '<li class="status"><ul class="unlisted"></ul></li>' +
-            '<li class="status"><ul class="private"></ul></li>' +
-            '<li class="status"><ul class="public"></ul></li>' +
-            '<li class="status"><ul class="publicapi"></ul></li>' +
-            '</ul>',
-
         contentWrapper = null,
 
         /**
@@ -147,8 +135,6 @@
         this.tilesWrapper = document.createElement('div');
         this.tilesWrapper.classList.add('tiles-wrapper');
 
-        this.tilesWrapper.innerHTML = TILES_CONTAINER;
-
         contentWrapper = document.getElementById('contentScroll');
         document.body.insertBefore(this.tilesWrapper,
             contentWrapper);
@@ -178,15 +164,17 @@
             document.querySelectorAll('#divShaders tr + tr')
         ).map(function parseRow(tr) {
             var linkElement = tr.querySelector('td + td a'),
-                link = linkElement.getAttribute('href');
+                link = linkElement.getAttribute('href'),
+                status = tr.lastElementChild
+                    .previousElementSibling
+                    .textContent;
 
             return new ShaderTile({
                 id: link.replace('/view/', ''),
                 link: link,
                 title: linkElement.textContent,
-                status: tr.lastElementChild
-                    .previousElementSibling
-                    .textContent.replace(/(\s+|\+)/g, '').toLowerCase()
+                statusOrginal: status,
+                status: status.replace(/(\s+|\+)/g, '').toLowerCase()
             }, this);
         }, this);
     };
@@ -208,10 +196,24 @@
      * Creates and adds shader tile element.
      */
     ShaderTile.prototype.createHTML = function() {
-        var li = document.createElement('li');
+        var tile = document.createElement('li'),
+            targetElement = this.tilesView.tilesWrapper
+                .querySelector('.list.' + this.shader.status);
 
-        li.classList.add('shader');
-        li.innerHTML = TILE_TEMPLATE
+        if (!targetElement) {
+            let list = document.createElement('ul'),
+                listElement = document.createElement('li');
+
+            list.classList.add('list', this.shader.status);
+            list.setAttribute('data-status', this.shader.statusOrginal);
+            listElement.appendChild(list);
+
+            this.tilesView.tilesWrapper.appendChild(list);
+            targetElement = list;
+        }
+
+        tile.classList.add('shader');
+        tile.innerHTML = TILE_TEMPLATE
             .replace(
                 '{previewUrl}', getPreviewUrlById(this.shader.id)
             )
@@ -222,8 +224,7 @@
                 '{shaderTitle}', this.shader.title
             );
 
-        this.tilesView.tilesWrapper.querySelector('.' + this.shader.status)
-            .appendChild(li);
+        targetElement.appendChild(tile);
     };
 
     /**
