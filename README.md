@@ -69,6 +69,9 @@ Fullscreen edit ~~(dark theme)~~
 
 ## ShaderToy extension changelog:
 
+* 0.9.12 (11-Feb-2018)
+Multilanguage alterative profile page support.
+
 * 0.9.11
 Export to ZIP by [Chris White cxw42](https://github.com/cxw42)
 
