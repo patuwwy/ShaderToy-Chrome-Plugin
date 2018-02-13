@@ -225,7 +225,7 @@
      * Sends initial message.
      */
     function sendInitialMessage() {
-        chrome.extension.sendMessage({
+        chrome.runtime.sendMessage({
             present: true
         }, function() {});
     }
