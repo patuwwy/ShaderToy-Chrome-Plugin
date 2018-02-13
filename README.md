@@ -1,7 +1,9 @@
 # ShaderToy unofficial plugin.
 
-Extension to make Shadertoy coding more comfortable.
-[Chrome Web Store](https://chrome.google.com/webstore/detail/shadertoy-unofficial-plug/ohicbclhdmkhoabobgppffepcopomhgl?hl=pl)
+[b]WebExtension[/b] to make [b]Shadertoy[/b] coding more comfortable.
+
+[Chrome extension](https://chrome.google.com/webstore/detail/shadertoy-unofficial-plug/ohicbclhdmkhoabobgppffepcopomhgl?hl=pl)
+[Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/shadertoy-unofficial-plugin/)
 
 ## Info
 
@@ -13,9 +15,9 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 * Save as new draft (for owned shaders).
 
-* Adjustable slider for full control of 'iTime' uniform and audio/video inputs.
+* Adjustable slider for full control of 'iTime' uniform and audio/video channels' time.
 
-* Four sliders simulating mouse position with the same range.
+* Four sliders for simulating mouse position.
   This can be used to tweaking variables with iMouse.xyzw uniform.
 
 * ~~Switchable dark color theme.~~
@@ -29,15 +31,15 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 * ~~Shaders previews on "My profile" page.~~
 (feature removed - implemented natively in Shadertoy. Big preview on mouse over is still available)
 
-* Change resolution in windowed and fullscreen mode by pressing keys 1...9.
+* Change resolution in windowed and fullscreen mode by pressing keys ALT + 1...9.
 
   Resolution is divided by pressed key value, for example:
 
   Key '2' divides by 2, 1920x1080 becomes 960x540.
-  Key '8' divides by 9, 1920x1080 becomes 240x135.
+  Key '8' divides by 8, 1920x1080 becomes 240x135.
 
   This allows to run shaders smoothly (even in fullscreen) on non-top GPUs.
-  Notice that lower resolution is interpolated to original size. This causes blurrish rendering. For pixelated image, rendering mode switch has been added.
+  Notice that lower resolution is interpolated to original size. This causes blurrish rendering. For pixelated image, rendering mode switch has been added in extension's popup (click on green S icon).
 
 * Take HQ screenshot. Screenshot resolution is 2 * current resolution (including current resolution divider). 1920x1080 becomes 3840x2160.
 
@@ -71,6 +73,7 @@ Fullscreen edit ~~(dark theme)~~
 
 * 0.9.12 (11-Feb-2018)
 Multilanguage alterative profile page support.
+[b]First release for Firefox.[/b]
 
 * 0.9.11
 Export to ZIP by [Chris White cxw42](https://github.com/cxw42)
