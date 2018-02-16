@@ -146,6 +146,7 @@
         (function waitForShaders() {
             if (document.querySelectorAll('#divShaders tr + tr').length) {
                 this.userShaders = this.getShaders();
+                this.addSecondHeader();
             } else {
                 setTimeout(waitForShaders.bind(this), 200);
             }
@@ -177,6 +178,28 @@
                 status: status.replace(/(\s+|\+)/g, '').toLowerCase()
             }, this);
         }, this);
+    };
+
+    /**
+     * Adds header with links to shaders' groups.
+     */
+    TilesView.prototype.addSecondHeader = function() {
+        var SECOND_HEADER_CONTENT = '<a href="#contentScroll">Original part</a>',
+            secondHeaderElement = document.createElement('div'),
+            contents = '';
+
+        helpers.collectionToArray(document.querySelectorAll(
+            '.tiles-wrapper > ul'
+        )).forEach((tilesList, i) => {
+            var attr = tilesList.getAttribute('data-status');
+
+            tilesList.setAttribute('id', 'toy-list-' + i);
+            contents += '<a href="#toy-list-' + i + '">' + attr + '</a>';
+        });
+
+        secondHeaderElement.classList.add('toyPlugHeader');
+        secondHeaderElement.innerHTML = SECOND_HEADER_CONTENT + contents;
+        document.body.prepend(secondHeaderElement);
     };
 
     /**

@@ -229,9 +229,9 @@ body.alternate-profile div#header {
     font-size: 24px;
     clear: both;
     width: 100%;
-    padding: 15px 0;
+    padding: 50px 0 0;
     border-bottom: 1px solid #888;
-    margin: 15px;
+    margin:  15px 30px;
 }
 
 .tiles-wrapper .shader-image {
@@ -270,4 +270,26 @@ body.alternate-profile div#header {
 #shaderDescription a.regular {
     font-weight: normal;
     text-decoration: underline;
+}
+
+.toyPlugHeader {
+    position: fixed;
+    width: 100%;
+    height: 22px;
+    top: 44px;
+    left: 0;
+    display: flex;
+    background: rgba(0,0,0,.9);
+    box-sizing: border-box;
+    padding: 0 74px;
+    align-items: center;
+    z-index: 1;
+}
+
+.toyPlugHeader a {
+    color: #eee;
+    margin-top: -1px;
+    display: block;
+    margin-right: 20px;
+    text-decoration: none
 }
