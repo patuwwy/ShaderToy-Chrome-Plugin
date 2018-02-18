@@ -72,6 +72,9 @@ Fullscreen edit ~~(dark theme)~~
 
 ## ShaderToy extension changelog:
 
+* 0.9.13 (18-Feb-2018)
+  * Popup background changed.
+
 * 0.9.12 (11-Feb-2018)
   * **First release for Firefox.**
   * Multilanguage alterative profile page support.

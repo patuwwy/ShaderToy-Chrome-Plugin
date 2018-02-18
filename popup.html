@@ -107,34 +107,6 @@
             transition: all .2s ease;
         }
 
-        .wrapper:before {
-            transition: all .2s ease;
-            content: "";
-            display: block;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 200%;
-            height: 200%;
-            background-color: #fff;
-            background-image: linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee),
-            linear-gradient(45deg, #eee 25%, transparent 25%, transparent 75%, #eee 75%, #eee);
-            background-size: 60px 60px;
-            background-position:0 0, 30px 30px;
-            z-index: -1;
-            -webkit-animation: shift 5s linear infinite;
-            -webkit-filter: contrast(0.9);
-        }
-
-        @-webkit-keyframes shift {
-            0% {
-                transform: translateX(0) translateY(-120px);
-            }
-            100% {
-                transform: translateX(-240px) translateY(-60px);
-            }
-        }
-
         .author {
             text-align: left;
         }
@@ -142,42 +114,7 @@
         header {
             position: relative;
             text-align: center;
-        }
-
-        .bars {
-            /*position: relative;*/
-            display: block;
-            width: 100%;
-        }
-
-        .bars li {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 8px;
-            background: #aaa;
-            display: block;
-            animation: bar 1.7s ease-in-out infinite;
-            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%,rgba(0,0,0,1) 50%, rgba(0,0,0,1) 50%, rgba(0,0,0,0.5) 100%);
-        }
-
-        .bars .l1 { animation-delay: -.1s; background: #301 }
-        .bars .l2 { animation-delay: -.2s; background: #307 }
-        .bars .l3 { animation-delay: -.3s; background: #40a  }
-        .bars .l4 { animation-delay: -.4s; background: #01f }
-        .bars .l5 { animation-delay: -.5s; background: #06a  }
-        .bars .l6 { animation-delay: -.6s; background: #40c  }
-        .bars .l7 { animation-delay: -.7s; background: #70a  }
-        .bars .l8 { animation-delay: -.8s; background: #a10  }
-
-        @keyframes bar {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(37px);
-            }
+            margin-top: 15px;
         }
 
         a:focus { outline: none;}
@@ -230,11 +167,11 @@
 
         body {
             color: #000;
+            text-shadow: 1px 1px 3px #000;
         }
 
         body .wrapper {
-            color: #999;
-            text-shadow: 1px 1px 0 #444;
+            color: #eee;
         }
 
         body .wrapper:before {
@@ -251,21 +188,21 @@
             clear: both;
         }
 
+        iframe {
+            position: fixed;
+            width: 100%;
+            height: 105%;
+            z-index: -1;
+            left: 0;
+            top: -2.5%;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
     <div class="wrapper">
         <header>
-            <ul class="bars">
-                <li class="l1"></li>
-                <li class="l2"></li>
-                <li class="l3"></li>
-                <li class="l4"></li>
-                <li class="l5"></li>
-                <li class="l6"></li>
-                <li class="l7"></li>
-                <li class="l8"></li>
-            </ul>
+            <iframe frameborder="0" src="https://www.shadertoy.com/embed/XsdcD4?gui=false&t=10&paused=false&muted=true"></iframe>
             <h1>
                 <b>
                     Shadertoy extension
@@ -275,11 +212,11 @@
         </header>
         <section class="settings">
             <ul>
-                <li>
+                <li title="Shows shaders on Your page in a grid, with big previews">
                     <label>Alternative profile page</label>
                     <input type="checkbox" id="input-alternate-profile"/>
                 </li>
-                <li>
+                <li title="Adds zip functionality. Needs page refresh.">
                     <label>Enable ZIP downloads</label>
                     <input type="checkbox" id="enable-zip-downloads"/>
                 </li>
