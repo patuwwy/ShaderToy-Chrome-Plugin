@@ -73,20 +73,21 @@ Fullscreen edit ~~(dark theme)~~
 ## ShaderToy extension changelog:
 
 * 0.9.12 (11-Feb-2018)
-  * **First release for Firefox.** 
+  * **First release for Firefox.**
   * Multilanguage alterative profile page support.
+  * Fix for confirmation dialog (on profile page) Now it appear on window's center when alternative profile page is active.
 
-* 0.9.11 
+* 0.9.11
   * **Export to ZIP** by [Chris White cxw42](https://github.com/cxw42)
 
-* 0.9.10 (10-Jan-2018) 
+* 0.9.10 (10-Jan-2018)
   * Alternative Profile page hot fix.
 
 * 0.9.8 (27-Nov-2017)
   * [issue#40](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/40)
   * [issue#41](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/41)
 
-* 0.9.7 (24-Nov-2017) 
+* 0.9.7 (24-Nov-2017)
   * Forked shader's banner. [issue#40](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/40)
 
 * 0.9.6 (10-Nov-2017)
@@ -97,14 +98,14 @@ Fullscreen edit ~~(dark theme)~~
   * Fixed font color for auto-links.
   * Fixed shader titles on tiles.
 
-* 0.9.4 (7-Oct-2017) 
+* 0.9.4 (7-Oct-2017)
   * Make links for URLs if not inserted with BBCode in description and comments.
 
 * 0.9.3 (6-Oct-2017)
   * Foldable controls.
   * Extension's buttons colorized.
 
-* 0.9.2 (2-Sep-2017 at Riverwash party) 
+* 0.9.2 (2-Sep-2017 at Riverwash party)
   * **Clone any shader**.
 
 * 0.9.1 (13-Aug-2017)
@@ -127,10 +128,10 @@ Fullscreen edit ~~(dark theme)~~
   * On/Off record with CTRL + SHIFT + R (for fullscreen).
   * Fixed taking screenshot.
 
-* 0.8.2 
+* 0.8.2
   * Clean up.
 
-* 0.8.1 
+* 0.8.1
   * Dark theme removed. Dark theme has been implemented in ShaderToy.
 
 * **0.8.0**
@@ -142,20 +143,20 @@ Fullscreen edit ~~(dark theme)~~
   * Cloned shader is saved as draft.
   * Dark theme dialog buttons colors fixed.
 
-* 0.7.6 
+* 0.7.6
   * Loop switch fix.
 
-* 0.7.5 
+* 0.7.5
   * Correct value for iFrame uniform.
 
-* 0.7.4 
+* 0.7.4
   * Confirm shader cloning when original shader has not been saved.
 
 * 0.7.2
   * Cloning own shaders. No more copying uniforms and passes by hand.
   * Images for Github preview removed. One image added.
 
-* 0.7.1 
+* 0.7.1
   * Time looping.
 
 * **0.7.0**
@@ -207,28 +208,28 @@ Fullscreen edit ~~(dark theme)~~
   * Extension styling.
   * Dark theme fixes.
 
-* 0.2.5 
+* 0.2.5
   * Show plugin popup only when on Shadertoy.com.
 
-* 0.2.3 
+* 0.2.3
   * Added sort shaders by views/likes/comments on "My profile" page.
 
-* 0.2.2 
+* 0.2.2
   * Moved to Git.
 
-* 0.2.1 
+* 0.2.1
   * Code comments added.
 
-* 0.2.0 
+* 0.2.0
   * Basic implementation of fullscreen edit.
 
-* 0.1.1 
+* 0.1.1
   * Added pause/restart time in fullscreen mode.
 
-* 0.1.0 
+* 0.1.0
   * Added basic **dark theme**.
 
-* 0.0.1 
+* 0.0.1
   * Change resolution by keys 1...9.
 
 ## Contact

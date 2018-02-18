@@ -293,3 +293,13 @@ body.alternate-profile div#header {
     margin-right: 20px;
     text-decoration: none
 }
+
+.alternate-profile div#dlgAlertShader {
+    position: fixed !important;
+    right: 0 !important;
+    left: 50% !important;
+    top: 50% !important;
+    bottom: 0 !important;
+    margin-left: -160px;
+    margin-top: -80px;
+}
