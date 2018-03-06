@@ -294,6 +294,10 @@ body.alternate-profile div#header {
     text-decoration: none
 }
 
+.toyPlugHeader a:hover {
+    color: #fff;
+}
+
 .alternate-profile div#dlgAlertShader {
     position: fixed !important;
     right: 0 !important;

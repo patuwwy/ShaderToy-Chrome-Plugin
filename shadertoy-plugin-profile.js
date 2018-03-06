@@ -274,7 +274,7 @@
             me.button.classList.add('formButton-extension');
             me.button.style.width = '200px';
             me.button.style.marginTop = '10px';
-            me.button.innerHTML = me.downloadCaption;
+            me.button.textContent = me.downloadCaption;
 
             me.button.onclick = function onDownloadButtonClick() {
                 var ids = 0,
@@ -287,7 +287,7 @@
                     return;
                 }
 
-                this.innerHTML = me.loadingCaption;
+                this.textContent = me.loadingCaption;
                 ids = helpers.collectionToArray(
                     document.querySelectorAll('#divShaders tr + tr')
                 ).map(function getShaderIdFromURL(tr) {
@@ -311,7 +311,7 @@
 
                     me.processQueue();
                 } else {
-                    this.innerHTML = me.downloadCaption;
+                    this.textContent = me.downloadCaption;
                     window.alert('No shaders found!');
                 }
             };
@@ -324,7 +324,7 @@
             httpReq,
             str = '';
 
-        me.button.innerHTML = me.loadingCaption + ' ' +
+        me.button.textContent = me.loadingCaption + ' ' +
             me.downloadResults.length + '/' + me.numShaders;
 
         try {
@@ -344,7 +344,7 @@
                     me.processQueue();
                 } else {
                     me.loading = false;
-                    me.button.innerHTML = me.downloadCaption;
+                    me.button.textContent = me.downloadCaption;
                     window.ToyPlug.common.downloadJson(me.downloadResults[0].info.username + '.json', JSON.stringify(me.downloadResults));
                 }
             }, false);
