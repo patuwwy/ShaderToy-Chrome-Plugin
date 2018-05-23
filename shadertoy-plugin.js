@@ -198,6 +198,8 @@
 
         this.shaderDuplicator = new ShaderDuplicator();
         this.anchorsMaker = new AnchorsMaker();
+
+        this.resolutionInfo = new ResolutionInfo();
     };
 
     /**
@@ -232,6 +234,7 @@
 
         gShaderToy.resize(n.w, n.h);
         this.currentDivider = divider;
+        window.dispatchEvent(new window.CustomEvent('toyplug:canvas:resolution:changed'));
     };
 
     /**
@@ -1080,6 +1083,31 @@
             setTimeout(this.makeCommentsLinks.bind(this), 200, this);
         }
     };
+
+    /**
+     * Provides canvas resolution information.
+     */
+    class ResolutionInfo {
+        onResize() {
+            let frameRateElement = document.getElementById('myFramerate'),
+                canvasElement = document.getElementById('demogl');
+
+            if (frameRateElement && canvasElement) {
+                frameRateElement.setAttribute(
+                    'title',
+                    'width: $W, height: $H'
+                        .replace('$W', canvasElement.width)
+                        .replace('$H', canvasElement.height)
+                );
+            }
+        }
+
+        constructor() {
+            window.addEventListener('resize', this.onResize);
+            window.addEventListener('toyplug:canvas:resolution:changed', this.onResize);
+            this.onResize();
+        }
+    }
 
     window.ToyPlug = window.ToyPlug || new ToyPlug();
 })(document, window);
