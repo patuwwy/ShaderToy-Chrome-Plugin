@@ -54,6 +54,8 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 * Show links in description/comments even if not inserted with BBCode.
 
+* Show current canvas resolution on FPS hover.
+
 ## Screenshots
 
 ![](./screenshots/list-preview.jpg)
@@ -71,6 +73,10 @@ Fullscreen edit ~~(dark theme)~~
 
 
 ## ShaderToy extension changelog:
+
+* 0.9.16
+  * Display current canvas resolution on FPS hover.
+  * Fix auto-links.
 
 * 0.9.13 (18-Feb-2018)
   * Popup background changed.
