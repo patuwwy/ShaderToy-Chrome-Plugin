@@ -1038,8 +1038,8 @@
         links.forEach(link => {
             let href = link.getAttribute('href');
 
-            link.setAttribute('href', href.replace(/[^a-zA-Z\d\s:]$/igm, ' '));
-            link.textContent = href.replace(/[^a-zA-Z\d\s:]$/igm, ' ');
+            link.setAttribute('href', href.replace(/[^a-zA-Z\d\s:]$/igm, ' ').replace(/.$/, ''));
+            link.textContent = href.replace(/[^a-zA-Z\d\s:]$/igm, ' ').replace(/.$/, '');
         });
     };
 
