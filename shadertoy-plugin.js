@@ -1029,8 +1029,18 @@
     AnchorsMaker.prototype._makeLink = function(element) {
         element.innerHTML = element.innerHTML.replace(
             this.NOT_ANCHOR_URL_REGEXP,
-            '<a target="_blank" class="regular" href="$1">$1</a>'
+            '<a class="ext-link" target="_blank" class="regular" href="$1">$1</a>'
         );
+
+        let links = Array.from(element.querySelectorAll('.ext-link'));
+
+        // remove non alphanumeric on the end.
+        links.forEach(link => {
+            let href = link.getAttribute('href');
+
+            link.setAttribute('href', href.replace(/[^a-zA-Z\d\s:]$/igm, ' '));
+            link.textContent = href.replace(/[^a-zA-Z\d\s:]$/igm, ' ');
+        });
     };
 
     /**
