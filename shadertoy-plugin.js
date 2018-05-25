@@ -1035,14 +1035,14 @@
             '<a class="ext-link" target="_blank" class="regular" href="$1">$1</a>'
         );
 
-        let links = Array.from(element.querySelectorAll('.ext-link'));
+        let links = Array.from(element.querySelectorAll('[href].ext-link'));
 
-        // remove non alphanumeric on the end.
+        // remove non alphanumeric at the end.
         links.forEach(link => {
-            let href = link.getAttribute('href');
+            let href = link.getAttribute('href').replace(/[^a-zA-Z0-9 :]$/, ' ');
 
-            link.setAttribute('href', href.replace(/[^a-zA-Z\d\s:]$/igm, ' ').replace(/.$/, ''));
-            link.textContent = href.replace(/[^a-zA-Z\d\s:]$/igm, ' ').replace(/.$/, '');
+            link.setAttribute('href', href);
+            link.textContent = href;
         });
     };
 
