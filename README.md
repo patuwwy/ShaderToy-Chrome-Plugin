@@ -74,7 +74,7 @@ Fullscreen edit ~~(dark theme)~~
 
 ## ShaderToy extension changelog:
 
-* 0.9.16
+* 0.9.17 (26-05-2018)
   * Display current canvas resolution on FPS hover.
   * Fix auto-links.
 
