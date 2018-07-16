@@ -243,7 +243,7 @@ Fullscreen edit ~~(dark theme)~~
 
 ## Contact
 
-[PatrykFalba (Patu)](http://patrykfalba.eu)
+[PatrykFalba (Patu)](http://patrykfalba.pl)
 
 ## Contributors:
 
