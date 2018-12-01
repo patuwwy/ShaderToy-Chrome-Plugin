@@ -209,6 +209,7 @@ body.alternate-profile div#header {
     margin: 0 15px;
     display: block;
     position: relative;
+    padding-top: 56%;
 }
 
 .tiles-wrapper .shader-tile .shader-name {
@@ -236,6 +237,10 @@ body.alternate-profile div#header {
 
 .tiles-wrapper .shader-image {
     width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
 .tiles-wrapper:after {

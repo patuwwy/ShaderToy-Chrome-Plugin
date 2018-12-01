@@ -186,19 +186,35 @@
     TilesView.prototype.addSecondHeader = function() {
         var SECOND_HEADER_CONTENT = '<a href="#contentScroll">Original part</a>',
             secondHeaderElement = document.createElement('div'),
-            contents = '';
+            contents = '',
+            headerAnchors = [];
+
+        var orginalPartAnchor = document.createElement('a');
+        orginalPartAnchor.setAttribute('href', '#contentScroll');
+        orginalPartAnchor.textContent = 'Orginal part';
+
+        headerAnchors.push(orginalPartAnchor);
 
         helpers.collectionToArray(document.querySelectorAll(
             '.tiles-wrapper > ul'
         )).forEach((tilesList, i) => {
-            var attr = tilesList.getAttribute('data-status');
+            var attr = tilesList.getAttribute('data-status'),
+                anchor = document.createElement('a');
 
             tilesList.setAttribute('id', 'toy-list-' + i);
-            contents += '<a href="#toy-list-' + i + '">' + attr + '</a>';
+
+            anchor.href = '#toy-list-' + i;
+            anchor.textContent = attr;
+
+            headerAnchors.push(anchor);
         });
 
         secondHeaderElement.classList.add('toyPlugHeader');
-        secondHeaderElement.innerHTML = SECOND_HEADER_CONTENT + contents;
+
+        headerAnchors.forEach(anchor => {
+            secondHeaderElement.appendChild(anchor);
+        });
+
         document.body.prepend(secondHeaderElement);
     };
 
@@ -371,7 +387,7 @@
     function ToyPlugProfilePage() {
         helpers = new Helpers({});
 
-        if (document.head.innerHTML) {
+        if (document.head.textContent) {
             this.sortableShaderList = new SortableShaderList();
 
             if (window.alternateProfile) {

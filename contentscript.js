@@ -74,7 +74,7 @@
     function executeScriptOnPage(javascriptCode) {
         var script = document.createElement('script');
 
-        script.innerHTML = javascriptCode;
+        script.textContent = javascriptCode;
         document.body.appendChild(script);
     }
 

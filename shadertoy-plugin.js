@@ -1058,7 +1058,7 @@
             return;
         }
 
-        if (descriptionElement.innerHTML) {
+        if (descriptionElement.textContent) {
             this._makeLink(descriptionElement);
         } else {
             setTimeout(this.makeDescriptionLinks.bind(this), 200, this);
