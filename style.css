@@ -1,8 +1,10 @@
-body, a {
-    -webkit-transition: all .15s ease;
+body,
+a {
+    transition: all 0.15s ease;
 }
 
-body, html {
+body,
+html {
     min-height: 100vh;
 }
 
@@ -30,7 +32,7 @@ body, html {
 }
 
 .fullscreen-edit .cm-s-default.CodeMirror {
-    background: rgba(255,255,255,.4);
+    background: rgba(255, 255, 255, 0.4);
 }
 
 #userPicture {
@@ -55,7 +57,7 @@ body, html {
 .time-slider:after {
     clear: both;
     display: block;
-    content: "";
+    content: '';
     float: none;
 }
 
@@ -69,7 +71,7 @@ body, html {
     line-height: 24px;
 }
 
-.time-slider [type=number] {
+.time-slider [type='number'] {
     width: 7%;
     text-align: center;
     background: transparent;
@@ -77,7 +79,7 @@ body, html {
     color: #888;
 }
 
-.time-slider [type=range] {
+.time-slider [type='range'] {
     width: 86%;
 }
 
@@ -89,16 +91,16 @@ body, html {
 .mouse-uniforms input {
     float: left;
     display: block;
-    width: 40%
+    width: 40%;
 }
 
 .mouse-uniforms:before {
-    content: "iMouse uniform";
+    content: 'iMouse uniform';
     display: block;
 }
 
 .mouse-uniforms:after {
-    content: "";
+    content: '';
     display: block;
     float: none;
     clear: both;
@@ -134,7 +136,7 @@ body, html {
     width: 640px;
     margin-right: 60px;
     position: fixed;
-    transition: opacity .15s ease;
+    transition: opacity 0.15s ease;
     z-index: 3;
     box-shadow: 5px 5px 20px #000;
 }
@@ -168,7 +170,8 @@ body.alternate-profile div#footer {
     position: fixed;
 }
 
-body.alternate-profile, body.alternate-profile div#contentScroll {
+body.alternate-profile,
+body.alternate-profile div#contentScroll {
     top: auto;
     height: auto;
     overflow: visible;
@@ -220,7 +223,7 @@ body.alternate-profile div#header {
     line-height: 1.2em;
     color: #fff;
     padding: 5px;
-    background: rgba(0,0,0,.4);
+    background: rgba(0, 0, 0, 0.4);
     display: block;
 }
 
@@ -232,7 +235,7 @@ body.alternate-profile div#header {
     width: 100%;
     padding: 50px 0 0;
     border-bottom: 1px solid #888;
-    margin:  15px 30px;
+    margin: 15px 30px;
 }
 
 .tiles-wrapper .shader-image {
@@ -244,7 +247,7 @@ body.alternate-profile div#header {
 }
 
 .tiles-wrapper:after {
-    content: "";
+    content: '';
     display: block;
     float: none;
     clear: both;
@@ -258,7 +261,7 @@ body.alternate-profile div#header {
 }
 
 #shaderInfo:after {
-    content: "";
+    content: '';
     display: block;
     float: none;
     clear: both;
@@ -268,7 +271,7 @@ body.alternate-profile div#header {
 .formButtonSmall.formButton-extension {
     background-color: #1967a0;
     color: #fff;
-    transition: all .25s ease;
+    transition: all 0.25s ease;
 }
 
 #comments a.regular,
@@ -284,7 +287,7 @@ body.alternate-profile div#header {
     top: 44px;
     left: 0;
     display: flex;
-    background: rgba(0,0,0,.9);
+    background: rgba(0, 0, 0, 0.9);
     box-sizing: border-box;
     padding: 0 74px;
     align-items: center;
@@ -296,7 +299,7 @@ body.alternate-profile div#header {
     margin-top: -1px;
     display: block;
     margin-right: 20px;
-    text-decoration: none
+    text-decoration: none;
 }
 
 .toyPlugHeader a:hover {

@@ -7,14 +7,12 @@
      * @const {string}
      */
     var MAIN_EXTENSION_FILENAME = 'shadertoy-plugin.js',
-
         /**
          * Profile page script filename.
          *
          * @const {string}
          */
         PROFILE_EXTENSION_FILENAME = 'shadertoy-plugin-profile.js',
-
         /**
          * Home page script filename.  Not yet used.
          *
@@ -28,7 +26,6 @@
          * @const {string}
          */
         JSZIP_FILENAME = '/lib/jszip-3.1.5.js',
-
         /**
          * script to sanitize filenames, used by the main extension script.
          * Defines window.sanitize_filename().
@@ -40,7 +37,6 @@
          * @const {string}
          */
         SANITIZE_FILENAME = '/lib/node-sanitize-filename.js',
-
         /**
          * Whether or not ZIP support is currently enabled.
          * Initially null to indicate "not initialized"
@@ -82,41 +78,41 @@
      * Listens to extension messages.
      */
     function bindMessagesListener() {
-        chrome.runtime.onMessage.addListener(
-            function(request /*, sender, sendResponse */) {
-                if (request.data.renderMode) {
-                    executeScriptOnPage(
-                        'ToyPlug.setRenderMode(\'' +
-                            request.data.renderMode + '\');'
-                    );
-                }
-
-                if ('loopEnabled' in request.data) {
-                    executeScriptOnPage(
-                        'ToyPlug.editPage.timebar.loop = ' +
-                            request.data.loopEnabled + ';'
-                    );
-
-                    chrome.storage.sync.set({
-                        loopEnabled: request.data.loopEnabled
-                    }, function() {}
-                    );
-                }
-
-                if ('alternateProfile' in request.data) {
-                    chrome.storage.sync.set({
-                        alternateProfile: request.data.alternateProfile
-                    }, function() {});
-                }
-
-                if ('enableZip' in request.data) {
-                    chrome.storage.sync.set({
-                        enableZip: !!request.data.enableZip
-                    }, function() {});
-                    setZipEnabled(!!request.data.enableZip);
-                }
+        chrome.runtime.onMessage.addListener(function(request /*, sender, sendResponse */) {
+            if (request.data.renderMode) {
+                executeScriptOnPage("ToyPlug.setRenderMode('" + request.data.renderMode + "');");
             }
-        );
+
+            if ('loopEnabled' in request.data) {
+                executeScriptOnPage('ToyPlug.editPage.timebar.loop = ' + request.data.loopEnabled + ';');
+
+                chrome.storage.sync.set(
+                    {
+                        loopEnabled: request.data.loopEnabled
+                    },
+                    function() {}
+                );
+            }
+
+            if ('alternateProfile' in request.data) {
+                chrome.storage.sync.set(
+                    {
+                        alternateProfile: request.data.alternateProfile
+                    },
+                    function() {}
+                );
+            }
+
+            if ('enableZip' in request.data) {
+                chrome.storage.sync.set(
+                    {
+                        enableZip: !!request.data.enableZip
+                    },
+                    function() {}
+                );
+                setZipEnabled(!!request.data.enableZip);
+            }
+        });
     }
 
     /**
@@ -165,9 +161,7 @@
 
             for (key in changes) {
                 if (key === 'loopEnabled') {
-                    executeScriptOnPage(
-                        'window.TimebarLoop = ' + changes[key].newValue + ';'
-                    );
+                    executeScriptOnPage('window.TimebarLoop = ' + changes[key].newValue + ';');
                 } else if (key === 'enableZip') {
                     setZipEnabled(!!changes[key].newValue);
                 }
@@ -185,13 +179,13 @@
      * @param value {mixed} The new value.
      */
     function setWindowVariable(variable, value) {
-        var isString = typeof (value) === 'string',
+        var isString = typeof value === 'string',
             code;
 
         if (isString) {
             // Make a proper single-quoted, escaped representation
-            value = value.replace(/[\\]/g, '\\\\').replace(/[']/g, '\\\'');
-            value = '\'' + value + '\'';
+            value = value.replace(/[\\]/g, '\\\\').replace(/[']/g, "\\'");
+            value = "'" + value + "'";
         }
 
         code = 'window.' + variable + ' = ' + value + ';';
@@ -225,9 +219,12 @@
      * Sends initial message.
      */
     function sendInitialMessage() {
-        chrome.runtime.sendMessage({
-            present: true
-        }, function() {});
+        chrome.runtime.sendMessage(
+            {
+                present: true
+            },
+            function() {}
+        );
     }
 
     /**
