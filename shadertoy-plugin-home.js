@@ -6,4 +6,4 @@
     // Doesn't do anything yet!
     // If you add code to this file, uncomment the
     // `loadScript(HOME_EXTENSION_FILENAME)` call in contentscript.js.
-}());
+})();

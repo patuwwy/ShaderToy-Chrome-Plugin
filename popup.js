@@ -49,16 +49,15 @@
     /**
      * Sets listener for alternate profile page select element.
      */
-    Popup.prototype.bindAlternateProfileInput =
-        function bindAlternateProfileInput() {
-            var i = document.getElementById('input-alternate-profile');
+    Popup.prototype.bindAlternateProfileInput = function bindAlternateProfileInput() {
+        var i = document.getElementById('input-alternate-profile');
 
-            i.addEventListener('change', function onInputChange(/* e */) {
-                sendMessage({
-                    alternateProfile: i.checked
-                });
+        i.addEventListener('change', function onInputChange(/* e */) {
+            sendMessage({
+                alternateProfile: i.checked
             });
-        };
+        });
+    };
 
     /**
      * Sets listener for enable-ZIP-download option
@@ -77,7 +76,7 @@
      * Sends chrome message.
      */
     function sendMessage(data) {
-        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
             chrome.tabs.sendMessage(
                 tabs[0].id,
                 {
@@ -127,8 +126,7 @@
     /**
      * Shows current version.
      */
-    document.getElementById('version').innerText = 'v' +
-        chrome.runtime.getManifest().version;
+    document.getElementById('version').innerText = 'v' + chrome.runtime.getManifest().version;
 
     return new Popup();
 })();
