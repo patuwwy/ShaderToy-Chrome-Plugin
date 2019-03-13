@@ -630,8 +630,9 @@
             this.onControlsExpandTriggerClick.bind(this)
         );
 
-        this.setControlsVisibility(
-            this.getControlsVisibilitySavedState()
+    this.renderSpeedSelector.addEventListener(
+      "change",
+      this.onChangeRenderSpeedSelector.bind(this)
         );
     }
 
@@ -655,6 +656,8 @@
      */
     Timebar.prototype.createElements = function createElements() {
         this.controlsExpandTrigger = document.createElement('div');
+    this.renderSpeedSelectorWrapper = document.createElement('div');
+
         this.sliderBar = document.createElement('div');
         this.minValueInput = document.createElement('input');
         this.sliderInput = document.createElement('input');
@@ -664,14 +667,32 @@
         this.controlsExpandTrigger.classList.add('expand-trigger');
         this.controlsExpandTrigger.classList.add('formButton');
         this.controlsExpandTrigger.classList.add('formButton-extension');
+    this.controlsExpandTrigger.classList.add('speed-select');
 
-        extensionElements.controlsContainer.appendChild(
-            this.controlsExpandTrigger
+    let renderSpeedSpan = document.createElement('label');
+    renderSpeedSpan.setAttribute('for', 'renderSpeed');
+    renderSpeedSpan.textContent = 'render speed factor:';
+    renderSpeedSpan.style.marginLeft = '10px';
+
+    this.renderSpeedSelectorWrapper.appendChild(renderSpeedSpan);
+
+    this.renderSpeedSelector = this.renderSpeedSelectorWrapper.appendChild(
+      document.createElement('select')
         );
 
+    [1, 2, 4, 8, 18, 32, 64].forEach(val => {
+      let option = document.createElement('option');
+      option.value = val;
+      option.textContent = val;
+
+      this.renderSpeedSelector.appendChild(option);
+    });
+
+    extensionElements.controlsContainer.appendChild(this.controlsExpandTrigger);
         extensionElements.controlsContainer.appendChild(
-            this.sliderBar
+      this.renderSpeedSelectorWrapper
         );
+    extensionElements.controlsContainer.appendChild(this.sliderBar);
 
         this.sliderBar.classList.add('time-slider');
 
@@ -693,6 +714,23 @@
         this.sliderInput.value = 0;
         this.sliderInput.step = 20;
     };
+
+  Timebar.prototype._Paint = Effect.prototype.Paint;
+
+  Timebar.prototype.onChangeRenderSpeedSelector = function(e) {
+    let speedFactor = e.target.value;
+    let self = this;
+
+    if (!self._Paint && typeof Effect.prototype.Paint === 'function') {
+      self._Paint = Effect.prototype._Paint;
+    }
+
+    Effect.prototype.Paint = function(...args) {
+      for (let i = 0; i < speedFactor; i++) {
+        self._Paint.apply(this, args);
+      }
+    };
+  };
 
     Timebar.prototype.onChangeMinInput = function onChangeMinInput() {
         this.maxValueInput.min = parseInt(this.minValueInput.value, 10) + 1;
