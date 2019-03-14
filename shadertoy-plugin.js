@@ -50,6 +50,7 @@
             if (!this.initialized) {
                 this.init();
             }
+
             this.initialized = true;
         }
         /**
@@ -65,6 +66,7 @@
                 // Sane output for invalid input
                 return '';
             }
+
             values = values || {};
 
             if (typeof values !== 'object') {
@@ -99,6 +101,7 @@
          */
         init() {
             this.common = new ToyPlugCommon();
+
             if (this.isEditPage()) {
                 this.editPage = new ToyPlugEditPage();
             }
@@ -118,6 +121,7 @@
          */
         downloadBlob(filename, blob) {
             var link = window.document.createElement('a');
+
             link.href = window.URL.createObjectURL(blob);
             link.download = filename;
             document.body.appendChild(link);
@@ -130,6 +134,7 @@
          */
         downloadJson(filename, data) {
             var blob = new window.Blob([data], { type: 'application/json' });
+
             this.downloadBlob(filename, blob);
         }
     }
@@ -194,6 +199,7 @@
          */
         createContainers() {
             var controlsContainer = document.createElement('div');
+
             controlsContainer.classList.add('toyplug-controls-container');
             shaderToyElements.shaderInfo.insertBefore(controlsContainer, shaderToyElements.shaderInfo.querySelector('#shaderInfoHeader'));
             extensionElements.controlsContainer = controlsContainer;
@@ -212,6 +218,7 @@
                     w: b.width / divider,
                     h: b.height / divider
                 };
+
             gShaderToy.resize(n.w, n.h);
             this.currentDivider = divider;
             window.dispatchEvent(new window.CustomEvent('toyplug:canvas:resolution:changed'));
@@ -224,6 +231,7 @@
          */
         changeTimePosition(timeShift) {
             var destTime = Math.max(0, gShaderToy.mTf + timeShift);
+
             updateShaderToyTime(destTime);
             updateInputsTime(destTime);
             gShaderToy.mTf = destTime;
@@ -335,10 +343,12 @@
                             new Date().toJSON().slice(0, 10) +
                             ' ' +
                             new Date(new Date()).toString().split(' ')[4];
+
                     link.setAttribute('href', imageData);
                     link.setAttribute('download', filename);
                     link.dispatchEvent(clickEvent);
                     this.decreaseRes(currentDivider);
+
                     if (!paused) {
                         gShaderToy.pauseTime();
                     }
@@ -386,6 +396,7 @@
         downloadShader() {
             var container = document.getElementById('shaderPublished') || document.getElementById('shaderButtons'),
                 download = document.createElement('div');
+
             if (container) {
                 download.classList.add('formButton');
                 download.classList.add('formButton-extension');
@@ -515,22 +526,28 @@
                 container.appendChild(upload);
                 upload.addEventListener('click', function onUploadButtonClick() {
                     var fileInput = document.createElement('input');
+
                     fileInput.type = 'file';
                     fileInput.addEventListener('change', function onInputChange() {
                         var file = this.files[0],
                             reader = new window.FileReader();
+
                         reader.onload = function onFileLoaded() {
                             var text = reader.result;
+
                             try {
                                 dataLoadShader(JSON.parse('[' + text + ']'));
                             } catch (error) {
                                 window.alert('Failed to load shader!');
                             }
+
                             gShaderToy.mInfo.id = '-1';
                         };
+
                         reader.readAsText(file);
                         container.removeChild(fileInput);
                     });
+
                     container.appendChild(fileInput);
                     fileInput.click();
                 });
@@ -578,6 +595,7 @@
 
         onControlsExpandTriggerClick() {
             var isExpanded = this.getControlsVisibilitySavedState();
+
             this.setControlsVisibility(!isExpanded);
 
             window.localStorage.setItem('controlsExpanded', !isExpanded);
@@ -594,22 +612,22 @@
             this.sliderInput = document.createElement('input');
             this.maxValueInput = document.createElement('input');
             this.controlsExpandTrigger.textContent = 'Toggle controls';
-            this.controlsExpandTrigger.classList.add('expand-trigger');
-            this.controlsExpandTrigger.classList.add('formButton');
-            this.controlsExpandTrigger.classList.add('formButton-extension');
-            this.controlsExpandTrigger.classList.add('speed-select');
+            this.controlsExpandTrigger.classList.add('expand-trigger', 'formButton', 'formButton-extension', 'speed-select');
+
             let renderSpeedSpan = document.createElement('label');
-            renderSpeedSpan.setAttribute('for', 'renderSpeed');
+            renderSpeedSpan.setAttribute('for', 'ste-renderSpeed');
             renderSpeedSpan.textContent = 'render speed factor:';
-            renderSpeedSpan.style.marginLeft = '10px';
             this.renderSpeedSelectorWrapper.appendChild(renderSpeedSpan);
             this.renderSpeedSelector = this.renderSpeedSelectorWrapper.appendChild(document.createElement('select'));
+            this.renderSpeedSelector.id = 'ste-renderSpeed';
+
             [1, 2, 4, 8, 18, 32, 64].forEach(val => {
                 let option = document.createElement('option');
                 option.value = val;
                 option.textContent = val;
                 this.renderSpeedSelector.appendChild(option);
             });
+
             extensionElements.controlsContainer.appendChild(this.controlsExpandTrigger);
             extensionElements.controlsContainer.appendChild(this.renderSpeedSelectorWrapper);
             extensionElements.controlsContainer.appendChild(this.sliderBar);
@@ -660,8 +678,10 @@
          * Sets slider to ShaderToy time.
          */
         updateSlider() {
-            this.loop = window.TimebarLoop;
             var outsideLoop = false;
+
+            this.loop = window.TimebarLoop;
+
             if (gShaderToy && !this.busy) {
                 this.sliderInput.value = gShaderToy.mTf;
             }
@@ -680,6 +700,7 @@
                 updateShaderToyTime(this.sliderInput.value);
                 updateInputsTime(this.sliderInput.value);
             }
+
             setTimeout(this.updateSlider.bind(this), 26);
         }
 
@@ -690,10 +711,12 @@
             this.wasPaused = gShaderToy.mIsPaused;
             this.sliderInput.min = parseInt(this.minValueInput.value * 1000, 10);
             this.sliderInput.max = parseInt(this.maxValueInput.value * 1000, 10);
+
             if (!this.wasPaused) {
                 this.busy = true;
                 gShaderToy.pauseTime();
             }
+
             return false;
         }
 
@@ -704,6 +727,7 @@
             if (!this.wasPaused) {
                 gShaderToy.pauseTime();
             }
+
             window.requestAnimationFrame(
                 function() {
                     updateShaderToyTime(this.sliderInput.value, !this.wasPaused);
@@ -744,6 +768,7 @@
             gShaderToy.mTOffset = value;
             gShaderToy.mTo = window.getRealTime();
             gShaderToy.mTf = value;
+
             try {
                 gShaderToy.mEffect.mAudioContext.currentTime = value;
             } catch (ignore) {}
@@ -759,8 +784,10 @@
         gShaderToy.mEffect.mPasses.forEach(function mPass(pass) {
             pass.mInputs.forEach(function mInput(input) {
                 var media = null;
+
                 if (input) {
                     media = input.audio || input.video;
+
                     if (media) {
                         media.controls = true;
                         media.currentTime = value / 1000;
@@ -786,9 +813,11 @@
         finishShaderFork() {
             var storedShader = window.localStorage.getItem(LOCALSTORAGE_SHADER_FORK_KEYNAME),
                 ctx = gShaderToy.mGLContext;
+
             if (!storedShader) {
                 return;
             }
+
             try {
                 gShaderToy.mGLContext = null;
                 setTimeout(function() {
@@ -799,6 +828,7 @@
                     gShaderToy.mInfo.username = 'None';
                     gShaderToy.mInfo.id = '-1';
                     gShaderToy.mNeedsSave = true;
+
                     if (document.getElementById('published')) {
                         document.getElementById('published').value = '0';
                     }
@@ -815,6 +845,7 @@
             this.button.classList.add('formButton');
             this.button.classList.add('formButton-extension');
             this.button.classList.add('fork-shader-btn');
+
             shaderToyElements.shaderInfo.appendChild(this.button);
         }
 
@@ -823,6 +854,7 @@
          */
         bindButtonEvents() {
             var self = this;
+
             this.button.addEventListener('click', self.onButtonClick.bind(self));
         }
 
@@ -851,11 +883,13 @@
         onButtonClick() {
             var shaderData = gShaderToy.exportToJSON(),
                 banner = this.createBanner(shaderData.info);
+
             shaderData.renderpass.forEach(function(pass) {
                 if (pass.name === 'Image') {
                     pass.code = banner + pass.code;
                 }
             });
+
             window.localStorage.setItem(LOCALSTORAGE_SHADER_FORK_KEYNAME, JSON.stringify(shaderData));
             gShaderToy.mNeedsSave = false;
             window.location.href = 'https://www.shadertoy.com/new';
@@ -873,8 +907,10 @@
                 { gS: 'OriX', vPart: 'z', size: 'width' },
                 { gS: 'OriY', vPart: 'w', size: 'height' }
             ];
+
             this.addSliders();
             this.onResize();
+
             window.addEventListener('resize', this.onResize.bind(this));
         }
 
@@ -919,6 +955,7 @@
                 axis = slider.getAttribute('data-axis'),
                 vPart = slider.getAttribute('data-vPart'),
                 value = slider.value;
+
             slider.nextSibling.textContent = vPart + ': ' + value;
             gShaderToy['mMouse' + axis] = value;
             gShaderToy.mForceFrame = true;
@@ -930,6 +967,7 @@
          */
         onResize() {
             var sizes = document.getElementById('demogl').getBoundingClientRect();
+
             this.sliders.forEach(function(slider) {
                 slider.max = sizes[slider.getAttribute('data-size')];
                 this.onSliderChange({ target: slider });
@@ -980,9 +1018,11 @@
         makeDescriptionLinks() {
             var SELECTOR = '#shaderDescription',
                 descriptionElement = document.querySelector(SELECTOR);
+
             if (descriptionElement.tagName === 'TEXTAREA') {
                 return;
             }
+
             if (descriptionElement.textContent) {
                 this._makeLink(descriptionElement);
             } else {
@@ -997,6 +1037,7 @@
         makeCommentsLinks() {
             var SELECTOR = '#myComments .commentContent',
                 commentsContents = document.querySelectorAll(SELECTOR);
+
             if (commentsContents.length) {
                 Array.prototype.slice.apply(commentsContents).forEach(
                     function(commentContentElement) {
