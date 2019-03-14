@@ -315,3 +315,13 @@ body.alternate-profile div#header {
     margin-left: -160px;
     margin-top: -80px;
 }
+
+#ste-renderSpeed {
+    background-color: rgb(25, 103, 160);
+    color: rgb(255, 255, 255);
+    margin-left: 10px;
+}
+
+.toyplug-controls-container label[for='ste-renderSpeed'] {
+    margin-left: 10px;
+}
