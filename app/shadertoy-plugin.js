@@ -80,6 +80,7 @@
 
             // Regularize line endings, in case one of the inputs used \r\n
             result = result.replace(/\r\n|\r/g, '\n');
+
             return result;
         }
 
@@ -182,6 +183,7 @@
             this.currentDivider = 1;
             this.bindKeys();
             this.createContainers();
+
             // Create new UI controls
             this.timebar = new Timebar(this);
             this.mouseUniforms = new MouseUniforms(this);
@@ -189,6 +191,7 @@
             this.uploadShader();
             this.downloadShader();
             this.downloadShaderAsZip();
+
             this.shaderDuplicator = new ShaderDuplicator();
             this.anchorsMaker = new AnchorsMaker();
             this.resolutionInfo = new ResolutionInfo();
@@ -198,11 +201,26 @@
          * Creates containers for extension elements.
          */
         createContainers() {
-            var controlsContainer = document.createElement('div');
+            extensionElements.controlsContainer = document.createElement('div');
+            extensionElements.controlsContainer.classList.add('toyplug-controls-container');
 
-            controlsContainer.classList.add('toyplug-controls-container');
-            shaderToyElements.shaderInfo.insertBefore(controlsContainer, shaderToyElements.shaderInfo.querySelector('#shaderInfoHeader'));
-            extensionElements.controlsContainer = controlsContainer;
+            extensionElements.controlsContainerHeader = document.createElement('div');
+            extensionElements.controlsContainerHeader.classList.add('ste-header');
+            extensionElements.controlsContainer.appendChild(extensionElements.controlsContainerHeader);
+
+            extensionElements.timeWrapper = document.createElement('div');
+            extensionElements.timeWrapper.classList.add('time-slider');
+            extensionElements.controlsContainer.appendChild(extensionElements.timeWrapper);
+
+            extensionElements.mouseSlidersWrapper = document.createElement('div');
+            extensionElements.mouseSlidersWrapper.classList.add('mouse-uniforms');
+            extensionElements.controlsContainer.appendChild(extensionElements.mouseSlidersWrapper);
+
+            extensionElements.controlsContainerFooter = document.createElement('div');
+            extensionElements.controlsContainerFooter.classList.add('ste-footer');
+            extensionElements.controlsContainer.appendChild(extensionElements.controlsContainerFooter);
+
+            shaderToyElements.shaderInfo.insertBefore(extensionElements.controlsContainer, shaderToyElements.shaderInfo.querySelector('#shaderInfoHeader'));
         }
 
         /**
@@ -326,9 +344,11 @@
             }
 
             this.decreaseRes(currentDivider * 0.25);
+
             window.setTimeout(function getImageData() {
                 imageData = gShaderToy.mGLContext.canvas.toDataURL('image/png');
             }, 100);
+
             window.setTimeout(
                 function() {
                     var link = document.createElement('a'),
@@ -406,7 +426,9 @@
                 download.style.minWidth = '60px';
                 download.style.display = 'inline-block';
                 download.textContent = 'Export';
+
                 container.appendChild(download);
+
                 download.addEventListener('click', function onDownloadButtonClick() {
                     var name = gShaderToy.mInfo.id;
 
@@ -478,7 +500,7 @@
                 });
 
                 // Build the ZIP.  Tweaked from the JSZip example.
-                zip = new window.JSZip();
+                zip = JSZip();
                 zip.file('readme.txt', readme, { binary: false });
                 zip.file(id + '.json', JSON.stringify(gShaderToy.exportToJSON()), { binary: false });
 
@@ -492,20 +514,15 @@
                     }
                 );
             } // onDownloadAsZipClick()
-            var download = document.createElement('div');
 
             // Put it down by the Fork button since it is a less-common function
             if (shaderToyElements.shaderInfo) {
-                download.id = 'dl-shader-zip';
-                download.classList.add('formButton');
-                download.classList.add('formButton-extension');
-                download.style.marginLeft = '12px';
-                download.style.marginTop = '10px';
-                download.style.float = 'right';
-                download.style.width = '100px';
+                let download = document.createElement('div');
+
+                download.classList.add('formButton', 'formButton-extension', 'download-zip');
                 download.textContent = 'Export ZIP';
-                download.style.display = window.enableZip ? 'block' : 'none';
-                shaderToyElements.shaderInfo.appendChild(download);
+
+                extensionElements.controlsContainerFooter.appendChild(download);
                 download.addEventListener('click', onDownloadAsZipClick);
             }
         }
@@ -524,6 +541,7 @@
                 upload.style.display = 'inline-block';
                 upload.textContent = 'Import';
                 container.appendChild(upload);
+
                 upload.addEventListener('click', function onUploadButtonClick() {
                     var fileInput = document.createElement('input');
 
@@ -590,7 +608,7 @@
         }
 
         setControlsVisibility(expand) {
-            this.controlsExpandTrigger.classList[expand ? 'add' : 'remove']('expanded');
+            extensionElements.controlsContainer.classList[expand ? 'add' : 'remove']('expanded');
         }
 
         onControlsExpandTriggerClick() {
@@ -607,40 +625,63 @@
         createElements() {
             this.controlsExpandTrigger = document.createElement('div');
             this.renderSpeedSelectorWrapper = document.createElement('div');
-            this.sliderBar = document.createElement('div');
+            this.renderSpeedSelectorWrapper.classList.add('ste-renderSpeed-wrapper');
             this.minValueInput = document.createElement('input');
+            this.minValueInput.classList.add('ste-min-input');
             this.sliderInput = document.createElement('input');
             this.maxValueInput = document.createElement('input');
+            this.maxValueInput.classList.add('ste-max-input');
+
+            extensionElements.resolutionInfoElement = document.createElement('div');
+            extensionElements.resolutionInfoElement.classList.add('ste-res-info');
+
+            {
+                this.loopInput = document.createElement('input');
+                this.loopInput.setAttribute('type', 'checkbox');
+                this.loopInput.classList.add('ste-input-loop');
+                this.loopInput.setAttribute('title', 'loop');
+                this.loopInput.addEventListener('change', event => {
+                    this.loop = event.target.checked;
+                });
+            }
+
             this.controlsExpandTrigger.textContent = 'Toggle controls';
             this.controlsExpandTrigger.classList.add('expand-trigger', 'formButton', 'formButton-extension', 'speed-select');
 
             let renderSpeedSpan = document.createElement('label');
             renderSpeedSpan.setAttribute('for', 'ste-renderSpeed');
-            renderSpeedSpan.textContent = 'render speed factor:';
+            renderSpeedSpan.textContent = 'Paint calls:';
+
             this.renderSpeedSelectorWrapper.appendChild(renderSpeedSpan);
             this.renderSpeedSelector = this.renderSpeedSelectorWrapper.appendChild(document.createElement('select'));
             this.renderSpeedSelector.id = 'ste-renderSpeed';
+            this.renderSpeedSelector.classList.add('formButton');
 
-            [1, 2, 4, 8, 18, 32, 64].forEach(val => {
+            [1, 2, 4, 8, 16, 32, 64].forEach(val => {
                 let option = document.createElement('option');
                 option.value = val;
                 option.textContent = val;
                 this.renderSpeedSelector.appendChild(option);
             });
 
-            extensionElements.controlsContainer.appendChild(this.controlsExpandTrigger);
-            extensionElements.controlsContainer.appendChild(this.renderSpeedSelectorWrapper);
-            extensionElements.controlsContainer.appendChild(this.sliderBar);
-            this.sliderBar.classList.add('time-slider');
-            this.sliderBar.appendChild(this.minValueInput);
-            this.sliderBar.appendChild(this.sliderInput);
-            this.sliderBar.appendChild(this.maxValueInput);
-            this.sliderInput.type = 'range';
+            extensionElements.controlsContainerHeader.appendChild(this.controlsExpandTrigger);
+            extensionElements.controlsContainerHeader.appendChild(this.renderSpeedSelectorWrapper);
+            extensionElements.controlsContainerHeader.appendChild(extensionElements.resolutionInfoElement);
+
+            {
+                extensionElements.timeWrapper.appendChild(this.minValueInput);
+                extensionElements.timeWrapper.appendChild(this.sliderInput);
+                extensionElements.timeWrapper.appendChild(this.maxValueInput);
+                extensionElements.timeWrapper.appendChild(this.loopInput);
+            }
+
             this.minValueInput.type = this.maxValueInput.type = 'number';
             this.minValueInput.value = 0;
             this.minValueInput.min = 0;
             this.maxValueInput.value = 60;
             this.maxValueInput.min = 1;
+
+            this.sliderInput.type = 'range';
             this.sliderInput.min = 0;
             this.sliderInput.max = 60 * 1000;
             this.sliderInput.value = 0;
@@ -680,7 +721,7 @@
         updateSlider() {
             var outsideLoop = false;
 
-            this.loop = window.TimebarLoop;
+            //this.loop = window.TimebarLoop;
 
             if (gShaderToy && !this.busy) {
                 this.sliderInput.value = gShaderToy.mTf;
@@ -846,7 +887,7 @@
             this.button.classList.add('formButton-extension');
             this.button.classList.add('fork-shader-btn');
 
-            shaderToyElements.shaderInfo.appendChild(this.button);
+            extensionElements.controlsContainerFooter.appendChild(this.button);
         }
 
         /**
@@ -918,8 +959,6 @@
          * Adds sliders to page.
          */
         addSliders() {
-            this.slidersWrapper = document.createElement('div');
-            this.slidersWrapper.classList.add('mouse-uniforms');
             this.sliders = this.config.map(function createSlider(obj) {
                 var slider = document.createElement('input'),
                     valueElement = document.createElement('span');
@@ -930,13 +969,12 @@
                 slider.setAttribute('data-vpart', obj.vPart);
                 slider.setAttribute('data-size', obj.size);
                 valueElement.textContent = obj.vPart + ': 0';
-                this.slidersWrapper.appendChild(slider);
-                this.slidersWrapper.appendChild(valueElement);
+                extensionElements.mouseSlidersWrapper.appendChild(slider);
+                extensionElements.mouseSlidersWrapper.appendChild(valueElement);
                 slider.addEventListener('input', this.onSliderChange.bind(this));
                 slider.addEventListener('blur', this.onSliderBlur);
                 return slider;
             }, this);
-            extensionElements.controlsContainer.appendChild(this.slidersWrapper);
         }
 
         /**
@@ -1055,17 +1093,19 @@
      */
     class ResolutionInfo {
         onResize() {
-            let frameRateElement = document.getElementById('myFramerate'),
-                canvasElement = document.getElementById('demogl');
+            let canvasElement = document.getElementById('demogl');
 
-            if (frameRateElement && canvasElement) {
-                frameRateElement.setAttribute('title', 'width: $W, height: $H'.replace('$W', canvasElement.width).replace('$H', canvasElement.height));
+            if (extensionElements.resolutionInfoElement) {
+                extensionElements.resolutionInfoElement.textContent = 'width: $W, height: $H'
+                    .replace('$W', canvasElement.width)
+                    .replace('$H', canvasElement.height);
             }
         }
 
         constructor() {
             window.addEventListener('resize', this.onResize);
             window.addEventListener('toyplug:canvas:resolution:changed', this.onResize);
+
             this.onResize();
         }
     }

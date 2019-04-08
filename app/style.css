@@ -39,12 +39,18 @@ html {
     background-size: 100%;
 }
 
-.expand-trigger {
-    float: left;
-    margin-bottom: 8px;
+.toyplug-controls-container {
+    margin-top: 15px;
 }
 
-.expand-trigger:not(.expanded) ~ * {
+.toyplug-controls-container .ste-header {
+    display: flex;
+    justify-items: flex-start;
+    align-items: center;
+}
+
+.toyplug-controls-container:not(.expanded) .ste-header ~ *,
+.toyplug-controls-container:not(.expanded) .ste-header .expand-trigger + div {
     display: none;
 }
 
@@ -52,17 +58,12 @@ html {
     clear: both;
     height: 32px;
     margin: 5px 0;
-}
-
-.time-slider:after {
-    clear: both;
-    display: block;
-    content: '';
-    float: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .time-slider input {
-    float: left;
     display: block;
     box-sizing: border-box;
     margin: 0;
@@ -72,15 +73,20 @@ html {
 }
 
 .time-slider [type='number'] {
-    width: 7%;
     text-align: center;
-    background: transparent;
     border: none;
-    color: #888;
+    color: #fff;
+    border-radius: 4px;
+    width: 40px;
 }
 
 .time-slider [type='range'] {
-    width: 86%;
+    flex-grow: 100;
+    margin: 0 10px;
+}
+
+.time-slider [type='checkbox'] {
+    margin-left: 10px;
 }
 
 .mouse-uniforms {
@@ -254,10 +260,8 @@ body.alternate-profile div#header {
     background: red;
 }
 
-.fork-shader-btn {
-    width: 60px;
-    margin-top: 10px;
-    float: right;
+.fork-shader-btn,
+.download-zip {
 }
 
 #shaderInfo:after {
@@ -274,6 +278,16 @@ body.alternate-profile div#header {
     transition: all 0.25s ease;
 }
 
+.formButton.formButton-extension {
+    padding-bottom: 5px;
+}
+
+.formButton.formButton-extension:hover,
+.formButtonSmall.formButton-extension:hover {
+    background-color: #0a80af;
+    color: #fff;
+}
+
 #comments a.regular,
 #shaderDescription a.regular {
     font-weight: normal;
@@ -283,7 +297,8 @@ body.alternate-profile div#header {
 .toyPlugHeader {
     position: fixed;
     width: 100%;
-    height: 22px;
+    height: 32px;
+    padding-bottom: 8px;
     top: 44px;
     left: 0;
     display: flex;
@@ -295,11 +310,15 @@ body.alternate-profile div#header {
 }
 
 .toyPlugHeader a {
+    background: rgb(25, 103, 160);
     color: #eee;
-    margin-top: -1px;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin-top: 0;
     display: block;
     margin-right: 20px;
     text-decoration: none;
+    font-weight: bold;
 }
 
 .toyPlugHeader a:hover {
@@ -318,10 +337,35 @@ body.alternate-profile div#header {
 
 #ste-renderSpeed {
     background-color: rgb(25, 103, 160);
-    color: rgb(255, 255, 255);
+    color: #fff;
+    margin-left: 10px;
+    min-width: auto;
+}
+
+.ste-min-input,
+.ste-max-input {
+    background-color: rgb(25, 103, 160);
+    color: #fff;
+}
+
+.ste-min-input {
+    margin-right: 5px;
+}
+
+.ste-max-input {
+    margin-left: 5px;
+}
+
+.toyplug-controls-container .ste-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.toyplug-controls-container .ste-footer .formButton-extension {
     margin-left: 10px;
 }
 
-.toyplug-controls-container label[for='ste-renderSpeed'] {
-    margin-left: 10px;
+.toyplug-controls-container .ste-header > * {
+    margin-right: 10px;
 }
