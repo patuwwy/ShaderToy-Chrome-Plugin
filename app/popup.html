@@ -21,6 +21,7 @@
 
         a {
             color: rgb(255, 153, 34);
+            cursor: pointer;
         }
 
         ul {
@@ -119,7 +120,10 @@
 
         a:focus { outline: none;}
 
-        footer { margin: 64px 0 10px; }
+        footer {
+            margin: 32px 0 10px;
+        }
+
         footer p {
             float: left;
             line-height: 48px;
@@ -197,28 +201,38 @@
             top: -2.5%;
             pointer-events: none;
         }
+
+        .beer {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .beer a {
+            background: greenyellow;
+            color: #000;
+            padding: 3px 6px;
+            border-radius: 5px;
+            text-decoration: none;
+            text-shadow: none;
+        }
     </style>
 </head>
 <body>
     <div class="wrapper">
         <header>
-            <iframe frameborder="0" src="https://www.shadertoy.com/embed/XsdcD4?gui=false&t=10&paused=false&muted=true"></iframe>
+            <iframe frameborder="0" src="https://www.shadertoy.com/embed/3djSRd?gui=false&t=10&paused=false&muted=true"></iframe>
             <h1>
                 <b>
                     Shadertoy extension
                 </b>
             </h1>
-            <p class="title-subtext">With <3 by <a href="http://patrykfalba.eu">Patu[Futuris^AberrationCreations]</a></p>
+            <p class="title-subtext">With &lt3 by <a href="http://patrykfalba.pl">Patu[Futuris^AberrationCreations]</a></p>
         </header>
         <section class="settings">
             <ul>
                 <li title="Shows shaders on Your page in a grid, with big previews">
                     <label>Alternative profile page</label>
                     <input type="checkbox" id="input-alternate-profile"/>
-                </li>
-                <li title="Adds zip functionality. Needs page refresh.">
-                    <label>Enable ZIP downloads</label>
-                    <input type="checkbox" id="enable-zip-downloads"/>
                 </li>
             </ul>
             <ul>
@@ -228,10 +242,6 @@
                         <option value="auto">auto</option>
                         <option value="pixelated">pixelated</option>
                     </select>
-                </li>
-                <li title="Time loop in set range">
-                    <label>Loop</label>
-                    <input type="checkbox" id="input-loop"/>
                 </li>
             </ul>
         </section>
@@ -271,6 +281,11 @@
                 </li>
             <ul>
         </section>
+        <div class="beer">
+            <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VDFNBT9N3ANHW&source=url">
+                Beer? Sure.
+            </a>
+        </div>
         <footer>
             <p id="version" class="version">version</p>
             <a class="gitlink" target="_blank" href="https://github.com/patuwwy/ShaderToy-Chrome-Plugin">Read more, report bugs: <img src="assets/github-10-xxl.png"/></a>

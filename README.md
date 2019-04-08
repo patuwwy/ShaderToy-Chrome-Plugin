@@ -4,7 +4,7 @@
 
 [Chrome extension](https://chrome.google.com/webstore/detail/shadertoy-unofficial-plug/ohicbclhdmkhoabobgppffepcopomhgl?hl=pl)
 
-[Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/shadertoy-unofficial-plugin/) (not fully functional)
+[Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/shadertoy-unofficial-plugin/) (not fully functional. WIP)
 
 ## Info
 
@@ -48,36 +48,47 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 -   Fullscreen edit mode.
 
--   Export shaders (single JSON or ZIP archive with JSON and readme.txt)
+-   Export shaders (single JSON or ZIP archive with JSON and readme.txt).
 
--   Import JSON
+-   Import JSON.
 
 -   Show links in description/comments even if not inserted with BBCode.
 
--   Show current canvas resolution on FPS hover.
+-   Show current canvas resolution ~~on FPS hover~~.
 
--   Render call multiplier
+-   Render call multiplier.
+
+-   Loop in set range (including video/audio channels).
 
 ## Screenshots
 
-![](./screenshots/list-preview.jpg)
-Preview images on profile page with detail overlay on mouse hover
+![](./screenshots/new.png)
+Controls
 
-![](./screenshots/screen3.jpg)
+![](./screenshots/profile-preview.jpg)
+Preview images on profile page on mouse hover
 
-![](./screenshots/alt-profile.jpg)
+![](./screenshots/alt-profile.png)
 Alternative shader list
 
-![](./screenshots/previews.jpg)
+![](./screenshots/fork.png)
+Fork any shader
 
-![](./screenshots/screen2.jpg)
-Fullscreen edit ~~(dark theme)~~
+![](./screenshots/popup.png)
+Info popup (+ render mode)
 
 ## ShaderToy extension changelog:
 
+-   0.11.0 (08-04-2019)
+
+    -   Updated controls section appearance.
+    -   Show resolution in control section.
+    -   Fixed render multiplier.
+    -   Moved loop switch from popup to control section.
+
 -   0.10.0 (13-03-2019)
 
-    -   Render multiplier (calls draw multiple times)
+    -   Render multiplier (calls draw multiple times).
 
 -   0.9.17 (26-05-2018)
 
@@ -295,3 +306,7 @@ Fullscreen edit ~~(dark theme)~~
 [movAX13h](http://blog.thrill-project.com/)
 
 [Chris White cxw42](https://github.com/cxw42)
+
+## Beer? Sure.
+
+[PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VDFNBT9N3ANHW&source=url)

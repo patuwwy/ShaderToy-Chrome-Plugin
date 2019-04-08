@@ -18,31 +18,7 @@
          *
          * @const {string}
          */
-        // HOME_EXTENSION_FILENAME = 'shadertoy-plugin-home.js',
-
-        /**
-         * ZIP export script filename, used by the main extension script.
-         *
-         * @const {string}
-         */
-        JSZIP_FILENAME = '/lib/jszip-3.1.5.js',
-        /**
-         * script to sanitize filenames, used by the main extension script.
-         * Defines window.sanitize_filename().
-         * Bundled using webpack from:
-         * https://github.com/parshap/truncate-utf8-bytes/blob/master/lib/truncate.js
-         * https://github.com/parshap/utf8-byte-length/blob/master/browser.js
-         * https://github.com/parshap/truncate-utf8-bytes/blob/master/browser.js
-         *
-         * @const {string}
-         */
-        SANITIZE_FILENAME = '/lib/node-sanitize-filename.js',
-        /**
-         * Whether or not ZIP support is currently enabled.
-         * Initially null to indicate "not initialized"
-         * @type {mixed} null, true, or false
-         */
-        isZipEnabled = null;
+        HOME_EXTENSION_FILENAME = 'shadertoy-plugin-home.js';
 
     /**
      * Load a script directly from our extension.  The script should be
@@ -57,9 +33,11 @@
 
         script.src = chrome.runtime.getURL(filename);
         script.async = true;
+
         if (id) {
             script.id = id;
         }
+
         document.head.appendChild(script);
     }
 
@@ -102,54 +80,7 @@
                     function() {}
                 );
             }
-
-            if ('enableZip' in request.data) {
-                chrome.storage.sync.set(
-                    {
-                        enableZip: !!request.data.enableZip
-                    },
-                    function() {}
-                );
-                setZipEnabled(!!request.data.enableZip);
-            }
         });
-    }
-
-    /**
-     * Set whether or not ZIP support is enabled.  Loads the scripts when
-     * enabling support.
-     * @param enable {Boolean} truthy to enable; falsy to disable
-     */
-    function setZipEnabled(enable) {
-        if (enable === isZipEnabled) {
-            // No change => nothing to do
-            return;
-        }
-
-        var elem;
-
-        enable = !!enable;
-        isZipEnabled = enable;
-        setWindowVariable('enableZip', enable);
-
-        if (!enable) {
-            // Hide the ZIP controls.  Do this here because the plugins cannot
-            // watch for changes using chrome.storage.onChanged.
-
-            // On the shader page
-            elem = document.getElementById('dl-shader-zip');
-            if (elem) {
-                elem.style.display = 'none';
-            }
-        } else {
-            loadZipScripts();
-
-            // Enable button on the shader page
-            elem = document.getElementById('dl-shader-zip');
-            if (elem) {
-                elem.style.display = 'block';
-            }
-        }
     }
 
     /**
@@ -162,8 +93,6 @@
             for (key in changes) {
                 if (key === 'loopEnabled') {
                     executeScriptOnPage('window.TimebarLoop = ' + changes[key].newValue + ';');
-                } else if (key === 'enableZip') {
-                    setZipEnabled(!!changes[key].newValue);
                 }
             }
         });
@@ -201,10 +130,6 @@
             setWindowVariable('alternateProfile', items.alternateProfile);
         });
 
-        chrome.storage.sync.get('enableZip', function(items) {
-            setZipEnabled(items.enableZip);
-        });
-
         chrome.storage.sync.get('loopEnabled', function(items) {
             var code = '';
 
@@ -228,18 +153,6 @@
     }
 
     /**
-     * Loads the scripts for ZIP support, if they haven't already been loaded.
-     */
-    function loadZipScripts() {
-        if (document.getElementById('script-jszip')) {
-            return; // Don't reload if the scripts are already there
-        }
-
-        loadScript(JSZIP_FILENAME, 'script-jszip');
-        loadScript(SANITIZE_FILENAME);
-    }
-
-    /**
      * Loads profile script on profile page.
      */
     function initializeProfilePage() {
@@ -253,10 +166,7 @@
      */
     function initializeHomePage() {
         if (document.location.href.match(/shadertoy.com\/?$/)) {
-            void 0; // jshint ignore: line
-            // The Home script doesn't do anything yet --- uncomment this
-            // if you add code to it.
-            // loadScript(HOME_EXTENSION_FILENAME);
+            loadScript(HOME_EXTENSION_FILENAME);
         }
     }
 
@@ -269,6 +179,8 @@
         synchronizeChrome();
 
         loadScript(MAIN_EXTENSION_FILENAME);
+        loadScript('scripts/node-sanitize-filename.js');
+        loadScript('scripts/jszip-3.1.5.js');
 
         initializeProfilePage();
         initializeHomePage();
