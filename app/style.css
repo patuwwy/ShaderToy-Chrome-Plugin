@@ -260,10 +260,6 @@ body.alternate-profile div#header {
     background: red;
 }
 
-.fork-shader-btn,
-.download-zip {
-}
-
 #shaderInfo:after {
     content: '';
     display: block;
@@ -276,6 +272,7 @@ body.alternate-profile div#header {
     background-color: #1967a0;
     color: #fff;
     transition: all 0.25s ease;
+    cursor: pointer;
 }
 
 .formButton.formButton-extension {
@@ -286,6 +283,7 @@ body.alternate-profile div#header {
 .formButtonSmall.formButton-extension:hover {
     background-color: #0a80af;
     color: #fff;
+    cursor: pointer;
 }
 
 #comments a.regular,
@@ -368,4 +366,92 @@ body.alternate-profile div#header {
 
 .toyplug-controls-container .ste-header > * {
     margin-right: 10px;
+}
+
+body div#header {
+    overflow: visible;
+}
+
+.recent-list,
+.recent-list * {
+    box-sizing: border-box;
+}
+
+.recent-list.formButton {
+    background-color: rgb(25, 103, 160);
+    color: #fff;
+    display: inline;
+    position: relative;
+    margin-right: 20px;
+    z-index: 3;
+}
+
+.recent-list input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 200%;
+    width: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.recent-list ul {
+    display: none;
+    background: #000b;
+    color: #fff;
+    padding: 20px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 300px;
+    margin: 20px 0;
+    z-index: 1;
+    border-radius: 4px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.recent-list input:checked + ul {
+    display: block;
+}
+
+.recent-list li {
+    margin: 0;
+    padding: 0;
+}
+
+.recent-list li a {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 4px 8px;
+    text-align: left;
+    font-weight: normal;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.recent-list li:first-child a {
+    padding-top: 8px;
+}
+
+.recent-list li:last-child a {
+    padding-bottom: 8px;
+}
+
+.recent-list li a:hover {
+    background: #0a80af;
+}
+
+.recent-list img {
+    width: 64px;
+    margin-right: 8px;
+}
+
+.recent-list li.no-shaders-info {
+    padding: 10px;
+    white-space: pre-line;
 }

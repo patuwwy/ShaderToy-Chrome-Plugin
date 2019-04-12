@@ -18,7 +18,8 @@
          *
          * @const {string}
          */
-        HOME_EXTENSION_FILENAME = 'shadertoy-plugin-home.js';
+        HOME_EXTENSION_FILENAME = 'shadertoy-plugin-home.js',
+        COMMON_FILENAME = 'shadertoy-plugin-common.js';
 
     /**
      * Load a script directly from our extension.  The script should be
@@ -181,6 +182,8 @@
         loadScript(MAIN_EXTENSION_FILENAME);
         loadScript('scripts/node-sanitize-filename.js');
         loadScript('scripts/jszip-3.1.5.js');
+
+        loadScript(COMMON_FILENAME);
 
         initializeProfilePage();
         initializeHomePage();

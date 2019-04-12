@@ -300,7 +300,7 @@
                 httpReq,
                 str = '';
 
-            me.button.textContent = me.loadingCaption + ' ' + me.downloadResults.length + '/' + me.numShaders;
+            me.button.textContent = me.loadingCaption + ' ' + me.downloadResults.length + '/' + (me.numShaders + 1);
 
             try {
                 httpReq = new window.XMLHttpRequest();
