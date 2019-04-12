@@ -1,5 +1,10 @@
 ## ShaderToy extension changelog:
 
+-   0.12.0 (12-04-2019)
+
+    -   Recent shaders.
+    -   Fix displayed shaders count when exporting all.
+
 -   0.11.0 (08-04-2019)
 
     -   Updated controls section appearance.

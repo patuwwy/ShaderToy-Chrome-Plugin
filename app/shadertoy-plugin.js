@@ -575,8 +575,6 @@
 
     /**
      * Provides timebar functionality.
-     *
-     * @contructor
      */
     class Timebar {
         constructor(toyPlug) {
@@ -938,7 +936,7 @@
     }
 
     /**
-     * Mouse uniform sliders constructor.
+     * Mouse uniform sliders.
      */
     class MouseUniforms {
         constructor() {

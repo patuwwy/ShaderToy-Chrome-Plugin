@@ -60,6 +60,8 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 -   Loop in set range (including video/audio channels).
 
+-   List of recently viewed own shaders.
+
 ## Screenshots
 
 ![](./screenshots/new.png)
