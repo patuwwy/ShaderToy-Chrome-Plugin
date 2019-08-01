@@ -72,7 +72,9 @@ jobs:
                   name: "Publish Release on GitHub"
                   command: |
                       ls /root/workspace/output
-                      export VERSION=$(cat /root/workspace/output/version.txt)
+                      VERSION=$(cat /root/workspace/output/version.txt)
+                      
+                      echo $VERSION
                       ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -replace $VERSION /root/workspace/output
 
 workflows:
