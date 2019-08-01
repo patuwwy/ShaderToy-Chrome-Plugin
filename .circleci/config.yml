@@ -19,7 +19,7 @@ jobs:
                   name: 'Zip'
                   command: |
                       mkdir output
-                      zip -r ./output/ext.zip ./app
+                      zip -r ./output/ShaderToy-Chrome-Plugin.zip ./app
                       cat ./app/manifest.json | jq -r '.version' >> ./output/version.txt
 #
             - persist_to_workspace:
@@ -46,7 +46,7 @@ jobs:
                   command: |
                       if [ "${CIRCLE_BRANCH}" == "master" ]; then
                           ACCESS_TOKEN=$(curl "https://accounts.google.com/o/oauth2/token" -d "client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&refresh_token=${REFRESH_TOKEN}&grant_type=refresh_token&redirect_uri=urn:ietf:wg:oauth:2.0:oob" | jq -r .access_token)
-                          curl -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "x-goog-api-version: 2" -X PUT -T /root/workspace/output/ext.zip -v "https://www.googleapis.com/upload/chromewebstore/v1.1/items/${APP_ID}"
+                          curl -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "x-goog-api-version: 2" -X PUT -T /root/workspace/output/ShaderToy-Chrome-Plugin.zip -v "https://www.googleapis.com/upload/chromewebstore/v1.1/items/${APP_ID}"
                           curl -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "x-goog-api-version: 2" -H "Content-Length: 0" -X POST -v "https://www.googleapis.com/chromewebstore/v1.1/items/${APP_ID}/publish"
                       fi
     
@@ -72,10 +72,7 @@ jobs:
                   name: "Publish Release on GitHub"
                   command: |
                       VERSION=$(cat /root/workspace/output/version.txt)
-                      echo $GITHUB_TOKEN
-                      echo $CIRCLE_PROJECT_USERNAME
-                      echo $CIRCLE_PROJECT_REPONAME
-                      ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME $VERSION /root/workspace/output/
+                      ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -n $VERSION $VERSION /root/workspace/output/
 
 workflows:
     version: 2
