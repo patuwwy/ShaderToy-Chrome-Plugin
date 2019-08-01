@@ -18,7 +18,7 @@ jobs:
             - run:
                   name: 'Zip'
                   command: |
-                      mkdir build
+                      mkdir output
                       zip -r ext.zip ./app
                       cat ./app/manifest.json | jq -r '.version' >> ./output/version.txt
 #
