@@ -54,15 +54,14 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 -   Show links in description/comments even if not inserted with BBCode.
 
--   Show current canvas resolution ~~on FPS hover~~.
+-   ~~Show current canvas resolution~~ ~~on FPS hover~~
+    (feature removed - implemented natively in Shadertoy)
 
 -   Render call multiplier.
 
 -   Loop in set range (including video/audio channels).
 
 -   List of recently viewed own shaders.
-
--   ~~Show shader resolution info.~~
 
 ## Screenshots
 
@@ -113,7 +112,3 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 ## Changelog
 
 [changelog](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/blob/master/CHANGELOG.md)
-
-## Latest release
-
-[![CircleCI](https://circleci.com/gh/patuwwy/ShaderToy-Chrome-Plugin.svg?style=svg)](https://circleci.com/gh/patuwwy/ShaderToy-Chrome-Plugin)
