@@ -62,22 +62,39 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 -   List of recently viewed own shaders.
 
+-   ~~Show shader resolution info.~~
+
 ## Screenshots
 
+### Controls:
+
 ![](./screenshots/new.png)
-Controls
+
+---
+
+### Preview images on profile page on mouse hover:
 
 ![](./screenshots/profile-preview.jpg)
-Preview images on profile page on mouse hover
+
+---
+
+### Alternative shader list:
 
 ![](./screenshots/alt-profile.png)
-Alternative shader list
+
+---
+
+### Fork any shader:
 
 ![](./screenshots/fork.png)
-Fork any shader
+
+---
+
+### Info popup (+ render mode):
 
 ![](./screenshots/popup.png)
-Info popup (+ render mode)
+
+---
 
 ## Contact
 
@@ -96,3 +113,7 @@ Info popup (+ render mode)
 ## Changelog
 
 [changelog](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/blob/master/CHANGELOG.md)
+
+## Latest release
+
+[![CircleCI](https://circleci.com/gh/patuwwy/ShaderToy-Chrome-Plugin.svg?style=svg)](https://circleci.com/gh/patuwwy/ShaderToy-Chrome-Plugin)

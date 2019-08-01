@@ -194,7 +194,6 @@
 
             this.shaderDuplicator = new ShaderDuplicator();
             this.anchorsMaker = new AnchorsMaker();
-            this.resolutionInfo = new ResolutionInfo();
         }
 
         /**
@@ -630,9 +629,6 @@
             this.maxValueInput = document.createElement('input');
             this.maxValueInput.classList.add('ste-max-input');
 
-            extensionElements.resolutionInfoElement = document.createElement('div');
-            extensionElements.resolutionInfoElement.classList.add('ste-res-info');
-
             {
                 this.loopInput = document.createElement('input');
                 this.loopInput.setAttribute('type', 'checkbox');
@@ -664,7 +660,6 @@
 
             extensionElements.controlsContainerHeader.appendChild(this.controlsExpandTrigger);
             extensionElements.controlsContainerHeader.appendChild(this.renderSpeedSelectorWrapper);
-            extensionElements.controlsContainerHeader.appendChild(extensionElements.resolutionInfoElement);
 
             {
                 extensionElements.timeWrapper.appendChild(this.minValueInput);
@@ -1083,28 +1078,6 @@
             } else {
                 setTimeout(this.makeCommentsLinks.bind(this), 200, this);
             }
-        }
-    }
-
-    /**
-     * Provides canvas resolution information.
-     */
-    class ResolutionInfo {
-        onResize() {
-            let canvasElement = document.getElementById('demogl');
-
-            if (extensionElements.resolutionInfoElement) {
-                extensionElements.resolutionInfoElement.textContent = 'width: $W, height: $H'
-                    .replace('$W', canvasElement.width)
-                    .replace('$H', canvasElement.height);
-            }
-        }
-
-        constructor() {
-            window.addEventListener('resize', this.onResize);
-            window.addEventListener('toyplug:canvas:resolution:changed', this.onResize);
-
-            this.onResize();
         }
     }
 
