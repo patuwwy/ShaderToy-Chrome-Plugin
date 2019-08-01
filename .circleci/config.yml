@@ -32,13 +32,8 @@ jobs:
             - run:
                   name: 'Install Dependencies'
                   command: |
-                      apt-get update
-                      apt-get -y install curl jq zip
-            - run:
-                  name: 'Install Dependencies'
-                  command: |
-                      apt-get update
-                      apt-get -y install curl jq
+                      apk update
+                      apk add curl jq
             - run:
                   name: 'Upload & Publish Extension to the Google Chrome Store'
                   command: |
