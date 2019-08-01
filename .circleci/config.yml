@@ -78,13 +78,16 @@ workflows:
     version: 2
     commit-workflow:
         jobs:
-            - build      
-                  filters:
-                      branches:
-                          only: master
+            - build
             - publish:
                   requires:
                       - build                                        
+                  filters:
+                      branches:
+                          only: master
             - release:
                   requires:
                       - build
+                  filters:
+                      branches:
+                          only: master
