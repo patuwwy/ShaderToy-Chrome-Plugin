@@ -1,5 +1,7 @@
 class RecentShaders {
     constructor() {
+        this.MAX_SHADERS = 50;
+
         this.getRecentShaders();
 
         if (!!document.getElementById('saveButton') && window.gShaderID) {
@@ -49,11 +51,12 @@ class RecentShaders {
     }
 
     createComponent() {
+        const targetEl = document.getElementById('headerLogin');
+
         if (this.recentList) {
-            document.getElementById('headerLogin').removeChild(this.recentList);
+            targetEl.removeChild(this.recentList);
         }
 
-        const targetEl = document.getElementById('headerLogin');
         this.recentList = document.createElement('label');
 
         this.recentList.setAttribute('for', 'ste-recent-checkbox');
@@ -100,7 +103,7 @@ class RecentShaders {
                 title: titleElement.value
             });
 
-            this.recentShaders = this.recentShaders.slice(0, 10);
+            this.recentShaders = this.recentShaders.slice(0, this.MAX_SHADERS);
             this.saveRecentShaders();
             this.createComponent();
         } else {

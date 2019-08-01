@@ -405,11 +405,12 @@ body div#header {
     top: 100%;
     left: 0;
     width: 300px;
+    max-height: 90vh;
     margin: 20px 0;
     z-index: 1;
     border-radius: 4px;
     padding: 0;
-    overflow: hidden;
+    overflow: hidden auto;
 }
 
 .recent-list input:checked + ul {
