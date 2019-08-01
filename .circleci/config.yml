@@ -81,7 +81,13 @@ workflows:
             - build            
             - publish:
                   requires:
-                      - build
+                      - build                      
+                  filters:
+                      branches:
+                          only: master
             - release:
                   requires:
                       - build
+                  filters:
+                      branches:
+                          only: master
