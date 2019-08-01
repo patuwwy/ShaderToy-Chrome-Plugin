@@ -1,5 +1,15 @@
 ## ShaderToy extension changelog:
 
+-   0.12.154 (01-08-2019)
+
+    -   Change versioning strategy (Last number is commit number now)
+    -   Remove resolution info (it has been added to ShaderToy!)
+    -   Update README
+
+-   0.12.0 (01-08-2019)
+
+    -   Continous Delivery (Auto publish to Chrome Store, Auto release on GitHub)
+
 -   0.12.0 (12-04-2019)
 
     -   Recent shaders.
