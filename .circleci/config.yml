@@ -39,8 +39,6 @@ jobs:
                   command: |
                       echo "Publishing..."
                       #if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                          REFRESH_TOKEN=$(curl "https://accounts.google.com/o/oauth2/token" -d "client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&code=$CODE&grant_type=authorization_code&redirect_uri=urn:ietf:wg:oauth:2.0:oob" | jq '.refresh_token')
-                          
                           echo $REFRESH_TOKEN
                           echo $CLIENT_ID
                           echo $CLIENT_SECRET                          
