@@ -70,7 +70,7 @@ jobs:
                   name: 'Publish Release on GitHub'
                   command: |
                       VERSION=$(cat /root/workspace/output/version.txt)
-                      ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -n $VERSION $VERSION /root/workspace/output/
+                      ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -n $VERSION $VERSION /root/workspace/output/ || echo "Not released"
 
 workflows:
     version: 2
