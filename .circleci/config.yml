@@ -19,7 +19,7 @@ jobs:
                   name: 'Zip'
                   command: |
                       mkdir output
-                      zip -r ext.zip ./app
+                      zip -r ./output/ext.zip ./app
                       cat ./app/manifest.json | jq -r '.version' >> ./output/version.txt
 #
             - persist_to_workspace:
