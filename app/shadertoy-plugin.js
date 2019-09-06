@@ -19,6 +19,7 @@
          * Stores references to ShaderToy HTML elements.
          */
         shaderToyElements = {
+            leftColumnContainer: document.getElementById('leftColumnContainer'),
             shaderInfo: document.getElementById('shaderInfo'),
             shaderPlayer: document.getElementById('player'),
             shaderTags: document.getElementById('shaderTags'),
@@ -187,12 +188,12 @@
             // Create new UI controls
             this.timebar = new Timebar(this);
             this.mouseUniforms = new MouseUniforms(this);
+            this.shaderDuplicator = new ShaderDuplicator();
             this.duplicateShader();
-            this.uploadShader();
             this.downloadShader();
             this.downloadShaderAsZip();
+            this.uploadShader();
 
-            this.shaderDuplicator = new ShaderDuplicator();
             this.anchorsMaker = new AnchorsMaker();
         }
 
@@ -219,7 +220,7 @@
             extensionElements.controlsContainerFooter.classList.add('ste-footer');
             extensionElements.controlsContainer.appendChild(extensionElements.controlsContainerFooter);
 
-            shaderToyElements.shaderInfo.insertBefore(extensionElements.controlsContainer, shaderToyElements.shaderInfo.querySelector('#shaderInfoHeader'));
+            shaderToyElements.leftColumnContainer.insertBefore(extensionElements.controlsContainer, shaderToyElements.shaderInfo);
         }
 
         /**
@@ -391,10 +392,10 @@
             if (publishWrapper) {
                 duplicate.classList.add('formButton');
                 duplicate.classList.add('formButton-extension');
-                duplicate.style.marginLeft = '12px';
-                duplicate.style.display = 'inline-block';
                 duplicate.textContent = 'Save as new draft';
-                publishWrapper.appendChild(duplicate);
+
+                extensionElements.controlsContainerFooter.appendChild(duplicate);
+
                 duplicate.addEventListener('click', function() {
                     if (
                         (gShaderToy.mNeedsSave && window.confirm('Current shader will be saved as new draft. Page will be reloaded. Continue?')) ||
@@ -416,17 +417,11 @@
             var container = document.getElementById('shaderPublished') || document.getElementById('shaderButtons'),
                 download = document.createElement('div');
 
-            if (container) {
                 download.classList.add('formButton');
                 download.classList.add('formButton-extension');
-                download.style.marginLeft = '12px';
-                download.style.float = 'right';
-                download.style.width = '60px';
-                download.style.minWidth = '60px';
-                download.style.display = 'inline-block';
                 download.textContent = 'Export';
 
-                container.appendChild(download);
+                extensionElements.controlsContainerFooter.appendChild(download);
 
                 download.addEventListener('click', function onDownloadButtonClick() {
                     var name = gShaderToy.mInfo.id;
@@ -437,7 +432,7 @@
 
                     window.ToyPlug.common.downloadJson(name + '.json', JSON.stringify(gShaderToy.exportToJSON()));
                 });
-            }
+
         }
 
         /**
@@ -533,13 +528,9 @@
             if (container) {
                 upload.classList.add('formButton');
                 upload.classList.add('formButton-extension');
-                upload.style.marginLeft = '12px';
-                upload.style.float = 'right';
-                upload.style.width = '60px';
-                upload.style.minWidth = '60px';
-                upload.style.display = 'inline-block';
                 upload.textContent = 'Import';
-                container.appendChild(upload);
+
+                extensionElements.controlsContainerFooter.appendChild(upload);
 
                 upload.addEventListener('click', function onUploadButtonClick() {
                     var fileInput = document.createElement('input');
