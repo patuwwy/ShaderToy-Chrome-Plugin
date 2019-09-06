@@ -41,6 +41,12 @@ html {
 
 .toyplug-controls-container {
     margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.toyplug-controls-container.expanded {
+    flex-direction: column;
 }
 
 .toyplug-controls-container .ste-header {
@@ -49,7 +55,7 @@ html {
     align-items: center;
 }
 
-.toyplug-controls-container:not(.expanded) .ste-header ~ *,
+.toyplug-controls-container:not(.expanded) .ste-header ~ *:not(.ste-footer),
 .toyplug-controls-container:not(.expanded) .ste-header .expand-trigger + div {
     display: none;
 }
@@ -333,6 +339,11 @@ body.alternate-profile div#header {
     margin-top: -80px;
 }
 
+.ste-renderSpeed-wrapper {
+    margin-top: -2px;
+    margin-bottom: -2px;
+}
+
 #ste-renderSpeed {
     background-color: rgb(25, 103, 160);
     color: #fff;
@@ -357,11 +368,14 @@ body.alternate-profile div#header {
 .toyplug-controls-container .ste-footer {
     display: flex;
     justify-content: flex-end;
-    margin-top: 10px;
 }
 
 .toyplug-controls-container .ste-footer .formButton-extension {
     margin-left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: auto;
 }
 
 .toyplug-controls-container .ste-header > * {
