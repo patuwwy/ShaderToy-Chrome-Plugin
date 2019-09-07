@@ -15,6 +15,7 @@
          * @const {string}
          */
         LOCALSTORAGE_SHADER_FORK_KEYNAME = 'forkedShaderStorage',
+        SHADER_PREVIEW_LOCATION = '/media/shaders/',
         /**
          * Stores references to ShaderToy HTML elements.
          */
@@ -188,6 +189,7 @@
             // Create new UI controls
             this.timebar = new Timebar(this);
             this.mouseUniforms = new MouseUniforms(this);
+            this.shaderStaticPreview = new ShaderStaticPreview();
             this.shaderDuplicator = new ShaderDuplicator();
             this.duplicateShader();
             this.downloadShader();
@@ -417,22 +419,21 @@
             var container = document.getElementById('shaderPublished') || document.getElementById('shaderButtons'),
                 download = document.createElement('div');
 
-                download.classList.add('formButton');
-                download.classList.add('formButton-extension');
-                download.textContent = 'Export';
+            download.classList.add('formButton');
+            download.classList.add('formButton-extension');
+            download.textContent = 'Export';
 
-                extensionElements.controlsContainerFooter.appendChild(download);
+            extensionElements.controlsContainerFooter.appendChild(download);
 
-                download.addEventListener('click', function onDownloadButtonClick() {
-                    var name = gShaderToy.mInfo.id;
+            download.addEventListener('click', function onDownloadButtonClick() {
+                var name = gShaderToy.mInfo.id;
 
-                    if (name === '-1') {
-                        name = 'default';
-                    }
+                if (name === '-1') {
+                    name = 'default';
+                }
 
-                    window.ToyPlug.common.downloadJson(name + '.json', JSON.stringify(gShaderToy.exportToJSON()));
-                });
-
+                window.ToyPlug.common.downloadJson(name + '.json', JSON.stringify(gShaderToy.exportToJSON()));
+            });
         }
 
         /**
@@ -1069,6 +1070,44 @@
             } else {
                 setTimeout(this.makeCommentsLinks.bind(this), 200, this);
             }
+        }
+    }
+
+    class ShaderStaticPreview {
+        constructor() {
+            this.addButton();
+            this.addPreviewImage();
+        }
+
+        addPreviewImage() {
+            this.previewImage = document.createElement('img');
+            this.previewImage.classList.add('toyplug-preview');
+            this.previewImage.setAttribute('src', SHADER_PREVIEW_LOCATION + window.gShaderID + '.jpg');
+
+            document.body.appendChild(this.previewImage);
+        }
+
+        addButton() {
+            this.button = document.createElement('div');
+            this.button.style.backgroundImage = 'url(' + SHADER_PREVIEW_LOCATION + window.gShaderID + '.jpg)';
+            this.button.classList.add('formButton', 'formButton-extension', 'formButton-preview-button');
+            this.button.setAttribute('title', 'Show generated preview');
+            this.button.addEventListener('click', this.onButtonClick.bind(this));
+
+            extensionElements.controlsContainerFooter.appendChild(this.button);
+        }
+
+        onButtonClick(event) {
+            this.previewImage.classList.toggle('visible');
+
+            window.addEventListener('click', this.hidePreview.bind(this));
+            event.stopPropagation();
+        }
+
+        hidePreview() {
+            this.previewImage.classList.remove('visible');
+
+            window.removeEventListener('click', this.hidePreview);
         }
     }
 
