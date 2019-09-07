@@ -470,3 +470,26 @@ body div#header {
     padding: 10px;
     white-space: pre-line;
 }
+
+.toyplug-preview {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+    max-width: 100%;
+    max-height: 100%;
+    z-index: 10;
+    display: none;
+    cursor: pointer;
+}
+
+.toyplug-preview.visible {
+    display: block;
+}
+
+.formButton.formButton-extension.formButton-preview-button {
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-width: 30px;
+    background-position: 50%;
+}

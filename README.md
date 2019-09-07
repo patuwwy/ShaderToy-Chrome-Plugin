@@ -63,6 +63,8 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 -   List of recently viewed own shaders.
 
+-   Shader preview (automaticly generated image).
+
 ## Screenshots
 
 ### Controls:
