@@ -1,5 +1,9 @@
 ## ShaderToy extension changelog:
 
+-   0.12.172 (01-10-2019)
+
+    -   Hot fixes for ShaderToy layout update.
+
 -   0.12.170 (08-09-2019)
 
     -   Show shader screenshot.
