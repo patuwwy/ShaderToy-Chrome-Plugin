@@ -8,9 +8,11 @@ class RecentShaders {
             this.shaderID = window.gShaderID;
             this.addRecent();
 
-            document.getElementById('saveButton').addEventListener('click', () => {
-                this.addRecent();
-            });
+            document
+                .getElementById('saveButton')
+                .addEventListener('click', () => {
+                    this.addRecent();
+                });
         }
 
         this.createComponent();
@@ -43,7 +45,8 @@ class RecentShaders {
             let infoElement = document.createElement('li');
 
             infoElement.classList.add('no-shaders-info');
-            infoElement.textContent = 'All your shaders that you open \r\nwill be visible here.';
+            infoElement.textContent =
+                'All your shaders that you open \r\nwill be visible here.';
             list.appendChild(infoElement);
         }
 
@@ -51,7 +54,18 @@ class RecentShaders {
     }
 
     createComponent() {
-        const targetEl = document.getElementById('headerLogin');
+        let targetEl = document.querySelector('#headerBlock2 > span');
+
+        if (!targetEl) {
+            targetEl = document.createElement('span');
+            document
+                .querySelector('#headerBlock2')
+                .insertBefore(
+                    targetEl,
+                    document.querySelector('#headerBlock2 > *')
+                );
+            targetEl.style.margin = '14px 0';
+        }
 
         if (this.recentList) {
             targetEl.removeChild(this.recentList);
@@ -68,14 +82,18 @@ class RecentShaders {
         checkbox.id = 'ste-recent-checkbox';
 
         this.recentList.textContent = 'Open recent...';
-        this.recentList.classList.add('recent-list', 'formButton', 'formButton-extension');
+        this.recentList.classList.add(
+            'recent-list',
+            'formButton',
+            'formButton-extension'
+        );
 
         this.recentList.appendChild(checkbox);
         this.recentList.appendChild(list);
 
         targetEl.insertBefore(this.recentList, targetEl.firstChild);
 
-        window.addEventListener('click', event => {
+        window.addEventListener('click', (event) => {
             if (event.target.id !== 'ste-recent-checkbox') {
                 checkbox.checked = false;
             }
@@ -95,7 +113,9 @@ class RecentShaders {
     addRecent() {
         const titleElement = document.getElementById('shaderTitle');
 
-        this.recentShaders = this.recentShaders.filter(shader => shader.id !== this.shaderID);
+        this.recentShaders = this.recentShaders.filter(
+            (shader) => shader.id !== this.shaderID
+        );
 
         if (titleElement.value) {
             this.recentShaders.unshift({
@@ -112,7 +132,10 @@ class RecentShaders {
     }
 
     saveRecentShaders() {
-        window.localStorage.setItem('RecentShaders', JSON.stringify(this.recentShaders));
+        window.localStorage.setItem(
+            'RecentShaders',
+            JSON.stringify(this.recentShaders)
+        );
     }
 }
 

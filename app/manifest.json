@@ -1,14 +1,14 @@
 {
     "manifest_version": 2,
     "name": "Shadertoy unofficial plugin.",
-    "version": "0.12.170",
+    "version": "0.12.172",
     "description": "Shadertoy.com unofficial plugin.",
     "homepage_url": "https://github.com/patuwwy/ShaderToy-Chrome-Plugin",
     "background": {
-        "scripts": ["background.js"],
+        "scripts": [ "background.js" ],
         "persistent": false
     },
-    "permissions": ["https://www.shadertoy.com/*", "activeTab", "storage"],
+    "permissions": [ "https://www.shadertoy.com/*", "activeTab", "storage" ],
     "icons": {
         "128": "assets/icon_active_128.png"
     },
@@ -19,10 +19,10 @@
     },
     "content_scripts": [
         {
-            "matches": ["https://www.shadertoy.com/*"],
-            "exclude_matches": ["https://www.shadertoy.com/signin"],
-            "js": ["contentscript.js"],
-            "css": ["style.css"],
+            "matches": [ "https://www.shadertoy.com/*" ],
+            "exclude_matches": [ "https://www.shadertoy.com/signin" ],
+            "js": [ "contentscript.js" ],
+            "css": [ "style.css" ],
             "run_at": "document_end"
         }
     ],

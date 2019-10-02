@@ -20,7 +20,7 @@
          * Stores references to ShaderToy HTML elements.
          */
         shaderToyElements = {
-            leftColumnContainer: document.getElementById('leftColumnContainer'),
+            leftColumnContainer: document.querySelector('.container > .block0'),
             shaderInfo: document.getElementById('shaderInfo'),
             shaderPlayer: document.getElementById('player'),
             shaderTags: document.getElementById('shaderTags'),
@@ -136,7 +136,7 @@
          * Download a JSON file of the provided data
          */
         downloadJson(filename, data) {
-            var blob = new window.Blob([data], { type: 'application/json' });
+            var blob = new window.Blob([ data ], { type: 'application/json' });
 
             this.downloadBlob(filename, blob);
         }
@@ -204,25 +204,50 @@
          */
         createContainers() {
             extensionElements.controlsContainer = document.createElement('div');
-            extensionElements.controlsContainer.classList.add('toyplug-controls-container');
+            extensionElements.controlsContainer.classList.add(
+                'toyplug-controls-container'
+            );
 
-            extensionElements.controlsContainerHeader = document.createElement('div');
-            extensionElements.controlsContainerHeader.classList.add('ste-header');
-            extensionElements.controlsContainer.appendChild(extensionElements.controlsContainerHeader);
+            extensionElements.controlsContainerHeader = document.createElement(
+                'div'
+            );
+            extensionElements.controlsContainerHeader.classList.add(
+                'ste-header'
+            );
+            extensionElements.controlsContainer.appendChild(
+                extensionElements.controlsContainerHeader
+            );
 
             extensionElements.timeWrapper = document.createElement('div');
             extensionElements.timeWrapper.classList.add('time-slider');
-            extensionElements.controlsContainer.appendChild(extensionElements.timeWrapper);
+            extensionElements.controlsContainer.appendChild(
+                extensionElements.timeWrapper
+            );
 
-            extensionElements.mouseSlidersWrapper = document.createElement('div');
-            extensionElements.mouseSlidersWrapper.classList.add('mouse-uniforms');
-            extensionElements.controlsContainer.appendChild(extensionElements.mouseSlidersWrapper);
+            extensionElements.mouseSlidersWrapper = document.createElement(
+                'div'
+            );
+            extensionElements.mouseSlidersWrapper.classList.add(
+                'mouse-uniforms'
+            );
+            extensionElements.controlsContainer.appendChild(
+                extensionElements.mouseSlidersWrapper
+            );
 
-            extensionElements.controlsContainerFooter = document.createElement('div');
-            extensionElements.controlsContainerFooter.classList.add('ste-footer');
-            extensionElements.controlsContainer.appendChild(extensionElements.controlsContainerFooter);
+            extensionElements.controlsContainerFooter = document.createElement(
+                'div'
+            );
+            extensionElements.controlsContainerFooter.classList.add(
+                'ste-footer'
+            );
+            extensionElements.controlsContainer.appendChild(
+                extensionElements.controlsContainerFooter
+            );
 
-            shaderToyElements.leftColumnContainer.insertBefore(extensionElements.controlsContainer, shaderToyElements.shaderInfo);
+            shaderToyElements.leftColumnContainer.insertBefore(
+                extensionElements.controlsContainer,
+                shaderToyElements.shaderInfo
+            );
         }
 
         /**
@@ -241,7 +266,9 @@
 
             gShaderToy.resize(n.w, n.h);
             this.currentDivider = divider;
-            window.dispatchEvent(new window.CustomEvent('toyplug:canvas:resolution:changed'));
+            window.dispatchEvent(
+                new window.CustomEvent('toyplug:canvas:resolution:changed')
+            );
         }
 
         /**
@@ -322,13 +349,17 @@
          * Toggles fullscreen edit mode.
          */
         toggleFullScreenEdit() {
-            var isFS = document.body.classList.contains(this.FULLSCREEN_MODE_CLASS);
+            var isFS = document.body.classList.contains(
+                this.FULLSCREEN_MODE_CLASS
+            );
 
             if (document.webkitIsFullScreen) {
                 document.webkitExitFullscreen();
             }
 
-            document.body.classList[isFS ? 'remove' : 'add'](this.FULLSCREEN_MODE_CLASS);
+            document.body.classList[isFS ? 'remove' : 'add'](
+                this.FULLSCREEN_MODE_CLASS
+            );
             this.decreaseRes(this.currentDivider);
         }
 
@@ -396,11 +427,16 @@
                 duplicate.classList.add('formButton-extension');
                 duplicate.textContent = 'Save as new draft';
 
-                extensionElements.controlsContainerFooter.appendChild(duplicate);
+                extensionElements.controlsContainerFooter.appendChild(
+                    duplicate
+                );
 
                 duplicate.addEventListener('click', function() {
                     if (
-                        (gShaderToy.mNeedsSave && window.confirm('Current shader will be saved as new draft. Page will be reloaded. Continue?')) ||
+                        (gShaderToy.mNeedsSave &&
+                            window.confirm(
+                                'Current shader will be saved as new draft. Page will be reloaded. Continue?'
+                            )) ||
                         !gShaderToy.mNeedsSave
                     ) {
                         gShaderToy.mInfo.username = 'None';
@@ -416,7 +452,9 @@
          * Create the UI controls to download the JSON file of the current shader
          */
         downloadShader() {
-            var container = document.getElementById('shaderPublished') || document.getElementById('shaderButtons'),
+            var container =
+                    document.getElementById('shaderPublished') ||
+                    document.getElementById('shaderButtons'),
                 download = document.createElement('div');
 
             download.classList.add('formButton');
@@ -425,15 +463,21 @@
 
             extensionElements.controlsContainerFooter.appendChild(download);
 
-            download.addEventListener('click', function onDownloadButtonClick() {
-                var name = gShaderToy.mInfo.id;
+            download.addEventListener(
+                'click',
+                function onDownloadButtonClick() {
+                    var name = gShaderToy.mInfo.id;
 
-                if (name === '-1') {
-                    name = 'default';
+                    if (name === '-1') {
+                        name = 'default';
+                    }
+
+                    window.ToyPlug.common.downloadJson(
+                        name + '.json',
+                        JSON.stringify(gShaderToy.exportToJSON())
+                    );
                 }
-
-                window.ToyPlug.common.downloadJson(name + '.json', JSON.stringify(gShaderToy.exportToJSON()));
-            });
+            );
         }
 
         /**
@@ -445,9 +489,13 @@
              */
             function onDownloadAsZipClick() {
                 var id = gShaderToy.mInfo.id,
-                    friendlyName = gShaderToy.mInfo.name || 'ShaderToy shader ' + id,
+                    friendlyName =
+                        gShaderToy.mInfo.name || 'ShaderToy shader ' + id,
                     username = gShaderToy.mInfo.username || 'unknown',
-                    filename = window.sanitizeFilename(username) + ' - ' + window.sanitizeFilename(friendlyName),
+                    filename =
+                        window.sanitizeFilename(username) +
+                        ' - ' +
+                        window.sanitizeFilename(friendlyName),
                     tags = [],
                     tagsString = '',
                     description,
@@ -465,7 +513,10 @@
                 // write access to the shader.
                 // Get the tags from the tag box, with a fallback to the
                 // ShaderToy info.
-                if (shaderToyElements.shaderTags && shaderToyElements.shaderTags.value) {
+                if (
+                    shaderToyElements.shaderTags &&
+                    shaderToyElements.shaderTags.value
+                ) {
                     tags = shaderToyElements.shaderTags.value.split(/\s*,\s*/);
                 }
 
@@ -480,7 +531,10 @@
 
                 // Get the description from the textarea, with a fallback
                 // to the ShaderToy info
-                if (shaderToyElements.shaderDescription && shaderToyElements.shaderDescription.value) {
+                if (
+                    shaderToyElements.shaderDescription &&
+                    shaderToyElements.shaderDescription.value
+                ) {
                     description = shaderToyElements.shaderDescription.value;
                 } else {
                     description = gShaderToy.mInfo.description;
@@ -497,12 +551,19 @@
                 // Build the ZIP.  Tweaked from the JSZip example.
                 zip = JSZip();
                 zip.file('readme.txt', readme, { binary: false });
-                zip.file(id + '.json', JSON.stringify(gShaderToy.exportToJSON()), { binary: false });
+                zip.file(
+                    id + '.json',
+                    JSON.stringify(gShaderToy.exportToJSON()),
+                    { binary: false }
+                );
 
                 // Save the ZIP
                 zip.generateAsync({ type: 'blob' }).then(
                     function(content) {
-                        window.ToyPlug.common.downloadBlob(filename + '.zip', content);
+                        window.ToyPlug.common.downloadBlob(
+                            filename + '.zip',
+                            content
+                        );
                     },
                     function() {
                         window.alert("Couldn't save ZIP"); // jshint ignore: line
@@ -514,7 +575,11 @@
             if (shaderToyElements.shaderInfo) {
                 let download = document.createElement('div');
 
-                download.classList.add('formButton', 'formButton-extension', 'download-zip');
+                download.classList.add(
+                    'formButton',
+                    'formButton-extension',
+                    'download-zip'
+                );
                 download.textContent = 'Export ZIP';
 
                 extensionElements.controlsContainerFooter.appendChild(download);
@@ -533,33 +598,41 @@
 
                 extensionElements.controlsContainerFooter.appendChild(upload);
 
-                upload.addEventListener('click', function onUploadButtonClick() {
-                    var fileInput = document.createElement('input');
+                upload.addEventListener(
+                    'click',
+                    function onUploadButtonClick() {
+                        var fileInput = document.createElement('input');
 
-                    fileInput.type = 'file';
-                    fileInput.addEventListener('change', function onInputChange() {
-                        var file = this.files[0],
-                            reader = new window.FileReader();
+                        fileInput.type = 'file';
+                        fileInput.addEventListener(
+                            'change',
+                            function onInputChange() {
+                                var file = this.files[0],
+                                    reader = new window.FileReader();
 
-                        reader.onload = function onFileLoaded() {
-                            var text = reader.result;
+                                reader.onload = function onFileLoaded() {
+                                    var text = reader.result;
 
-                            try {
-                                dataLoadShader(JSON.parse('[' + text + ']'));
-                            } catch (error) {
-                                window.alert('Failed to load shader!');
+                                    try {
+                                        dataLoadShader(
+                                            JSON.parse('[' + text + ']')
+                                        );
+                                    } catch (error) {
+                                        window.alert('Failed to load shader!');
+                                    }
+
+                                    gShaderToy.mInfo.id = '-1';
+                                };
+
+                                reader.readAsText(file);
+                                container.removeChild(fileInput);
                             }
+                        );
 
-                            gShaderToy.mInfo.id = '-1';
-                        };
-
-                        reader.readAsText(file);
-                        container.removeChild(fileInput);
-                    });
-
-                    container.appendChild(fileInput);
-                    fileInput.click();
-                });
+                        container.appendChild(fileInput);
+                        fileInput.click();
+                    }
+                );
             }
         }
     }
@@ -574,19 +647,37 @@
             this.busy = false;
             this.wasPaused = false;
             this.createElements();
-            this.sliderInput.addEventListener('mousedown', this.sliderOnMouseDown.bind(this));
-            this.sliderInput.addEventListener('mouseup', this.sliderOnMouseUp.bind(this));
+            this.sliderInput.addEventListener(
+                'mousedown',
+                this.sliderOnMouseDown.bind(this)
+            );
+            this.sliderInput.addEventListener(
+                'mouseup',
+                this.sliderOnMouseUp.bind(this)
+            );
             this.sliderInput.addEventListener(
                 'input',
                 function() {
                     updateShaderToyTime(this.sliderInput.value);
                 }.bind(this)
             );
-            this.minValueInput.addEventListener('change', this.onChangeMinInput.bind(this));
-            this.maxValueInput.addEventListener('change', this.onChangeMaxInput.bind(this));
+            this.minValueInput.addEventListener(
+                'change',
+                this.onChangeMinInput.bind(this)
+            );
+            this.maxValueInput.addEventListener(
+                'change',
+                this.onChangeMaxInput.bind(this)
+            );
             this.updateSlider();
-            this.controlsExpandTrigger.addEventListener('click', this.onControlsExpandTriggerClick.bind(this));
-            this.renderSpeedSelector.addEventListener('change', this.onChangeRenderSpeedSelector.bind(this));
+            this.controlsExpandTrigger.addEventListener(
+                'click',
+                this.onControlsExpandTriggerClick.bind(this)
+            );
+            this.renderSpeedSelector.addEventListener(
+                'change',
+                this.onChangeRenderSpeedSelector.bind(this)
+            );
 
             this._Paint = Effect.prototype.Paint;
             this.setControlsVisibility(this.getControlsVisibilitySavedState());
@@ -597,7 +688,9 @@
         }
 
         setControlsVisibility(expand) {
-            extensionElements.controlsContainer.classList[expand ? 'add' : 'remove']('expanded');
+            extensionElements.controlsContainer.classList[
+                expand ? 'add' : 'remove'
+            ]('expanded');
         }
 
         onControlsExpandTriggerClick() {
@@ -614,7 +707,9 @@
         createElements() {
             this.controlsExpandTrigger = document.createElement('div');
             this.renderSpeedSelectorWrapper = document.createElement('div');
-            this.renderSpeedSelectorWrapper.classList.add('ste-renderSpeed-wrapper');
+            this.renderSpeedSelectorWrapper.classList.add(
+                'ste-renderSpeed-wrapper'
+            );
             this.minValueInput = document.createElement('input');
             this.minValueInput.classList.add('ste-min-input');
             this.sliderInput = document.createElement('input');
@@ -626,32 +721,43 @@
                 this.loopInput.setAttribute('type', 'checkbox');
                 this.loopInput.classList.add('ste-input-loop');
                 this.loopInput.setAttribute('title', 'loop');
-                this.loopInput.addEventListener('change', event => {
+                this.loopInput.addEventListener('change', (event) => {
                     this.loop = event.target.checked;
                 });
             }
 
             this.controlsExpandTrigger.textContent = 'Toggle controls';
-            this.controlsExpandTrigger.classList.add('expand-trigger', 'formButton', 'formButton-extension', 'speed-select');
+            this.controlsExpandTrigger.classList.add(
+                'expand-trigger',
+                'formButton',
+                'formButton-extension',
+                'speed-select'
+            );
 
             let renderSpeedSpan = document.createElement('label');
             renderSpeedSpan.setAttribute('for', 'ste-renderSpeed');
             renderSpeedSpan.textContent = 'Paint calls:';
 
             this.renderSpeedSelectorWrapper.appendChild(renderSpeedSpan);
-            this.renderSpeedSelector = this.renderSpeedSelectorWrapper.appendChild(document.createElement('select'));
+            this.renderSpeedSelector = this.renderSpeedSelectorWrapper.appendChild(
+                document.createElement('select')
+            );
             this.renderSpeedSelector.id = 'ste-renderSpeed';
             this.renderSpeedSelector.classList.add('formButton');
 
-            [1, 2, 4, 8, 16, 32, 64].forEach(val => {
+            [ 1, 2, 4, 8, 16, 32, 64 ].forEach((val) => {
                 let option = document.createElement('option');
                 option.value = val;
                 option.textContent = val;
                 this.renderSpeedSelector.appendChild(option);
             });
 
-            extensionElements.controlsContainerHeader.appendChild(this.controlsExpandTrigger);
-            extensionElements.controlsContainerHeader.appendChild(this.renderSpeedSelectorWrapper);
+            extensionElements.controlsContainerHeader.appendChild(
+                this.controlsExpandTrigger
+            );
+            extensionElements.controlsContainerHeader.appendChild(
+                this.renderSpeedSelectorWrapper
+            );
 
             {
                 extensionElements.timeWrapper.appendChild(this.minValueInput);
@@ -690,14 +796,22 @@
 
         onChangeMinInput() {
             this.maxValueInput.min = parseInt(this.minValueInput.value, 10) + 1;
-            this.maxValueInput.value = Math.max(parseInt(this.maxValueInput.value, 10), parseInt(this.minValueInput.value, 10) + 1);
-            this.sliderInput.min = parseInt(this.minValueInput.value, 10) * 1000;
+            this.maxValueInput.value = Math.max(
+                parseInt(this.maxValueInput.value, 10),
+                parseInt(this.minValueInput.value, 10) + 1
+            );
+            this.sliderInput.min =
+                parseInt(this.minValueInput.value, 10) * 1000;
         }
 
         onChangeMaxInput() {
             this.minValueInput.max = parseInt(this.maxValueInput.value, 10);
-            this.minValueInput.value = Math.min(parseInt(this.maxValueInput.value, 10) - 1, parseInt(this.minValueInput.value, 10));
-            this.sliderInput.max = parseInt(this.maxValueInput.value, 10) * 1000;
+            this.minValueInput.value = Math.min(
+                parseInt(this.maxValueInput.value, 10) - 1,
+                parseInt(this.minValueInput.value, 10)
+            );
+            this.sliderInput.max =
+                parseInt(this.maxValueInput.value, 10) * 1000;
         }
 
         /**
@@ -735,8 +849,14 @@
          */
         sliderOnMouseDown() {
             this.wasPaused = gShaderToy.mIsPaused;
-            this.sliderInput.min = parseInt(this.minValueInput.value * 1000, 10);
-            this.sliderInput.max = parseInt(this.maxValueInput.value * 1000, 10);
+            this.sliderInput.min = parseInt(
+                this.minValueInput.value * 1000,
+                10
+            );
+            this.sliderInput.max = parseInt(
+                this.maxValueInput.value * 1000,
+                10
+            );
 
             if (!this.wasPaused) {
                 this.busy = true;
@@ -756,7 +876,10 @@
 
             window.requestAnimationFrame(
                 function() {
-                    updateShaderToyTime(this.sliderInput.value, !this.wasPaused);
+                    updateShaderToyTime(
+                        this.sliderInput.value,
+                        !this.wasPaused
+                    );
                     updateInputsTime(this.sliderInput.value);
                     this.busy = false;
                 }.bind(this)
@@ -780,7 +903,7 @@
 
         gShaderToy.pauseTime();
 
-        gShaderToy.mFpsFrame = ~~((value / 1000) * 60);
+        gShaderToy.mFpsFrame = ~~(value / 1000 * 60);
         gShaderToy.mForceFrame = true;
         gShaderToy.mRestarted = true;
         gShaderToy.mFpsTo = gShaderToy.mTo;
@@ -837,7 +960,9 @@
          * Loads shader from LocalStorage if there is is stored one.
          */
         finishShaderFork() {
-            var storedShader = window.localStorage.getItem(LOCALSTORAGE_SHADER_FORK_KEYNAME),
+            var storedShader = window.localStorage.getItem(
+                    LOCALSTORAGE_SHADER_FORK_KEYNAME
+                ),
                 ctx = gShaderToy.mGLContext;
 
             if (!storedShader) {
@@ -850,7 +975,10 @@
                     dataLoadShader(JSON.parse('[' + storedShader + ']'));
                     gShaderToy.mGLContext = ctx;
                     gShaderToy.startRendering();
-                    window.localStorage.setItem(LOCALSTORAGE_SHADER_FORK_KEYNAME, '');
+                    window.localStorage.setItem(
+                        LOCALSTORAGE_SHADER_FORK_KEYNAME,
+                        ''
+                    );
                     gShaderToy.mInfo.username = 'None';
                     gShaderToy.mInfo.id = '-1';
                     gShaderToy.mNeedsSave = true;
@@ -881,7 +1009,10 @@
         bindButtonEvents() {
             var self = this;
 
-            this.button.addEventListener('click', self.onButtonClick.bind(self));
+            this.button.addEventListener(
+                'click',
+                self.onButtonClick.bind(self)
+            );
         }
 
         createBanner(shaderInfo) {
@@ -916,7 +1047,10 @@
                 }
             });
 
-            window.localStorage.setItem(LOCALSTORAGE_SHADER_FORK_KEYNAME, JSON.stringify(shaderData));
+            window.localStorage.setItem(
+                LOCALSTORAGE_SHADER_FORK_KEYNAME,
+                JSON.stringify(shaderData)
+            );
             gShaderToy.mNeedsSave = false;
             window.location.href = 'https://www.shadertoy.com/new';
         }
@@ -956,7 +1090,10 @@
                 valueElement.textContent = obj.vPart + ': 0';
                 extensionElements.mouseSlidersWrapper.appendChild(slider);
                 extensionElements.mouseSlidersWrapper.appendChild(valueElement);
-                slider.addEventListener('input', this.onSliderChange.bind(this));
+                slider.addEventListener(
+                    'input',
+                    this.onSliderChange.bind(this)
+                );
                 slider.addEventListener('blur', this.onSliderBlur);
                 return slider;
             }, this);
@@ -989,7 +1126,9 @@
          * Updates sliders range on window resize.
          */
         onResize() {
-            var sizes = document.getElementById('demogl').getBoundingClientRect();
+            var sizes = document
+                .getElementById('demogl')
+                .getBoundingClientRect();
 
             this.sliders.forEach(function(slider) {
                 slider.max = sizes[slider.getAttribute('data-size')];
@@ -1024,11 +1163,16 @@
          * @param {element} Element to replace urls in.
          */
         _makeLink(element) {
-            element.innerHTML = element.innerHTML.replace(this.NOT_ANCHOR_URL_REGEXP, '<a class="ext-link" target="_blank" class="regular" href="$1">$1</a>');
+            element.innerHTML = element.innerHTML.replace(
+                this.NOT_ANCHOR_URL_REGEXP,
+                '<a class="ext-link" target="_blank" class="regular" href="$1">$1</a>'
+            );
             let links = Array.from(element.querySelectorAll('[href].ext-link'));
             // remove non alphanumeric at the end.
-            links.forEach(link => {
-                let href = link.getAttribute('href').replace(/[^a-zA-Z0-9 :]$/, ' ');
+            links.forEach((link) => {
+                let href = link
+                    .getAttribute('href')
+                    .replace(/[^a-zA-Z0-9 :]$/, ' ');
                 link.setAttribute('href', href);
                 link.textContent = href;
             });
@@ -1082,17 +1226,28 @@
         addPreviewImage() {
             this.previewImage = document.createElement('img');
             this.previewImage.classList.add('toyplug-preview');
-            this.previewImage.setAttribute('src', SHADER_PREVIEW_LOCATION + window.gShaderID + '.jpg');
+            this.previewImage.setAttribute(
+                'src',
+                SHADER_PREVIEW_LOCATION + window.gShaderID + '.jpg'
+            );
 
             document.body.appendChild(this.previewImage);
         }
 
         addButton() {
             this.button = document.createElement('div');
-            this.button.style.backgroundImage = 'url(' + SHADER_PREVIEW_LOCATION + window.gShaderID + '.jpg)';
-            this.button.classList.add('formButton', 'formButton-extension', 'formButton-preview-button');
+            this.button.style.backgroundImage =
+                'url(' + SHADER_PREVIEW_LOCATION + window.gShaderID + '.jpg)';
+            this.button.classList.add(
+                'formButton',
+                'formButton-extension',
+                'formButton-preview-button'
+            );
             this.button.setAttribute('title', 'Show generated preview');
-            this.button.addEventListener('click', this.onButtonClick.bind(this));
+            this.button.addEventListener(
+                'click',
+                this.onButtonClick.bind(this)
+            );
 
             extensionElements.controlsContainerFooter.appendChild(this.button);
         }

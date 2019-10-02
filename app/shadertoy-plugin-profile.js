@@ -29,7 +29,7 @@
             '<a href="{shaderUrl}" class="shader-tile">' +
             '<img class="shader-image" src="{previewUrl}"/>' +
             '<span class="shader-name">{shaderTitle}</span></a>',
-        contentWrapper = null,
+        userContent = null,
         /**
          * Stores Helpers instance.
          *
@@ -93,8 +93,12 @@
          */
         rebuildList() {
             this.shadersListContainer = document.getElementById('divShaders');
-            this.shadersTable = this.shadersListContainer.querySelector('table');
-            this.shadersListRows = helpers.collectionToArray(this.shadersListContainer.querySelectorAll('tr'));
+            this.shadersTable = this.shadersListContainer.querySelector(
+                'table'
+            );
+            this.shadersListRows = helpers.collectionToArray(
+                this.shadersListContainer.querySelectorAll('tr')
+            );
             this.shadersListHeadRow = this.shadersListRows[0];
             // Add small preview images to shaders list.
             // Images are shown on hover.
@@ -125,10 +129,16 @@
          */
         init() {
             document.body.classList.add('alternate-profile');
+
             this.tilesWrapper = document.createElement('div');
             this.tilesWrapper.classList.add('tiles-wrapper');
-            contentWrapper = document.getElementById('contentScroll');
-            document.body.insertBefore(this.tilesWrapper, contentWrapper);
+
+            userContent = document.getElementById('userContent');
+
+            document
+                .getElementById('content')
+                .insertBefore(this.tilesWrapper, userContent);
+
             this.userShaders = this.getShaders();
             // Need to wait for user's shaders to load.
             // This is a hot fix.
@@ -148,27 +158,36 @@
          * @returns {ShaderTile[]}
          */
         getShaders() {
-            return helpers.collectionToArray(document.querySelectorAll('#divShaders tr + tr')).map(function parseRow(tr) {
-                var linkElement = tr.querySelector('td + td a'),
-                    link = linkElement.getAttribute('href'),
-                    status = tr.lastElementChild.previousElementSibling.textContent;
-                return new ShaderTile(
-                    {
-                        id: link.replace('/view/', ''),
-                        link: link,
-                        title: linkElement.textContent,
-                        statusOrginal: status,
-                        status: status.replace(/(\s+|\+)/g, '').toLowerCase()
-                    },
-                    this
-                );
-            }, this);
+            return helpers
+                .collectionToArray(
+                    document.querySelectorAll('#divShaders tr + tr')
+                )
+                .map(function parseRow(tr) {
+                    var linkElement = tr.querySelector('td + td a'),
+                        link = linkElement.getAttribute('href'),
+                        status =
+                            tr.lastElementChild.previousElementSibling
+                                .textContent;
+                    return new ShaderTile(
+                        {
+                            id: link.replace('/view/', ''),
+                            link: link,
+                            title: linkElement.textContent,
+                            statusOrginal: status,
+                            status: status
+                                .replace(/(\s+|\+)/g, '')
+                                .toLowerCase()
+                        },
+                        this
+                    );
+                }, this);
         }
         /**
          * Adds header with links to shaders' groups.
          */
         addSecondHeader() {
-            var SECOND_HEADER_CONTENT = '<a href="#contentScroll">Original part</a>',
+            var SECOND_HEADER_CONTENT =
+                    '<a href="#contentScroll">Original part</a>',
                 secondHeaderElement = document.createElement('div'),
                 contents = '',
                 headerAnchors = [],
@@ -177,17 +196,21 @@
             orginalPartAnchor.setAttribute('href', '#contentScroll');
             orginalPartAnchor.textContent = 'Orginal part';
             headerAnchors.push(orginalPartAnchor);
-            helpers.collectionToArray(document.querySelectorAll('.tiles-wrapper > ul')).forEach((tilesList, i) => {
-                var attr = tilesList.getAttribute('data-status'),
-                    anchor = document.createElement('a');
+            helpers
+                .collectionToArray(
+                    document.querySelectorAll('.tiles-wrapper > ul')
+                )
+                .forEach((tilesList, i) => {
+                    var attr = tilesList.getAttribute('data-status'),
+                        anchor = document.createElement('a');
 
-                tilesList.setAttribute('id', 'toy-list-' + i);
-                anchor.href = '#toy-list-' + i;
-                anchor.textContent = attr;
-                headerAnchors.push(anchor);
-            });
+                    tilesList.setAttribute('id', 'toy-list-' + i);
+                    anchor.href = '#toy-list-' + i;
+                    anchor.textContent = attr;
+                    headerAnchors.push(anchor);
+                });
             secondHeaderElement.classList.add('toyPlugHeader');
-            headerAnchors.forEach(anchor => {
+            headerAnchors.forEach((anchor) => {
                 secondHeaderElement.appendChild(anchor);
             });
             document.body.prepend(secondHeaderElement);
@@ -213,7 +236,9 @@
          */
         createHTML() {
             var tile = document.createElement('li'),
-                targetElement = this.tilesView.tilesWrapper.querySelector('.list.' + this.shader.status);
+                targetElement = this.tilesView.tilesWrapper.querySelector(
+                    '.list.' + this.shader.status
+                );
 
             if (!targetElement) {
                 let list = document.createElement('ul'),
@@ -227,7 +252,10 @@
             }
 
             tile.classList.add('shader');
-            tile.innerHTML = TILE_TEMPLATE.replace('{previewUrl}', getPreviewUrlById(this.shader.id))
+            tile.innerHTML = TILE_TEMPLATE.replace(
+                '{previewUrl}',
+                getPreviewUrlById(this.shader.id)
+            )
                 .replace('{shaderUrl}', getShaderUrlById(this.shader.id))
                 .replace('{shaderTitle}', this.shader.title);
             targetElement.appendChild(tile);
@@ -265,16 +293,22 @@
                     i = 0;
 
                 if (me.loading) {
-                    window.alert('Please wait while we are processing your request!');
+                    window.alert(
+                        'Please wait while we are processing your request!'
+                    );
                     return;
                 }
 
                 this.textContent = me.loadingCaption;
-                ids = helpers.collectionToArray(document.querySelectorAll('#divShaders tr + tr')).map(function getShaderIdFromURL(tr) {
-                    var linkElement = tr.querySelector('a'),
-                        link = linkElement.getAttribute('href');
-                    return link.replace('/view/', '');
-                }, this);
+                ids = helpers
+                    .collectionToArray(
+                        document.querySelectorAll('#divShaders tr + tr')
+                    )
+                    .map(function getShaderIdFromURL(tr) {
+                        var linkElement = tr.querySelector('a'),
+                            link = linkElement.getAttribute('href');
+                        return link.replace('/view/', '');
+                    }, this);
                 me.numShaders = ids.length;
 
                 if (ids.length > 0) {
@@ -300,7 +334,12 @@
                 httpReq,
                 str = '';
 
-            me.button.textContent = me.loadingCaption + ' ' + me.downloadResults.length + '/' + (me.numShaders + 1);
+            me.button.textContent =
+                me.loadingCaption +
+                ' ' +
+                me.downloadResults.length +
+                '/' +
+                (me.numShaders + 1);
 
             try {
                 httpReq = new window.XMLHttpRequest();
@@ -318,7 +357,10 @@
                         } else {
                             me.loading = false;
                             me.button.textContent = me.downloadCaption;
-                            window.ToyPlug.common.downloadJson(me.downloadResults[0].info.username + '.json', JSON.stringify(me.downloadResults));
+                            window.ToyPlug.common.downloadJson(
+                                me.downloadResults[0].info.username + '.json',
+                                JSON.stringify(me.downloadResults)
+                            );
                         }
                     },
                     false
@@ -332,7 +374,10 @@
                 );
                 httpReq.open('POST', '/shadertoy', true);
                 httpReq.responseType = 'json';
-                httpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                httpReq.setRequestHeader(
+                    'Content-Type',
+                    'application/x-www-form-urlencoded'
+                );
                 str = '{ "shaders" : ["' + request.join('","') + '"] }';
                 str = 's=' + encodeURIComponent(str);
                 httpReq.send(str);
