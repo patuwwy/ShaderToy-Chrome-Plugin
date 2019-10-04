@@ -4,7 +4,7 @@
 
 [Chrome extension](https://chrome.google.com/webstore/detail/shadertoy-unofficial-plug/ohicbclhdmkhoabobgppffepcopomhgl?hl=pl)
 
-[Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/shadertoy-unofficial-plugin/) (not fully functional. WIP)
+[Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/shadertoy-unofficial-plugin/) (Not fully functional, see notes below)
 
 ## Info
 
@@ -27,7 +27,7 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 -   ~~Sorting shaders list by views, likes or comments on "My profile" page.~~
     (feature removed - implemented natively in Shadertoy)
 
--   Alternative shaders list on profile page.
+-   Alternative shaders list on profile page. (chrome only)
 
 -   ~~Shaders previews on "My profile" page.~~
     (feature removed - implemented natively in Shadertoy. Big preview on mouse over is still available)
@@ -40,7 +40,9 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
     Key '8' divides by 8, 1920x1080 becomes 240x135.
 
     This allows to run shaders smoothly (even in fullscreen) on non-top GPUs.
-    Notice that lower resolution is interpolated to original size. This causes blurrish rendering. For pixelated image, rendering mode switch has been added in extension's popup (click on green S icon).
+    Notice that lower resolution is interpolated to original size. This causes blurrish rendering.
+
+    For pixelated image, rendering mode switch has been added in extension's popup (click on green S icon) (chrome only).
 
 -   Take HQ screenshot. Screenshot resolution is 2 \* current resolution (including current resolution divider). 1920x1080 becomes 3840x2160.
 
@@ -63,7 +65,7 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 -   List of recently viewed own shaders.
 
--   Shader preview (automaticly generated image).
+-   Shader preview (automatic generated image).
 
 ## Screenshots
 
