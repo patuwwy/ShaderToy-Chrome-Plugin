@@ -1,4 +1,7 @@
 ## ShaderToy extension changelog:
+-   0.12.174 (04-10-2019)
+
+    -   Fix iMouse sliders appearance on firefox.
 
 -   0.12.172 (01-10-2019)
 
