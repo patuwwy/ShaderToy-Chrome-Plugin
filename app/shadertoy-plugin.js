@@ -191,12 +191,14 @@
             this.mouseUniforms = new MouseUniforms(this);
             this.shaderStaticPreview = new ShaderStaticPreview();
             this.shaderDuplicator = new ShaderDuplicator();
+
             this.duplicateShader();
             this.downloadShader();
             this.downloadShaderAsZip();
             this.uploadShader();
 
             this.anchorsMaker = new AnchorsMaker();
+            this.performanceIndicators = new PerformanceIndicators();
         }
 
         /**
@@ -1263,6 +1265,139 @@
             this.previewImage.classList.remove('visible');
 
             window.removeEventListener('click', this.hidePreview);
+        }
+    }
+
+    class PerformanceIndicators {
+        gl = gShaderToy.mGLContext;
+        ext = this.gl instanceof WebGL2RenderingContext &&
+            this.gl.getExtension('EXT_disjoint_timer_query_webgl2');
+
+        mTimingSupport = {
+            createQuery: () => this.gl.createQuery(),
+            deleteQuery: (query) => this.gl.deleteQuery(query),
+            beginQuery: (query) =>
+                this.gl.beginQuery(this.ext.TIME_ELAPSED_EXT, query),
+            endQuery: () => this.gl.endQuery(this.ext.TIME_ELAPSED_EXT),
+            isAvailable: (query) =>
+                this.gl.getQueryParameter(
+                    query,
+                    this.gl.QUERY_RESULT_AVAILABLE
+                ),
+            isDisjoint: () => this.gl.getParameter(this.ext.GPU_DISJOINT_EXT),
+            getResult: (query) =>
+                this.gl.getQueryParameter(query, this.gl.QUERY_RESULT)
+        };
+
+        constructor() {
+            if (this.ext) {
+                console.info('Found EXT_disjoint_timer_query_webgl2 extension');
+
+                this.replaceShaderToyPaint();
+                this.replecaShaderToyCreate();
+                this.setTimer();
+            } else {
+                console.log(
+                    'EXT_disjoint_timer_query_webgl2 extension not available'
+                );
+            }
+        }
+
+        replaceShaderToyPaint() {
+            const self = this;
+            let oldEffectPassPaint = EffectPass.prototype.Paint;
+
+            EffectPass.prototype.Paint = function(...args) {
+                let timing = this.mTiming;
+
+                if (timing) {
+                    self.mTimingSupport.beginQuery(timing.query[timing.cursor]);
+                }
+
+                let result = oldEffectPassPaint.apply(this, args);
+                if (timing) {
+                    self.mTimingSupport.endQuery();
+                    timing.cursor = (timing.cursor + 1) % timing.query.length;
+                    if (timing.wait > 0) {
+                        --timing.wait;
+                    } else {
+                        let prev = timing.cursor;
+                        let available = self.mTimingSupport.isAvailable(
+                            timing.query[prev]
+                        );
+                        let disjoint = self.mTimingSupport.isDisjoint();
+
+                        if (available && !disjoint) {
+                            let elapsed = self.mTimingSupport.getResult(
+                                timing.query[prev]
+                            );
+                            timing.accumTime += elapsed * 1e-6;
+                            timing.accumSamples++;
+                        }
+                    }
+                }
+                return result;
+            };
+        }
+
+        replecaShaderToyCreate() {
+            const NUM_QUERIES = 8;
+            const self = this;
+
+            let oldEffectPassCreate = EffectPass.prototype.Create;
+
+            EffectPass.prototype.Create = function(...args) {
+                let result = oldEffectPassCreate.apply(this, args);
+
+                if (
+                    self.mTimingSupport &&
+                    this.mType != 'common' &&
+                    this.mType != 'sound'
+                ) {
+                    this.mTiming = {
+                        query: Array.from({ length: NUM_QUERIES }, () =>
+                            self.mTimingSupport.createQuery()
+                        ),
+                        cursor: 0,
+                        wait: NUM_QUERIES,
+                        accumTime: 0,
+                        accumSamples: 0
+                    };
+                }
+            };
+        }
+
+        setTimer() {
+            setInterval(() => {
+                let numPasses = 0;
+
+                for (let pass of gShaderToy.mEffect.mPasses) {
+                    let timing = pass.mTiming;
+
+                    if (!timing) {
+                        continue;
+                    }
+
+                    if (timing.accumSamples) {
+                        timing.average = timing.accumTime / timing.accumSamples;
+                        timing.accumTime = 0;
+                        timing.accumSamples = 0;
+                    }
+
+                    if (timing.average === undefined) {
+                        continue;
+                    }
+
+                    ++numPasses;
+                }
+
+                let timing = gShaderToy.mEffect.mPasses[0].mTiming;
+
+                console.log(
+                    timing.average.toFixed(2) + 'ms',
+                    1000 / timing.average + 'fps'
+                );
+            }, 1000);
         }
     }
 
