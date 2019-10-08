@@ -492,3 +492,30 @@ body div#header {
     min-width: 30px;
     background-position: 50%;
 }
+
+.ste-rendering-meters {
+    z-index: 9;
+    position: absolute;
+    padding: 5px;
+    width: 100px;
+    left: 15px;
+    top: 15px;
+    width: 120px;
+
+    font-size: 10px;
+    background: #031d279c;
+}
+
+.ste-rendering-meters p {
+    text-shadow: 1px 1px 1px #000;
+    margin: 0;
+    color: #f80;
+}
+
+.ste-rendering-meters .slowest {
+    color: #f00;
+}
+
+.ste-rendering-meters .fastest {
+    color: #0a0;
+}
