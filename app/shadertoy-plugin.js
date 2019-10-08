@@ -1316,31 +1316,35 @@
     }
 
     class RenderMeters {
-        TIMERS_VISIBILITY_KEY = 'timersVisibility';
-        gl = gShaderToy.mGLContext;
-        ext = this.gl instanceof WebGL2RenderingContext &&
-            this.gl.getExtension('EXT_disjoint_timer_query_webgl2');
+        setUpInstanceVariables() {
+            this.mTimingSupport = {
+                createQuery: () => this.gl.createQuery(),
+                deleteQuery: (query) => this.gl.deleteQuery(query),
+                beginQuery: (query) =>
+                    this.gl.beginQuery(this.ext.TIME_ELAPSED_EXT, query),
+                endQuery: () => this.gl.endQuery(this.ext.TIME_ELAPSED_EXT),
+                isAvailable: (query) =>
+                    this.gl.getQueryParameter(
+                        query,
+                        this.gl.QUERY_RESULT_AVAILABLE
+                    ),
+                isDisjoint: () => this.gl.getParameter(this.ext.GPU_DISJOINT_EXT),
+                getResult: (query) =>
+                    this.gl.getQueryParameter(query, this.gl.QUERY_RESULT)
+            };
 
-        interval;
-        renderTimersVisible = false;
+            this.TIMERS_VISIBILITY_KEY = 'timersVisibility';
+            this.gl = gShaderToy.mGLContext;
+            this.ext = this.gl instanceof WebGL2RenderingContext &&
+                    this.gl.getExtension('EXT_disjoint_timer_query_webgl2');
 
-        mTimingSupport = {
-            createQuery: () => this.gl.createQuery(),
-            deleteQuery: (query) => this.gl.deleteQuery(query),
-            beginQuery: (query) =>
-                this.gl.beginQuery(this.ext.TIME_ELAPSED_EXT, query),
-            endQuery: () => this.gl.endQuery(this.ext.TIME_ELAPSED_EXT),
-            isAvailable: (query) =>
-                this.gl.getQueryParameter(
-                    query,
-                    this.gl.QUERY_RESULT_AVAILABLE
-                ),
-            isDisjoint: () => this.gl.getParameter(this.ext.GPU_DISJOINT_EXT),
-            getResult: (query) =>
-                this.gl.getQueryParameter(query, this.gl.QUERY_RESULT)
-        };
+            this.interval = null;
+            this.renderTimersVisible = false;
+        }
 
         constructor() {
+            this.setUpInstanceVariables();
+
             if (this.ext) {
                 console.info('Found EXT_disjoint_timer_query_webgl2 extension');
 
