@@ -812,6 +812,7 @@
             let triggerElement = document.createElement('input');
 
             triggerElement.type = 'checkbox';
+            triggerElement.classList.add('ste-render-meters-toggle');
 
             extensionElements.controlsContainerHeader.appendChild(
                 triggerElement
@@ -825,6 +826,10 @@
                         }
                     })
                 );
+            });
+
+            document.addEventListener('toyplug:renderTimersVisibility', (e) => {
+                triggerElement.checked = e.detail.enabled;
             });
         }
 
@@ -1316,6 +1321,7 @@
     }
 
     class RenderMeters {
+        TIMERS_VISIBILITY_KEY = 'timersVisibility';
         gl = gShaderToy.mGLContext;
         ext = this.gl instanceof WebGL2RenderingContext &&
             this.gl.getExtension('EXT_disjoint_timer_query_webgl2');
@@ -1356,7 +1362,19 @@
                 this.setState(e.detail.enabled);
             });
 
-            this.setState(this.renderTimersVisible);
+            this.restoreState();
+        }
+
+        restoreState() {
+            const saved = window.localStorage.getItem(
+                this.TIMERS_VISIBILITY_KEY
+            );
+
+            if (saved != undefined) {
+                this.setState(JSON.parse(saved));
+            } else {
+                this.setState(false);
+            }
         }
 
         setState(newState) {
@@ -1366,8 +1384,21 @@
                 this.setTimer();
             }
 
+            window.localStorage.setItem(
+                this.TIMERS_VISIBILITY_KEY,
+                JSON.stringify(newState)
+            );
+
             this.renderTimersVisible = newState;
             this.updateElementVisibility();
+
+            document.dispatchEvent(
+                new CustomEvent('toyplug:renderTimersVisibility', {
+                    detail: {
+                        enabled: newState
+                    }
+                })
+            );
         }
 
         replaceShaderToyPaint() {
@@ -1505,7 +1536,7 @@
                 });
 
                 extensionElements.renderMetersContainer.append(frag);
-            }, 1000);
+            }, 100);
         }
     }
 
