@@ -1,4 +1,9 @@
 ## ShaderToy extension changelog:
+-   0.13.184 (08-10-2019)
+
+    -   GPU render timers.
+    -   Layout fixes + icons.
+
 -   0.12.174 (04-10-2019)
 
     -   Fix iMouse sliders appearance on firefox.

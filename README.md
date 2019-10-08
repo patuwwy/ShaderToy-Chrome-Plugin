@@ -14,9 +14,11 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 -   Fork any shader.
 
--   Save as new draft (for owned shaders).
+-   GPU render timers.
 
 -   Adjustable slider for full control of 'iTime' uniform and audio/video channels' time.
+
+-   Save as new draft (for owned shaders).
 
 -   Four sliders for simulating mouse position.
     This can be used to tweaking variables with iMouse.xyzw uniform.
@@ -108,6 +110,8 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 [movAX13h](http://blog.thrill-project.com/)
 
 [Chris White cxw42](https://github.com/cxw42)
+
+Render timing based on [shadertoy_gpu_timing.user.js](https://github.com/andrei-drexler/shadertoy-userscripts/blob/master/shadertoy_gpu_timing.user.js) by [Andrei Drexler](https://github.com/andrei-drexler)
 
 ## Beer? Sure.
 
