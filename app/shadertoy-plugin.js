@@ -258,17 +258,6 @@
                     shaderToyElements.shaderInfo
                 );
 
-                extensionElements.renderMetersContainer = document.createElement(
-                    'div'
-                );
-                extensionElements.renderMetersContainer.classList.add(
-                    'ste-rendering-meters'
-                );
-
-                shaderToyElements.shaderPlayer.appendChild(
-                    extensionElements.renderMetersContainer
-                );
-
                 return true;
             } catch (e) {
                 console.error(e);
@@ -746,7 +735,7 @@
             {
                 this.loopInput = document.createElement('input');
                 this.loopInput.setAttribute('type', 'checkbox');
-                this.loopInput.classList.add('ste-input-loop');
+                this.loopInput.classList.add('ste-loop-toggle');
                 this.loopInput.setAttribute('title', 'loop');
                 this.loopInput.addEventListener('change', (event) => {
                     this.loop = event.target.checked;
@@ -814,6 +803,7 @@
             triggerElement.type = 'checkbox';
             triggerElement.classList.add('ste-render-meters-toggle');
 
+
             extensionElements.controlsContainerHeader.appendChild(
                 triggerElement
             );
@@ -828,7 +818,12 @@
                 );
             });
 
-            document.addEventListener('toyplug:renderTimersVisibility', (e) => {
+            document.addEventListener('toyplug:renderTimersVisibility:notAvailable', () => {
+                triggerElement.disabled = true;
+                triggerElement.title = 'EXT_disjoint_timer_query_webgl2 not found';
+            });
+
+            document.addEventListener('toyplug:renderTimersVisibility:updated', (e) => {
                 triggerElement.checked = e.detail.enabled;
             });
         }
@@ -1350,13 +1345,31 @@
                 console.info('Found EXT_disjoint_timer_query_webgl2 extension');
 
                 this.replaceShaderToyPaint();
-                this.replecaShaderToyCreate();
+                this.replaceShaderToyCreate();
                 this.setTimer();
             } else {
                 console.log(
                     'EXT_disjoint_timer_query_webgl2 extension not available'
                 );
+
+                document.dispatchEvent(
+                    new CustomEvent('toyplug:renderTimersVisibility:notAvailable', {
+                        detail: {}
+                    })
+                );
+                return;
             }
+
+            extensionElements.renderMetersContainer = document.createElement(
+                'div'
+            );
+            extensionElements.renderMetersContainer.classList.add(
+                'ste-rendering-meters'
+            );
+
+            shaderToyElements.shaderPlayer.appendChild(
+                extensionElements.renderMetersContainer
+            );
 
             document.addEventListener('toyplug:renderTimersVisibility', (e) => {
                 this.setState(e.detail.enabled);
@@ -1393,7 +1406,7 @@
             this.updateElementVisibility();
 
             document.dispatchEvent(
-                new CustomEvent('toyplug:renderTimersVisibility', {
+                new CustomEvent('toyplug:renderTimersVisibility:updated', {
                     detail: {
                         enabled: newState
                     }
@@ -1439,7 +1452,7 @@
             };
         }
 
-        replecaShaderToyCreate() {
+        replaceShaderToyCreate() {
             const NUM_QUERIES = 8;
             const self = this;
 
@@ -1504,12 +1517,18 @@
                     };
                 }
 
-                let sorted = passData.sort(
-                    (p1, p2) => p1.avgRenderTime - p2.avgRenderTime
-                );
+                let sorted = [];
+                let fastest;
+                let slowest;
 
-                let fastest = sorted[0].avgRenderTime;
-                let slowest = sorted[sorted.length - 1].avgRenderTime;
+                if (numPasses > 1) {
+                    sorted = passData.sort(
+                        (p1, p2) => p1.avgRenderTime - p2.avgRenderTime
+                    );
+
+                    fastest = sorted[0].avgRenderTime;
+                    slowest = sorted[sorted.length - 1].avgRenderTime;
+                }
 
                 while (extensionElements.renderMetersContainer.lastChild) {
                     extensionElements.renderMetersContainer.lastChild.remove();
