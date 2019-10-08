@@ -40,7 +40,8 @@
             '{tags}\n{description}\n' +
             '-------------------------------------------------------------\n' +
             'You can upload the JSON file of the shader using\n' +
-            'https://github.com/patuwwy/ShaderToy-Chrome-Plugin\n';
+            'https://github.com/patuwwy/ShaderToy-Chrome-Plugin\n',
+        renderTimersVisible = false;
 
     /**
      * ToyPlug.
@@ -184,70 +185,96 @@
              */
             this.currentDivider = 1;
             this.bindKeys();
-            this.createContainers();
+
+            if (!this.createContainers()) {
+                return;
+            }
 
             // Create new UI controls
             this.timebar = new Timebar(this);
             this.mouseUniforms = new MouseUniforms(this);
             this.shaderStaticPreview = new ShaderStaticPreview();
             this.shaderDuplicator = new ShaderDuplicator();
+
             this.duplicateShader();
             this.downloadShader();
             this.downloadShaderAsZip();
             this.uploadShader();
 
             this.anchorsMaker = new AnchorsMaker();
+            this.performanceIndicators = new RenderMeters();
         }
 
         /**
          * Creates containers for extension elements.
          */
         createContainers() {
-            extensionElements.controlsContainer = document.createElement('div');
-            extensionElements.controlsContainer.classList.add(
-                'toyplug-controls-container'
-            );
+            try {
+                extensionElements.controlsContainer = document.createElement(
+                    'div'
+                );
+                extensionElements.controlsContainer.classList.add(
+                    'toyplug-controls-container'
+                );
 
-            extensionElements.controlsContainerHeader = document.createElement(
-                'div'
-            );
-            extensionElements.controlsContainerHeader.classList.add(
-                'ste-header'
-            );
-            extensionElements.controlsContainer.appendChild(
-                extensionElements.controlsContainerHeader
-            );
+                extensionElements.controlsContainerHeader = document.createElement(
+                    'div'
+                );
+                extensionElements.controlsContainerHeader.classList.add(
+                    'ste-header'
+                );
+                extensionElements.controlsContainer.appendChild(
+                    extensionElements.controlsContainerHeader
+                );
 
-            extensionElements.timeWrapper = document.createElement('div');
-            extensionElements.timeWrapper.classList.add('time-slider');
-            extensionElements.controlsContainer.appendChild(
-                extensionElements.timeWrapper
-            );
+                extensionElements.timeWrapper = document.createElement('div');
+                extensionElements.timeWrapper.classList.add('time-slider');
+                extensionElements.controlsContainer.appendChild(
+                    extensionElements.timeWrapper
+                );
 
-            extensionElements.mouseSlidersWrapper = document.createElement(
-                'div'
-            );
-            extensionElements.mouseSlidersWrapper.classList.add(
-                'mouse-uniforms'
-            );
-            extensionElements.controlsContainer.appendChild(
-                extensionElements.mouseSlidersWrapper
-            );
+                extensionElements.mouseSlidersWrapper = document.createElement(
+                    'div'
+                );
+                extensionElements.mouseSlidersWrapper.classList.add(
+                    'mouse-uniforms'
+                );
+                extensionElements.controlsContainer.appendChild(
+                    extensionElements.mouseSlidersWrapper
+                );
 
-            extensionElements.controlsContainerFooter = document.createElement(
-                'div'
-            );
-            extensionElements.controlsContainerFooter.classList.add(
-                'ste-footer'
-            );
-            extensionElements.controlsContainer.appendChild(
-                extensionElements.controlsContainerFooter
-            );
+                extensionElements.controlsContainerFooter = document.createElement(
+                    'div'
+                );
+                extensionElements.controlsContainerFooter.classList.add(
+                    'ste-footer'
+                );
+                extensionElements.controlsContainer.appendChild(
+                    extensionElements.controlsContainerFooter
+                );
 
-            shaderToyElements.leftColumnContainer.insertBefore(
-                extensionElements.controlsContainer,
-                shaderToyElements.shaderInfo
-            );
+                shaderToyElements.leftColumnContainer.insertBefore(
+                    extensionElements.controlsContainer,
+                    shaderToyElements.shaderInfo
+                );
+
+                extensionElements.renderMetersContainer = document.createElement(
+                    'div'
+                );
+                extensionElements.renderMetersContainer.classList.add(
+                    'ste-rendering-meters'
+                );
+
+                shaderToyElements.shaderPlayer.appendChild(
+                    extensionElements.renderMetersContainer
+                );
+
+                return true;
+            } catch (e) {
+                console.error(e);
+
+                return false;
+            }
         }
 
         /**
@@ -777,6 +804,33 @@
             this.sliderInput.max = 60 * 1000;
             this.sliderInput.value = 0;
             this.sliderInput.step = 20;
+
+            this.createRenderTimersTrigger();
+        }
+
+        createRenderTimersTrigger() {
+            let triggerElement = document.createElement('input');
+
+            triggerElement.type = 'checkbox';
+            triggerElement.classList.add('ste-render-meters-toggle');
+
+            extensionElements.controlsContainerHeader.appendChild(
+                triggerElement
+            );
+
+            triggerElement.addEventListener('change', (e) => {
+                document.dispatchEvent(
+                    new CustomEvent('toyplug:renderTimersVisibility', {
+                        detail: {
+                            enabled: e.target.checked
+                        }
+                    })
+                );
+            });
+
+            document.addEventListener('toyplug:renderTimersVisibility', (e) => {
+                triggerElement.checked = e.detail.enabled;
+            });
         }
 
         onChangeRenderSpeedSelector(e) {
@@ -1263,6 +1317,226 @@
             this.previewImage.classList.remove('visible');
 
             window.removeEventListener('click', this.hidePreview);
+        }
+    }
+
+    class RenderMeters {
+        TIMERS_VISIBILITY_KEY = 'timersVisibility';
+        gl = gShaderToy.mGLContext;
+        ext = this.gl instanceof WebGL2RenderingContext &&
+            this.gl.getExtension('EXT_disjoint_timer_query_webgl2');
+
+        interval;
+        renderTimersVisible = false;
+
+        mTimingSupport = {
+            createQuery: () => this.gl.createQuery(),
+            deleteQuery: (query) => this.gl.deleteQuery(query),
+            beginQuery: (query) =>
+                this.gl.beginQuery(this.ext.TIME_ELAPSED_EXT, query),
+            endQuery: () => this.gl.endQuery(this.ext.TIME_ELAPSED_EXT),
+            isAvailable: (query) =>
+                this.gl.getQueryParameter(
+                    query,
+                    this.gl.QUERY_RESULT_AVAILABLE
+                ),
+            isDisjoint: () => this.gl.getParameter(this.ext.GPU_DISJOINT_EXT),
+            getResult: (query) =>
+                this.gl.getQueryParameter(query, this.gl.QUERY_RESULT)
+        };
+
+        constructor() {
+            if (this.ext) {
+                console.info('Found EXT_disjoint_timer_query_webgl2 extension');
+
+                this.replaceShaderToyPaint();
+                this.replecaShaderToyCreate();
+                this.setTimer();
+            } else {
+                console.log(
+                    'EXT_disjoint_timer_query_webgl2 extension not available'
+                );
+            }
+
+            document.addEventListener('toyplug:renderTimersVisibility', (e) => {
+                this.setState(e.detail.enabled);
+            });
+
+            this.restoreState();
+        }
+
+        restoreState() {
+            const saved = window.localStorage.getItem(
+                this.TIMERS_VISIBILITY_KEY
+            );
+
+            if (saved != undefined) {
+                this.setState(JSON.parse(saved));
+            } else {
+                this.setState(false);
+            }
+        }
+
+        setState(newState) {
+            if (!newState) {
+                clearInterval(this.interval);
+            } else {
+                this.setTimer();
+            }
+
+            window.localStorage.setItem(
+                this.TIMERS_VISIBILITY_KEY,
+                JSON.stringify(newState)
+            );
+
+            this.renderTimersVisible = newState;
+            this.updateElementVisibility();
+
+            document.dispatchEvent(
+                new CustomEvent('toyplug:renderTimersVisibility', {
+                    detail: {
+                        enabled: newState
+                    }
+                })
+            );
+        }
+
+        replaceShaderToyPaint() {
+            const self = this;
+            let oldEffectPassPaint = EffectPass.prototype.Paint;
+
+            EffectPass.prototype.Paint = function(...args) {
+                let timing = this.mTiming;
+
+                if (timing) {
+                    self.mTimingSupport.beginQuery(timing.query[timing.cursor]);
+                }
+
+                let result = oldEffectPassPaint.apply(this, args);
+                if (timing) {
+                    self.mTimingSupport.endQuery();
+                    timing.cursor = (timing.cursor + 1) % timing.query.length;
+
+                    if (timing.wait > 0) {
+                        --timing.wait;
+                    } else {
+                        let prev = timing.cursor;
+                        let available = self.mTimingSupport.isAvailable(
+                            timing.query[prev]
+                        );
+                        let disjoint = self.mTimingSupport.isDisjoint();
+
+                        if (available && !disjoint) {
+                            let elapsed = self.mTimingSupport.getResult(
+                                timing.query[prev]
+                            );
+                            timing.accumTime += elapsed * 1e-6;
+                            timing.accumSamples++;
+                        }
+                    }
+                }
+                return result;
+            };
+        }
+
+        replecaShaderToyCreate() {
+            const NUM_QUERIES = 8;
+            const self = this;
+
+            let oldEffectPassCreate = EffectPass.prototype.Create;
+
+            EffectPass.prototype.Create = function(...args) {
+                let result = oldEffectPassCreate.apply(this, args);
+
+                if (
+                    self.mTimingSupport &&
+                    this.mType != 'common' &&
+                    this.mType != 'sound'
+                ) {
+                    this.mTiming = {
+                        query: Array.from({ length: NUM_QUERIES }, () =>
+                            self.mTimingSupport.createQuery()
+                        ),
+                        cursor: 0,
+                        wait: NUM_QUERIES,
+                        accumTime: 0,
+                        accumSamples: 0
+                    };
+                }
+
+                return result;
+            };
+        }
+
+        updateElementVisibility() {
+            extensionElements.renderMetersContainer.style.display = this
+                .renderTimersVisible
+                ? 'block'
+                : 'none';
+        }
+
+        setTimer() {
+            this.interval = setInterval(() => {
+                let numPasses = 0;
+                const passData = [];
+
+                for (let pass of gShaderToy.mEffect.mPasses) {
+                    let timing = pass.mTiming;
+
+                    if (!timing) {
+                        continue;
+                    }
+
+                    if (timing.accumSamples) {
+                        timing.average = timing.accumTime / timing.accumSamples;
+                        timing.accumTime = 0;
+                        timing.accumSamples = 0;
+                    }
+
+                    if (timing.average === undefined) {
+                        continue;
+                    }
+
+                    passData[numPasses++] = {
+                        avgRenderTime: timing.average.toFixed(2),
+                        name: pass.mName,
+                        compilationTime: pass.mCompilationTime
+                    };
+                }
+
+                let sorted = passData.sort(
+                    (p1, p2) => p1.avgRenderTime - p2.avgRenderTime
+                );
+
+                let fastest = sorted[0].avgRenderTime;
+                let slowest = sorted[sorted.length - 1].avgRenderTime;
+
+                while (extensionElements.renderMetersContainer.lastChild) {
+                    extensionElements.renderMetersContainer.lastChild.remove();
+                }
+
+                extensionElements.renderMetersContainer.removeChild;
+                let frag = document.createDocumentFragment();
+
+                passData.forEach((pass) => {
+                    let l = document.createElement('p');
+                    l.textContent = `${pass.name}: ${pass.avgRenderTime}ms`;
+
+                    if (numPasses > 1) {
+                        if (pass.avgRenderTime === slowest) {
+                            l.classList.add('slowest');
+                        }
+
+                        if (pass.avgRenderTime === fastest) {
+                            l.classList.add('fastest');
+                        }
+                    }
+
+                    frag.appendChild(l);
+                });
+
+                extensionElements.renderMetersContainer.append(frag);
+            }, 100);
         }
     }
 

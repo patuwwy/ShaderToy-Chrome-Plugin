@@ -33,7 +33,7 @@
         var script = document.createElement('script');
 
         script.src = chrome.runtime.getURL(filename);
-        script.async = true;
+        //script.async = true;
 
         if (id) {
             script.id = id;
@@ -57,13 +57,21 @@
      * Listens to extension messages.
      */
     function bindMessagesListener() {
-        chrome.runtime.onMessage.addListener(function(request /*, sender, sendResponse */) {
+        chrome.runtime.onMessage.addListener(function(
+            request /*, sender, sendResponse */
+        ) {
             if (request.data.renderMode) {
-                executeScriptOnPage("ToyPlug.setRenderMode('" + request.data.renderMode + "');");
+                executeScriptOnPage(
+                    "ToyPlug.setRenderMode('" + request.data.renderMode + "');"
+                );
             }
 
             if ('loopEnabled' in request.data) {
-                executeScriptOnPage('ToyPlug.editPage.timebar.loop = ' + request.data.loopEnabled + ';');
+                executeScriptOnPage(
+                    'ToyPlug.editPage.timebar.loop = ' +
+                        request.data.loopEnabled +
+                        ';'
+                );
 
                 chrome.storage.sync.set(
                     {
@@ -93,7 +101,9 @@
 
             for (key in changes) {
                 if (key === 'loopEnabled') {
-                    executeScriptOnPage('window.TimebarLoop = ' + changes[key].newValue + ';');
+                    executeScriptOnPage(
+                        'window.TimebarLoop = ' + changes[key].newValue + ';'
+                    );
                 }
             }
         });
