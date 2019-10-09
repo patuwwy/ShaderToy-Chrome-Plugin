@@ -19,7 +19,12 @@
          * @const {string}
          */
         HOME_EXTENSION_FILENAME = 'shadertoy-plugin-home.js',
-        COMMON_FILENAME = 'shadertoy-plugin-common.js';
+        COMMON_FILENAME = 'shadertoy-plugin-common.js',
+        STATE_STORAGE_KEY = 'STE-state',
+        state = {
+            alternateProfile: false,
+            renderMode: 'default'
+        };
 
     /**
      * Load a script directly from our extension.  The script should be
@@ -33,7 +38,7 @@
         var script = document.createElement('script');
 
         script.src = chrome.runtime.getURL(filename);
-        //script.async = true;
+        script.async = true;
 
         if (id) {
             script.id = id;
@@ -42,111 +47,68 @@
         document.head.appendChild(script);
     }
 
-    /**
-     * Injects script code into Shadertoy page.  The code runs in the page's
-     * world, not in this extension's world.
-     */
-    function executeScriptOnPage(javascriptCode) {
-        var script = document.createElement('script');
+    const restoreState = () => {
+        const storedState = window.localStorage.getItem(STATE_STORAGE_KEY);
 
-        script.textContent = javascriptCode;
-        document.body.appendChild(script);
-    }
+        if (storedState) {
+            try {
+                state = JSON.parse(storedState);
+            } catch (_ignore) {}
+        }
+    };
+
+    const saveState = (newState) => {
+        let oldState = state;
+
+        try {
+            oldState =
+                JSON.parse(window.localStorage.getItem(STATE_STORAGE_KEY)) ||
+                state;
+        } catch (_ignore) {}
+
+        const changes = Object.keys(newState).reduce(
+            (diff, key) =>
+                oldState[key] === newState[key]
+                    ? diff
+                    : {
+                          ...diff,
+                          [key]: newState[key]
+                      },
+            {}
+        );
+
+        window.localStorage.setItem(
+            STATE_STORAGE_KEY,
+            JSON.stringify(newState)
+        );
+
+        onStateUpdate(changes);
+    };
+
+    const onStateUpdate = (changes) => {
+        window.dispatchEvent(
+            new CustomEvent('STE:mainState:updated', {
+                detail: changes
+            })
+        );
+    };
 
     /**
      * Listens to extension messages.
      */
     function bindMessagesListener() {
         chrome.runtime.onMessage.addListener(function(
-            request /*, sender, sendResponse */
+            request,
+            _sender,
+            sendResponse
         ) {
-            if (request.data.renderMode) {
-                executeScriptOnPage(
-                    "ToyPlug.setRenderMode('" + request.data.renderMode + "');"
-                );
+            if (request.data.get === 'state') {
+                restoreState();
+                sendResponse(state);
             }
 
-            if ('loopEnabled' in request.data) {
-                executeScriptOnPage(
-                    'ToyPlug.editPage.timebar.loop = ' +
-                        request.data.loopEnabled +
-                        ';'
-                );
-
-                chrome.storage.sync.set(
-                    {
-                        loopEnabled: request.data.loopEnabled
-                    },
-                    function() {}
-                );
-            }
-
-            if ('alternateProfile' in request.data) {
-                chrome.storage.sync.set(
-                    {
-                        alternateProfile: request.data.alternateProfile
-                    },
-                    function() {}
-                );
-            }
-        });
-    }
-
-    /**
-     * Sets extension variables changes listener.
-     */
-    function bindStorageListener() {
-        chrome.storage.onChanged.addListener(function(changes) {
-            var key;
-
-            for (key in changes) {
-                if (key === 'loopEnabled') {
-                    executeScriptOnPage(
-                        'window.TimebarLoop = ' + changes[key].newValue + ';'
-                    );
-                }
-            }
-        });
-    }
-
-    /**
-     * Injects short script which sets variable in window context.
-     * We can't set it directly because our global scope is different from
-     * the page's global scope (isolated worlds).
-     *
-     * @param variable {String} The variable name.  Must be a valid
-     *                          JavaScript identifier.
-     * @param value {mixed} The new value.
-     */
-    function setWindowVariable(variable, value) {
-        var isString = typeof value === 'string',
-            code;
-
-        if (isString) {
-            // Make a proper single-quoted, escaped representation
-            value = value.replace(/[\\]/g, '\\\\').replace(/[']/g, "\\'");
-            value = "'" + value + "'";
-        }
-
-        code = 'window.' + variable + ' = ' + value + ';';
-
-        executeScriptOnPage(code);
-    }
-
-    /**
-     * Gets stored variables from google cloud.
-     */
-    function synchronizeChrome() {
-        chrome.storage.sync.get('alternateProfile', function(items) {
-            setWindowVariable('alternateProfile', items.alternateProfile);
-        });
-
-        chrome.storage.sync.get('loopEnabled', function(items) {
-            var code = '';
-
-            if ('loopEnabled' in items) {
-                code = 'TimebarLoop = ' + items.loopEnabled;
-                executeScriptOnPage(code);
+            if (request.data.set) {
+                saveState({ ...state, ...request.data.set });
             }
         });
     }
@@ -187,7 +149,7 @@
     function init() {
         // Must be before any loadScript calls to set window.* variables
         // with the configuration from chrome.storage.
-        synchronizeChrome();
+        //synchronizeChrome();
 
         loadScript(MAIN_EXTENSION_FILENAME);
         loadScript('scripts/node-sanitize-filename.js');
@@ -195,11 +157,11 @@
 
         loadScript(COMMON_FILENAME);
 
+        restoreState();
         initializeProfilePage();
         initializeHomePage();
 
         bindMessagesListener();
-        bindStorageListener();
         sendInitialMessage();
     }
 

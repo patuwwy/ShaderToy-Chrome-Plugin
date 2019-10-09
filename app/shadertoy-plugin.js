@@ -109,6 +109,25 @@
             if (this.isEditPage()) {
                 this.editPage = new ToyPlugEditPage();
             }
+
+            this.setListener();
+        }
+
+        setListener() {
+            window.addEventListener('STE:mainState:updated', (event) => {
+                const detail = event.detail;
+
+                if (detail.renderMode) {
+                    if (detail.renderMode == 'default') {
+                        this.setRenderMode('');
+
+                        return;
+                    }
+
+                    this.setRenderMode('pixelated'); // for chrome
+                    this.setRenderMode('optimizespeed'); //for firefox
+                }
+            });
         }
     }
 
@@ -803,7 +822,6 @@
             triggerElement.type = 'checkbox';
             triggerElement.classList.add('ste-render-meters-toggle');
 
-
             extensionElements.controlsContainerHeader.appendChild(
                 triggerElement
             );
@@ -818,14 +836,21 @@
                 );
             });
 
-            document.addEventListener('toyplug:renderTimersVisibility:notAvailable', () => {
-                triggerElement.disabled = true;
-                triggerElement.title = 'EXT_disjoint_timer_query_webgl2 not found';
-            });
+            document.addEventListener(
+                'toyplug:renderTimersVisibility:notAvailable',
+                () => {
+                    triggerElement.disabled = true;
+                    triggerElement.title =
+                        'EXT_disjoint_timer_query_webgl2 not found';
+                }
+            );
 
-            document.addEventListener('toyplug:renderTimersVisibility:updated', (e) => {
-                triggerElement.checked = e.detail.enabled;
-            });
+            document.addEventListener(
+                'toyplug:renderTimersVisibility:updated',
+                (e) => {
+                    triggerElement.checked = e.detail.enabled;
+                }
+            );
         }
 
         onChangeRenderSpeedSelector(e) {
@@ -1328,15 +1353,17 @@
                         query,
                         this.gl.QUERY_RESULT_AVAILABLE
                     ),
-                isDisjoint: () => this.gl.getParameter(this.ext.GPU_DISJOINT_EXT),
+                isDisjoint: () =>
+                    this.gl.getParameter(this.ext.GPU_DISJOINT_EXT),
                 getResult: (query) =>
                     this.gl.getQueryParameter(query, this.gl.QUERY_RESULT)
             };
 
             this.TIMERS_VISIBILITY_KEY = 'timersVisibility';
             this.gl = gShaderToy.mGLContext;
-            this.ext = this.gl instanceof WebGL2RenderingContext &&
-                    this.gl.getExtension('EXT_disjoint_timer_query_webgl2');
+            this.ext =
+                this.gl instanceof WebGL2RenderingContext &&
+                this.gl.getExtension('EXT_disjoint_timer_query_webgl2');
 
             this.interval = null;
             this.renderTimersVisible = false;
@@ -1357,9 +1384,12 @@
                 );
 
                 document.dispatchEvent(
-                    new CustomEvent('toyplug:renderTimersVisibility:notAvailable', {
-                        detail: {}
-                    })
+                    new CustomEvent(
+                        'toyplug:renderTimersVisibility:notAvailable',
+                        {
+                            detail: {}
+                        }
+                    )
                 );
                 return;
             }

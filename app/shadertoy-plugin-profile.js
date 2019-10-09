@@ -29,6 +29,7 @@
             '<a href="{shaderUrl}" class="shader-tile">' +
             '<img class="shader-image" src="{previewUrl}"/>' +
             '<span class="shader-name">{shaderTitle}</span></a>',
+        STATE_STORAGE_KEY = 'STE-state',
         userContent = null,
         /**
          * Stores Helpers instance.
@@ -398,7 +399,13 @@
             if (document.head.textContent) {
                 this.sortableShaderList = new SortableShaderList();
 
-                if (window.alternateProfile) {
+                if (
+                    JSON.parse(
+                        window.localStorage.getItem(STATE_STORAGE_KEY) || {
+                            alternateProfile: false
+                        }
+                    ).alternateProfile
+                ) {
                     this.tilesView = new TilesView();
                 }
 
