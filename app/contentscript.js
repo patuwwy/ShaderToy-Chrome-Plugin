@@ -38,7 +38,7 @@
         var script = document.createElement('script');
 
         script.src = chrome.runtime.getURL(filename);
-        script.async = true;
+        //script.async = true;
 
         if (id) {
             script.id = id;
@@ -55,6 +55,8 @@
                 state = JSON.parse(storedState);
             } catch (_ignore) {}
         }
+
+        onStateUpdate(state);
     };
 
     const saveState = (newState) => {
@@ -86,9 +88,9 @@
     };
 
     const onStateUpdate = (changes) => {
-        window.dispatchEvent(
+        document.dispatchEvent(
             new CustomEvent('STE:mainState:updated', {
-                detail: changes
+                detail: cloneInto(changes, window)
             })
         );
     };
@@ -147,22 +149,19 @@
      * Initializes extension.
      */
     function init() {
-        // Must be before any loadScript calls to set window.* variables
-        // with the configuration from chrome.storage.
-        //synchronizeChrome();
-
         loadScript(MAIN_EXTENSION_FILENAME);
         loadScript('scripts/node-sanitize-filename.js');
         loadScript('scripts/jszip-3.1.5.js');
 
         loadScript(COMMON_FILENAME);
 
-        restoreState();
         initializeProfilePage();
         initializeHomePage();
 
         bindMessagesListener();
         sendInitialMessage();
+
+        restoreState();
     }
 
     window.addEventListener('load', init);

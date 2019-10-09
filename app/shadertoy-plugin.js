@@ -15,6 +15,7 @@
          * @const {string}
          */
         LOCALSTORAGE_SHADER_FORK_KEYNAME = 'forkedShaderStorage',
+        STATE_STORAGE_KEY = 'STE-state',
         SHADER_PREVIEW_LOCATION = '/media/shaders/',
         /**
          * Stores references to ShaderToy HTML elements.
@@ -96,7 +97,15 @@
 
         setRenderMode(mode) {
             if (this.editPage) {
-                this.editPage.setRenderMode(mode);
+                if (mode == 'default') {
+                    this.editPage.setRenderMode('');
+
+                    return;
+                }
+
+                this.editPage.setRenderMode('pixelated');
+                this.editPage.setRenderMode('optimizespeed');
+
             }
         }
 
@@ -111,21 +120,20 @@
             }
 
             this.setListener();
+
+            let state = JSON.parse(window.localStorage.getItem(STATE_STORAGE_KEY));
+
+            if (state && state.renderMode) {
+                this.setRenderMode(state.renderMode);
+            }
         }
 
         setListener() {
-            window.addEventListener('STE:mainState:updated', (event) => {
+            document.addEventListener('STE:mainState:updated', (event) => {
                 const detail = event.detail;
 
-                if (detail.renderMode) {
-                    if (detail.renderMode == 'default') {
-                        this.setRenderMode('');
-
-                        return;
-                    }
-
-                    this.setRenderMode('pixelated'); // for chrome
-                    this.setRenderMode('optimizespeed'); //for firefox
+                if (detail && detail.renderMode) {
+                    this.setRenderMode(detail.renderMode);
                 }
             });
         }
