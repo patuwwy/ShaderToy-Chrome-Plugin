@@ -1,7 +1,11 @@
 ## ShaderToy extension changelog:
+-   0.13.190 (10-10-2019)
+
+    -   Firefox compatibility fix - **alternative profile page and render mode now works in Firefox**.
+
 -   0.13.184 (08-10-2019)
 
-    -   GPU render timers.
+    -   **GPU render timers** based on [shadertoy_gpu_timing.user.js](https://github.com/andrei-drexler/shadertoy-userscripts/blob/master/shadertoy_gpu_timing.user.js).
     -   Layout fixes + icons.
 
 -   0.12.174 (04-10-2019)
@@ -28,7 +32,7 @@
 
 -   0.12.0 (01-08-2019)
 
-    -   Continous Delivery (Auto publish to Chrome Store, Auto release on GitHub).
+    -   Continuous Delivery (Auto publish to Chrome Store, Auto release on GitHub).
 
 -   0.12.0 (12-04-2019)
 
@@ -58,7 +62,7 @@
 -   0.9.12 (11-Feb-2018)
 
     -   **First release for Firefox.**
-    -   Multilanguage alterative profile page support.
+    -   Multi-language alterative profile page support.
     -   Fix for confirmation dialog (on profile page) Now it appear on window's center when alternative profile page is active.
 
 -   0.9.11

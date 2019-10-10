@@ -4,7 +4,7 @@
 
 [Chrome extension](https://chrome.google.com/webstore/detail/shadertoy-unofficial-plug/ohicbclhdmkhoabobgppffepcopomhgl?hl=pl)
 
-[Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/shadertoy-unofficial-plugin/) (Not fully functional, see notes below)
+[Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/shadertoy-unofficial-plugin/)
 
 ## Info
 
@@ -14,7 +14,7 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 -   Fork any shader.
 
--   GPU render timers.
+-   GPU render timers (EXT_disjoint_timer_query_webgl2).
 
 -   Adjustable slider for full control of 'iTime' uniform and audio/video channels' time.
 
@@ -29,7 +29,7 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 -   ~~Sorting shaders list by views, likes or comments on "My profile" page.~~
     (feature removed - implemented natively in Shadertoy)
 
--   Alternative shaders list on profile page. (chrome only)
+-   Alternative shaders list on profile page. ~~(chrome only)~~
 
 -   ~~Shaders previews on "My profile" page.~~
     (feature removed - implemented natively in Shadertoy. Big preview on mouse over is still available)
@@ -42,9 +42,9 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
     Key '8' divides by 8, 1920x1080 becomes 240x135.
 
     This allows to run shaders smoothly (even in fullscreen) on non-top GPUs.
-    Notice that lower resolution is interpolated to original size. This causes blurrish rendering.
-
-    For pixelated image, rendering mode switch has been added in extension's popup (click on green S icon) (chrome only).
+    ~~Notice that lower resolution is interpolated to original size. This causes blurrish rendering.~~
+    Notice, antialiasing is enabled by default on Shadertoy WebGL canvas.
+    For "pixelated" image, rendering mode switch has been added in extension's popup (click on green S icon) ~~(chrome only)~~.
 
 -   Take HQ screenshot. Screenshot resolution is 2 \* current resolution (including current resolution divider). 1920x1080 becomes 3840x2160.
 
