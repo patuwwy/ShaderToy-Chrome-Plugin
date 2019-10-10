@@ -15,6 +15,7 @@
          * @const {string}
          */
         LOCALSTORAGE_SHADER_FORK_KEYNAME = 'forkedShaderStorage',
+        STATE_STORAGE_KEY = 'STE-state',
         SHADER_PREVIEW_LOCATION = '/media/shaders/',
         /**
          * Stores references to ShaderToy HTML elements.
@@ -96,7 +97,15 @@
 
         setRenderMode(mode) {
             if (this.editPage) {
-                this.editPage.setRenderMode(mode);
+                if (mode == 'default') {
+                    this.editPage.setRenderMode('');
+
+                    return;
+                }
+
+                this.editPage.setRenderMode('pixelated');
+                this.editPage.setRenderMode('optimizespeed');
+
             }
         }
 
@@ -109,6 +118,24 @@
             if (this.isEditPage()) {
                 this.editPage = new ToyPlugEditPage();
             }
+
+            this.setListener();
+
+            let state = JSON.parse(window.localStorage.getItem(STATE_STORAGE_KEY));
+
+            if (state && state.renderMode) {
+                this.setRenderMode(state.renderMode);
+            }
+        }
+
+        setListener() {
+            document.addEventListener('STE:mainState:updated', (event) => {
+                const detail = event.detail;
+
+                if (detail && detail.renderMode) {
+                    this.setRenderMode(detail.renderMode);
+                }
+            });
         }
     }
 
@@ -803,7 +830,6 @@
             triggerElement.type = 'checkbox';
             triggerElement.classList.add('ste-render-meters-toggle');
 
-
             extensionElements.controlsContainerHeader.appendChild(
                 triggerElement
             );
@@ -818,14 +844,21 @@
                 );
             });
 
-            document.addEventListener('toyplug:renderTimersVisibility:notAvailable', () => {
-                triggerElement.disabled = true;
-                triggerElement.title = 'EXT_disjoint_timer_query_webgl2 not found';
-            });
+            document.addEventListener(
+                'toyplug:renderTimersVisibility:notAvailable',
+                () => {
+                    triggerElement.disabled = true;
+                    triggerElement.title =
+                        'EXT_disjoint_timer_query_webgl2 not found';
+                }
+            );
 
-            document.addEventListener('toyplug:renderTimersVisibility:updated', (e) => {
-                triggerElement.checked = e.detail.enabled;
-            });
+            document.addEventListener(
+                'toyplug:renderTimersVisibility:updated',
+                (e) => {
+                    triggerElement.checked = e.detail.enabled;
+                }
+            );
         }
 
         onChangeRenderSpeedSelector(e) {
@@ -1328,15 +1361,17 @@
                         query,
                         this.gl.QUERY_RESULT_AVAILABLE
                     ),
-                isDisjoint: () => this.gl.getParameter(this.ext.GPU_DISJOINT_EXT),
+                isDisjoint: () =>
+                    this.gl.getParameter(this.ext.GPU_DISJOINT_EXT),
                 getResult: (query) =>
                     this.gl.getQueryParameter(query, this.gl.QUERY_RESULT)
             };
 
             this.TIMERS_VISIBILITY_KEY = 'timersVisibility';
             this.gl = gShaderToy.mGLContext;
-            this.ext = this.gl instanceof WebGL2RenderingContext &&
-                    this.gl.getExtension('EXT_disjoint_timer_query_webgl2');
+            this.ext =
+                this.gl instanceof WebGL2RenderingContext &&
+                this.gl.getExtension('EXT_disjoint_timer_query_webgl2');
 
             this.interval = null;
             this.renderTimersVisible = false;
@@ -1357,9 +1392,12 @@
                 );
 
                 document.dispatchEvent(
-                    new CustomEvent('toyplug:renderTimersVisibility:notAvailable', {
-                        detail: {}
-                    })
+                    new CustomEvent(
+                        'toyplug:renderTimersVisibility:notAvailable',
+                        {
+                            detail: {}
+                        }
+                    )
                 );
                 return;
             }

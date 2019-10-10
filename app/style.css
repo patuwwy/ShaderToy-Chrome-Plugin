@@ -300,14 +300,14 @@ body.alternate-profile div#header {
 .toyPlugHeader {
     position: fixed;
     width: 100%;
-    height: 32px;
+    height: 36px;
     padding-bottom: 8px;
-    top: 44px;
+    top: 42px;
     left: 0;
     display: flex;
     background: rgba(0, 0, 0, 0.9);
     box-sizing: border-box;
-    padding: 0 74px;
+    padding: 0 32px 4px;
     align-items: center;
     z-index: 1;
 }

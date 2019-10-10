@@ -29,7 +29,8 @@
             '<a href="{shaderUrl}" class="shader-tile">' +
             '<img class="shader-image" src="{previewUrl}"/>' +
             '<span class="shader-name">{shaderTitle}</span></a>',
-        userContent = null,
+        STATE_STORAGE_KEY = 'STE-state',
+        divUser = null,
         /**
          * Stores Helpers instance.
          *
@@ -133,13 +134,14 @@
             this.tilesWrapper = document.createElement('div');
             this.tilesWrapper.classList.add('tiles-wrapper');
 
-            userContent = document.getElementById('userContent');
+            divUser = document.querySelector('#content .divUser');
 
             document
                 .getElementById('content')
-                .insertBefore(this.tilesWrapper, userContent);
+                .insertBefore(this.tilesWrapper, divUser);
 
             this.userShaders = this.getShaders();
+
             // Need to wait for user's shaders to load.
             // This is a hot fix.
             (function waitForShaders() {
@@ -150,7 +152,8 @@
                     setTimeout(waitForShaders.bind(this), 200);
                 }
             }.call(this));
-            document.body.style = 'overflow: visible';
+
+            //document.body.style = 'overflow: visible';
         }
         /**
          * Parses all shaders from table and converts each to ShaderTile instance.
@@ -186,16 +189,13 @@
          * Adds header with links to shaders' groups.
          */
         addSecondHeader() {
-            var SECOND_HEADER_CONTENT =
-                    '<a href="#contentScroll">Original part</a>',
-                secondHeaderElement = document.createElement('div'),
-                contents = '',
+            var secondHeaderElement = document.createElement('div'),
                 headerAnchors = [],
-                orginalPartAnchor = document.createElement('a');
+                originalPartAnchor = document.createElement('a');
 
-            orginalPartAnchor.setAttribute('href', '#contentScroll');
-            orginalPartAnchor.textContent = 'Orginal part';
-            headerAnchors.push(orginalPartAnchor);
+            originalPartAnchor.setAttribute('href', '#userData');
+            originalPartAnchor.textContent = 'Original part';
+            headerAnchors.push(originalPartAnchor);
             helpers
                 .collectionToArray(
                     document.querySelectorAll('.tiles-wrapper > ul')
@@ -398,7 +398,13 @@
             if (document.head.textContent) {
                 this.sortableShaderList = new SortableShaderList();
 
-                if (window.alternateProfile) {
+                if (
+                    JSON.parse(
+                        window.localStorage.getItem(STATE_STORAGE_KEY) || {
+                            alternateProfile: false
+                        }
+                    ).alternateProfile
+                ) {
                     this.tilesView = new TilesView();
                 }
 
