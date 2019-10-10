@@ -1,26 +1,28 @@
 # ShaderToy unofficial plugin.
 
-**WebExtension** to make **Shadertoy** coding more comfortable.
+**WebExtension** for **Shadertoy** to make users coding more conveniently.
 
 [Chrome extension](https://chrome.google.com/webstore/detail/shadertoy-unofficial-plug/ohicbclhdmkhoabobgppffepcopomhgl?hl=pl)
 
 [Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/shadertoy-unofficial-plugin/)
 
-## Info
+## Contribution:
 
 Please report bugs and request features [here](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues).
 
+Please add issue with description before PR.
+
 ## Features:
 
--   Fork any shader.
+-   **Fork** any shader.
 
--   GPU render timers (EXT_disjoint_timer_query_webgl2).
+-   **GPU render timers** (EXT_disjoint_timer_query_webgl2).
 
--   Adjustable slider for full control of 'iTime' uniform and audio/video channels' time.
+-   Adjustable slider for **full control of 'iTime'** uniform and audio/video channels' time.
 
 -   Save as new draft (for owned shaders).
 
--   Four sliders for simulating mouse position.
+-   Four sliders for **simulating mouse position**.
     This can be used to tweaking variables with iMouse.xyzw uniform.
 
 -   ~~Switchable dark color theme.~~
@@ -34,7 +36,7 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 -   ~~Shaders previews on "My profile" page.~~
     (feature removed - implemented natively in Shadertoy. Big preview on mouse over is still available)
 
--   Change resolution in windowed and fullscreen mode by pressing keys ALT + 1...9.
+-   **Change resolution** in windowed and fullscreen mode by pressing keys ALT + 1...9.
 
     Resolution is divided by pressed key value, for example:
 
@@ -52,56 +54,56 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 -   Fullscreen edit mode.
 
--   Export shaders (single JSON or ZIP archive with JSON and readme.txt).
+-   **Export shaders** (single JSON or ZIP archive with JSON and readme.txt).
 
 -   Import JSON.
 
--   Show links in description/comments even if not inserted with BBCode.
+-   **Show links** in description/comments even if not inserted with BBCode.
 
 -   ~~Show current canvas resolution~~ ~~on FPS hover~~
     (feature removed - implemented natively in Shadertoy)
 
--   Render call multiplier.
+-   **Render call multiplier**.
 
--   Loop in set range (including video/audio channels).
+-   **Loop** in set time range (including video/audio channels).
 
--   List of recently viewed own shaders.
+-   **Open recent** - Quick access to recently viewed own shaders.
 
 -   Shader preview (automatic generated image).
 
 ## Screenshots
 
-### Controls:
+### Controls
 
-![](./screenshots/new.png)
+##### Setting iMouse.xyzw uniform:
 
----
+![](./screenshots/mouse.png)
 
-### Preview images on profile page on mouse hover:
+##### Setting iTime uniform. You can set the start and end time range and toggle loop:
 
-![](./screenshots/profile-preview.jpg)
+![](./screenshots/shader-edit.png)
 
----
-
-### Alternative shader list:
-
-![](./screenshots/alt-profile.png)
 
 ---
 
-### Fork any shader:
+### Alternative shader list on profile page
 
-![](./screenshots/fork.png)
+##### Displays your shaders, grouped by status, as a lists of images with title:
+
+![](./screenshots/alternate-profile.png)
 
 ---
 
-### Info popup (+ render mode):
+
+### Info popup
+
+##### Key bindings, render mode and alternate profile page switch:
 
 ![](./screenshots/popup.png)
 
 ---
 
-## Contact
+## Author / Contact:
 
 [PatrykFalba (Patu)](http://patrykfalba.pl)
 
@@ -109,14 +111,18 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 
 [movAX13h](http://blog.thrill-project.com/)
 
-[Chris White cxw42](https://github.com/cxw42)
+[cxw42](https://github.com/cxw42)
 
 Render timing based on [shadertoy_gpu_timing.user.js](https://github.com/andrei-drexler/shadertoy-userscripts/blob/master/shadertoy_gpu_timing.user.js) by [Andrei Drexler](https://github.com/andrei-drexler)
 
 ## Beer? Sure.
 
-[PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VDFNBT9N3ANHW&source=url)
+If You find it useful You are allowed to buy me a beer via [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VDFNBT9N3ANHW&source=url). :beer:
 
-## Changelog
+```
+int totalBeers = 0;
+```
 
-[changelog](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/blob/master/CHANGELOG.md)
+## Changelog:
+
+Most recent changelog is [here](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/blob/master/CHANGELOG.md).
