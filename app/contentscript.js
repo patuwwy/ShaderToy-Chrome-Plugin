@@ -90,7 +90,7 @@
     const onStateUpdate = (changes) => {
         document.dispatchEvent(
             new CustomEvent('STE:mainState:updated', {
-                detail: cloneInto(changes, window)
+                detail: window.chrome ? changes : cloneInto(changes, window)
             })
         );
     };
