@@ -1350,28 +1350,25 @@
 
     class RenderMeters {
         setUpInstanceVariables() {
+            this.gl = gShaderToy.mGLContext;
+            this.ext = this.gl instanceof WebGL2RenderingContext && this.gl.getExtension('EXT_disjoint_timer_query_webgl2');
+
+            if (!this.ext) {
+                return;
+            }
+
+            this.NUM_QUERIES = 16;
+            this.TIMERS_VISIBILITY_KEY = 'timersVisibility';
+
             this.mTimingSupport = {
                 createQuery: () => this.gl.createQuery(),
-                deleteQuery: (query) => this.gl.deleteQuery(query),
-                beginQuery: (query) =>
-                    this.gl.beginQuery(this.ext.TIME_ELAPSED_EXT, query),
+                deleteQuery: query => this.gl.deleteQuery(query),
+                beginQuery: query => this.gl.beginQuery(this.ext.TIME_ELAPSED_EXT, query),
                 endQuery: () => this.gl.endQuery(this.ext.TIME_ELAPSED_EXT),
-                isAvailable: (query) =>
-                    this.gl.getQueryParameter(
-                        query,
-                        this.gl.QUERY_RESULT_AVAILABLE
-                    ),
-                isDisjoint: () =>
-                    this.gl.getParameter(this.ext.GPU_DISJOINT_EXT),
-                getResult: (query) =>
-                    this.gl.getQueryParameter(query, this.gl.QUERY_RESULT)
+                isAvailable: query => this.gl.getQueryParameter(query, this.gl.QUERY_RESULT_AVAILABLE),
+                isDisjoint: () => this.gl.getParameter(this.ext.GPU_DISJOINT_EXT),
+                getResult: query => this.gl.getQueryParameter(query, this.gl.QUERY_RESULT)
             };
-
-            this.TIMERS_VISIBILITY_KEY = 'timersVisibility';
-            this.gl = gShaderToy.mGLContext;
-            this.ext =
-                this.gl instanceof WebGL2RenderingContext &&
-                this.gl.getExtension('EXT_disjoint_timer_query_webgl2');
 
             this.interval = null;
             this.renderTimersVisible = false;
@@ -1387,33 +1384,22 @@
                 this.replaceShaderToyCreate();
                 this.setTimer();
             } else {
-                console.log(
-                    'EXT_disjoint_timer_query_webgl2 extension not available'
-                );
+                console.warn('EXT_disjoint_timer_query_webgl2 extension not available');
 
                 document.dispatchEvent(
-                    new CustomEvent(
-                        'toyplug:renderTimersVisibility:notAvailable',
-                        {
-                            detail: {}
-                        }
-                    )
+                    new CustomEvent('toyplug:renderTimersVisibility:notAvailable', {
+                        detail: {}
+                    })
                 );
                 return;
             }
 
-            extensionElements.renderMetersContainer = document.createElement(
-                'div'
-            );
-            extensionElements.renderMetersContainer.classList.add(
-                'ste-rendering-meters'
-            );
+            extensionElements.renderMetersContainer = document.createElement('div');
+            extensionElements.renderMetersContainer.classList.add('ste-rendering-meters');
 
-            shaderToyElements.shaderPlayer.appendChild(
-                extensionElements.renderMetersContainer
-            );
+            shaderToyElements.shaderPlayer.appendChild(extensionElements.renderMetersContainer);
 
-            document.addEventListener('toyplug:renderTimersVisibility', (e) => {
+            document.addEventListener('toyplug:renderTimersVisibility', e => {
                 this.setState(e.detail.enabled);
             });
 
@@ -1421,9 +1407,7 @@
         }
 
         restoreState() {
-            const saved = window.localStorage.getItem(
-                this.TIMERS_VISIBILITY_KEY
-            );
+            const saved = window.localStorage.getItem(this.TIMERS_VISIBILITY_KEY);
 
             if (saved != undefined) {
                 this.setState(JSON.parse(saved));
@@ -1439,10 +1423,7 @@
                 this.setTimer();
             }
 
-            window.localStorage.setItem(
-                this.TIMERS_VISIBILITY_KEY,
-                JSON.stringify(newState)
-            );
+            window.localStorage.setItem(this.TIMERS_VISIBILITY_KEY, JSON.stringify(newState));
 
             this.renderTimersVisible = newState;
             this.updateElementVisibility();
@@ -1454,6 +1435,22 @@
                     }
                 })
             );
+        }
+
+        initPass(pass) {
+            const self = this;
+
+            if (self.mTimingSupport && pass.mType != 'common' && pass.mType != 'sound') {
+                pass.mTiming = {
+                    query: Array.from({ length: self.NUM_QUERIES }, () => self.mTimingSupport.createQuery()),
+                    cursor: 0,
+                    wait: self.NUM_QUERIES,
+                    accumTime: 0,
+                    accumSamples: 0
+                };
+            }
+
+            pass.ste = true;
         }
 
         replaceShaderToyPaint() {
@@ -1468,6 +1465,7 @@
                 }
 
                 let result = oldEffectPassPaint.apply(this, args);
+
                 if (timing) {
                     self.mTimingSupport.endQuery();
                     timing.cursor = (timing.cursor + 1) % timing.query.length;
@@ -1476,26 +1474,26 @@
                         --timing.wait;
                     } else {
                         let prev = timing.cursor;
-                        let available = self.mTimingSupport.isAvailable(
-                            timing.query[prev]
-                        );
+                        let available = self.mTimingSupport.isAvailable(timing.query[prev]);
                         let disjoint = self.mTimingSupport.isDisjoint();
 
                         if (available && !disjoint) {
-                            let elapsed = self.mTimingSupport.getResult(
-                                timing.query[prev]
-                            );
+                            let elapsed = self.mTimingSupport.getResult(timing.query[prev]);
                             timing.accumTime += elapsed * 1e-6;
                             timing.accumSamples++;
                         }
                     }
                 }
+
+                if (!timing && !this.ste) {
+                    self.initPass.call(self, this);
+                }
+
                 return result;
             };
         }
 
         replaceShaderToyCreate() {
-            const NUM_QUERIES = 8;
             const self = this;
 
             let oldEffectPassCreate = EffectPass.prototype.Create;
@@ -1503,31 +1501,14 @@
             EffectPass.prototype.Create = function(...args) {
                 let result = oldEffectPassCreate.apply(this, args);
 
-                if (
-                    self.mTimingSupport &&
-                    this.mType != 'common' &&
-                    this.mType != 'sound'
-                ) {
-                    this.mTiming = {
-                        query: Array.from({ length: NUM_QUERIES }, () =>
-                            self.mTimingSupport.createQuery()
-                        ),
-                        cursor: 0,
-                        wait: NUM_QUERIES,
-                        accumTime: 0,
-                        accumSamples: 0
-                    };
-                }
+                self.initPass.call(self, this);
 
                 return result;
             };
         }
 
         updateElementVisibility() {
-            extensionElements.renderMetersContainer.style.display = this
-                .renderTimersVisible
-                ? 'block'
-                : 'none';
+            extensionElements.renderMetersContainer.style.display = this.renderTimersVisible ? 'block' : 'none';
         }
 
         setTimer() {
@@ -1564,9 +1545,7 @@
                 let slowest;
 
                 if (numPasses > 1) {
-                    sorted = passData.sort(
-                        (p1, p2) => p1.avgRenderTime - p2.avgRenderTime
-                    );
+                    sorted = passData.sort((p1, p2) => p1.avgRenderTime - p2.avgRenderTime);
 
                     fastest = sorted[0].avgRenderTime;
                     slowest = sorted[sorted.length - 1].avgRenderTime;
@@ -1579,7 +1558,7 @@
                 extensionElements.renderMetersContainer.removeChild;
                 let frag = document.createDocumentFragment();
 
-                passData.forEach((pass) => {
+                passData.forEach(pass => {
                     let l = document.createElement('p');
                     l.textContent = `${pass.name}: ${pass.avgRenderTime}ms`;
 
