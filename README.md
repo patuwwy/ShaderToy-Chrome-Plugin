@@ -120,7 +120,7 @@ Render timing based on [shadertoy_gpu_timing.user.js](https://github.com/andrei-
 If You find it useful You are allowed to buy me a beer via [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VDFNBT9N3ANHW&source=url). :beer:
 
 ```
-int totalBeers = 0;
+int totalBeers = 1;
 ```
 
 ## Changelog:
