@@ -6,6 +6,8 @@
 
 [Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/shadertoy-unofficial-plugin/)
 
+[Microsoft Edge extension](https://microsoftedge.microsoft.com/addons/detail/mjcddpebilehgjibahdplabcocgpfmdb)
+
 ## Contribution:
 
 Please report bugs and request features [here](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues).
