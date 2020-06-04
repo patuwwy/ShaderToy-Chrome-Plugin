@@ -1,14 +1,14 @@
 {
     "manifest_version": 2,
     "name": "Shadertoy unofficial plugin.",
-    "version": "0.13.198",
+    "version": "0.13.199",
     "description": "Shadertoy.com unofficial plugin.",
     "homepage_url": "https://github.com/patuwwy/ShaderToy-Chrome-Plugin",
     "background": {
         "scripts": ["background.js"],
         "persistent": false
     },
-    "permissions": ["https://www.shadertoy.com/*", "activeTab", "storage"],
+    "permissions": ["https://www.shadertoy.com/*"],
     "icons": {
         "128": "assets/icon_active_128.png"
     },
