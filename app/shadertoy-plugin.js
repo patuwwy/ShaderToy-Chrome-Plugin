@@ -1350,7 +1350,7 @@
 
     class RenderMeters {
         setUpInstanceVariables() {
-            this.gl = gShaderToy.mGLContext;
+            this.gl = gShaderToy.mCanvas.getContext('webgl2');
             this.ext = this.gl instanceof WebGL2RenderingContext && this.gl.getExtension('EXT_disjoint_timer_query_webgl2');
 
             if (!this.ext) {
