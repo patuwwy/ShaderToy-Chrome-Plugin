@@ -434,7 +434,7 @@
             this.decreaseRes(currentDivider * 0.25);
 
             window.setTimeout(function getImageData() {
-                imageData = gShaderToy.mGLContext.canvas.toDataURL('image/png');
+                imageData = gShaderToy.mEffect.mGLContext.canvas.toDataURL('image/png');
             }, 100);
 
             window.setTimeout(
@@ -1057,17 +1057,17 @@
             var storedShader = window.localStorage.getItem(
                     LOCALSTORAGE_SHADER_FORK_KEYNAME
                 ),
-                ctx = gShaderToy.mGLContext;
+                ctx = gShaderToy.mEffect.mGLContext;
 
             if (!storedShader) {
                 return;
             }
 
             try {
-                gShaderToy.mGLContext = null;
+                gShaderToy.mEffect.mGLContext = null;
                 setTimeout(function() {
                     dataLoadShader(JSON.parse('[' + storedShader + ']'));
-                    gShaderToy.mGLContext = ctx;
+                    gShaderToy.mEffect.mGLContext = ctx;
                     gShaderToy.startRendering();
                     window.localStorage.setItem(
                         LOCALSTORAGE_SHADER_FORK_KEYNAME,
