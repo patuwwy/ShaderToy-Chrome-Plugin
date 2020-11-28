@@ -85,7 +85,6 @@ Please add issue with description before PR.
 
 ![](./screenshots/shader-edit.png)
 
-
 ---
 
 ### Alternative shader list on profile page
@@ -95,7 +94,6 @@ Please add issue with description before PR.
 ![](./screenshots/alternate-profile.png)
 
 ---
-
 
 ### Info popup
 
@@ -119,10 +117,10 @@ Render timing based on [shadertoy_gpu_timing.user.js](https://github.com/andrei-
 
 ## Beer? Sure.
 
-If You find it useful You are allowed to buy me a beer via [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VDFNBT9N3ANHW&source=url). :beer:
+If you find this extension useful, I'd love to hug a beer [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VDFNBT9N3ANHW&source=url). :beer:
 
 ```
-int totalBeers = 1;
+int totalBeers = 2;
 ```
 
 ## Changelog:
