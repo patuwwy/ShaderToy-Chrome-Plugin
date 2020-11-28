@@ -1,4 +1,13 @@
 ## ShaderToy extension changelog:
+
+-   0.13.201 (28-11-2020)
+
+    -   Temporary fix for resoultion decrease. (doesn't change resoltion when entering fullscreen)
+
+-   0.13.200
+
+    -   Fix for render timers
+
 -   0.13.190 (10-10-2019)
 
     -   Firefox compatibility fix - **alternative profile page and render mode now works in Firefox**.
