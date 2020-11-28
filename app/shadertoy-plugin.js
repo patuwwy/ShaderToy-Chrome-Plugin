@@ -295,23 +295,34 @@
 
         /**
          * Changes Shader resolution.
-         * Resolution calculation is based on divider and depends of fullscreen
-         * mode.
+         * Resolution calculation is based on divider.
          *
          * @param {number} divider
          */
         decreaseRes(divider) {
             var b = this.c.getBoundingClientRect(),
                 n = {
-                    w: b.width / divider,
-                    h: b.height / divider
+                    w: Math.floor(b.width / divider),
+                    h: Math.floor(b.height / divider)
                 };
 
-            gShaderToy.resize(n.w, n.h);
+            var mE = gShaderToy.mEffect;
+            var xres = n.w;
+            var yres = n.h;
+
+            gShaderToy.mEffect.mRO.unobserve(gShaderToy.mCanvas);
+
+            mE.mCanvas.setAttribute('width', xres);
+            mE.mCanvas.setAttribute('height', yres);
+            mE.mCanvas.width = xres;
+            mE.mCanvas.height = yres;
+            mE.mXres = xres;
+            mE.mYres = yres;
+
+            mE.ResizeBuffers(xres, yres);
+
+            gShaderToy.iSetResolution(xres, yres);
             this.currentDivider = divider;
-            window.dispatchEvent(
-                new window.CustomEvent('toyplug:canvas:resolution:changed')
-            );
         }
 
         /**
@@ -351,6 +362,7 @@
                 var which = e.which,
                     code = e.code;
                 if (e.target.id === self.MAIN_SHADERTOY_DEMO_ID) {
+                    console.log(e);
                     // Alt (or Cmd) + ...
                     if (e.altKey || e.metaKey) {
                         // 1...9 Keys
