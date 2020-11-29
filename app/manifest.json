@@ -30,6 +30,7 @@
         "popup.js",
         "shadertoy-plugin.js",
         "shadertoy-plugin-common.js",
+        "shadertoy-plugin-codemirror.js",
         "shadertoy-plugin-profile.js",
         "shadertoy-plugin-home.js",
         "scripts/jszip-3.1.5.js",
