@@ -31,27 +31,29 @@
     let colorPickerNode;
 
     CodeMirror.colorPicker = function (cm) {
+        const { doc } = cm;
         if (colorPickerNode && colorPickerNode.parentNode) {
             colorPickerNode.parentNode.removeChild(colorPickerNode);
         }
         // regex matches glsl vec3 with 3 floats in it. Can't use regex repetition for the (\.\d+|\d+\.|\d+\.\d+), part because it will extract all the values later
-        [...cm.doc.getValue().matchAll(/vec3\((\.\d+|\d+\.|\d+\.\d+),(\.\d+|\d+\.|\d+\.\d+),(\.\d+|\d+\.|\d+\.\d+)\)/g)].forEach(r => {
-            const cursor = cm.doc.indexFromPos(cm.doc.getCursor());
-            if (cursor < r.index + r[0].length && cursor > r.index) {
-                const startPos = cm.doc.posFromIndex(r.index);
-                const endPos = cm.doc.posFromIndex(r.index + r[0].length);
+        const vec3Regex = /vec3(\s+)?\((\s+)?(\.\d+|\d+\.|\d+\.\d+)(\s+)?,(\s+)?(\.\d+|\d+\.|\d+\.\d+)(\s+)?,(\s+)?(\.\d+|\d+\.|\d+\.\d+)(\s+)?\)/g;
+        [...doc.getValue().matchAll(vec3Regex)].forEach(result => {
+            const cursor = doc.indexFromPos(doc.getCursor());
+            if (cursor < result.index + result[0].length && cursor > result.index) {
+                const startPos = doc.posFromIndex(result.index);
+                const endPos = doc.posFromIndex(result.index + result[0].length);
 
                 colorPickerNode = document.createElement('div');
                 colorPickerNode.className = 'cm-colorpicker-wrapper';
                 const colorPickerInput = document.createElement('input');
                 colorPickerInput.type = 'color';
                 colorPickerInput.className = 'cm-colorpicker';
-                colorPickerInput.value = rgbToHex(parseFloat(r[1]) * 255, parseFloat(r[2]) * 255, parseFloat(r[3]) * 255);
+                colorPickerInput.value = rgbToHex(parseFloat(result[3]) * 255, parseFloat(result[6]) * 255, parseFloat(result[9]) * 255);
                 colorPickerNode.style.backgroundColor = colorPickerInput.value;
-                colorPickerInput.addEventListener('change', e => {
-                    const newColor = hexToRgb(e.target.value);
-                    cm.doc.replaceRange(`vec3(${newColor.r},${newColor.g},${newColor.b})`, startPos, endPos);
-                    colorPickerNode.style.backgroundColor = e.target.value;
+                colorPickerInput.addEventListener('change', event => {
+                    const newColor = hexToRgb(event.target.value);
+                    doc.replaceRange(`vec3(${newColor.r},${newColor.g},${newColor.b})`, startPos, endPos);
+                    colorPickerNode.style.backgroundColor = event.target.value;
                 });
                 colorPickerNode.appendChild(colorPickerInput);
                 cm.addWidget(startPos, colorPickerNode, true);
@@ -548,45 +550,6 @@
         }
     }
 
-    function resolveAutoHints(cm, pos) {
-        const helpers = cm.getHelpers(pos, 'hint');
-        let words;
-        if (helpers.length) {
-            const resolved = function (cm, callback, options) {
-                const app = applicableHelpers(cm, helpers);
-
-                function run(i) {
-                    if (i == app.length) return callback(null);
-                    fetchHints(app[i], cm, options, function (result) {
-                        if (result && result.list.length > 0) callback(result);
-                        else run(i + 1);
-                    });
-                }
-                run(0);
-            };
-            resolved.async = true;
-            resolved.supportsSelection = true;
-            return resolved;
-        }
-        if ((words = cm.getHelper(cm.getCursor(), 'hintWords'))) {
-            return function (cm) {
-                return CodeMirror.hint.fromList(cm, {
-                    words
-                });
-            };
-        }
-        if (CodeMirror.hint.anyword) {
-            return function (cm, options) {
-                return CodeMirror.hint.anyword(cm, options);
-            };
-        }
-        return function () {};
-    }
-
-    CodeMirror.registerHelper('hint', 'auto', {
-        resolve: resolveAutoHints
-    });
-
     CodeMirror.registerHelper('hint', 'fromList', function (cm, options) {
         const cur = cm.getCursor();
         const token = cm.getTokenAt(cur);
@@ -771,7 +734,11 @@
         'iSampleRate',
         `void mainImage( out vec4 fragColor, in vec2 fragCoord ){
 }`,
-        'vec2 uv = (fragCoord - .5*iResolution.xy) / min(iResolution.x, iResolution.y)'
+        'vec2 uv = (fragCoord - .5*iResolution.xy) / min(iResolution.x, iResolution.y)',
+        '#define pi acos(-1.)',
+        `mat2 rotate(float angle){
+    return mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+}`
     ];
 
     CodeMirror.commands.autocomplete = CodeMirror.showHint;
