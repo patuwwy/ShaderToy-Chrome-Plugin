@@ -791,58 +791,58 @@
     style.type = 'text/css';
     style.innerHTML = `
 .cm-colorpicker {
-opacity: 0;
-display: block;
-width: 32px;
-height: 16px;
-border: none;
-position: absolute;
-z-index: 10;
+    opacity: 0;
+    display: block;
+    width: 32px;
+    height: 16px;
+    border: none;
+    position: absolute;
+    z-index: 10;
 }
 .cm-colorpicker-wrapper {
-position: absolute;
-width: 32px;
-height: 16px;
-border-radius: 6px;
-border: 4px solid white;
-transform: translate(0, 1px);
-z-index: 10;
+    position: absolute;
+    width: 32px;
+    height: 16px;
+    border-radius: 6px;
+    border: 4px solid ${gThemeName === 'dark' ? 'white' : 'black'};
+    transform: translate(0, 1px);
+    z-index: 10;
 }
 .cm-hints {
-position: absolute;
-z-index: 10;
-overflow: hidden;
-list-style: none;
+    position: absolute;
+    z-index: 10;
+    overflow: hidden;
+    list-style: none;
 
-margin: 0;
-padding: 2px;
+    margin: 0;
+    padding: 2px;
 
--webkit-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
--moz-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
-border-radius: 3px;
-border: 1px solid silver;
+    -webkit-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
+    -moz-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
+    box-shadow: 2px 3px 5px rgba(0,0,0,.2);
+    border-radius: 3px;
+    border: 1px solid silver;
 
-background: white;
-font-size: 90%;
-font-family: monospace;
+    background: ${gThemeName === 'dark' ? 'black' : 'white'};
+    font-size: 90%;
+    font-family: monospace;
 
-max-height: 20em;
-overflow-y: auto;
+    max-height: 20em;
+    overflow-y: auto;
 }
 
 .cm-hint {
-margin: 0;
-padding: 0 4px;
-border-radius: 2px;
-white-space: pre;
-color: black;
-cursor: pointer;
+    margin: 0;
+    padding: 0 4px;
+    border-radius: 2px;
+    white-space: pre;
+    color: ${gThemeName === 'dark' ? 'white' : 'black'};
+    cursor: pointer;
 }
 
 li.cm-hint-active {
-background: #08f;
-color: white;
+    background: #08f;
+    color: ${gThemeName === 'dark' ? 'black' : 'white'};
 }
 `;
     document.getElementsByTagName('head')[0].appendChild(style);
