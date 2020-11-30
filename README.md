@@ -73,6 +73,10 @@ Please add issue with description before PR.
 
 -   Shader preview (automatic generated image).
 
+-   **Code completion** for glsl keywords in the code editor.
+
+-   **Color picker** for any vec3 with r,g,b values in the code editor.
+
 ## Screenshots
 
 ### Controls
@@ -103,6 +107,18 @@ Please add issue with description before PR.
 
 ---
 
+### Code editor
+
+##### Color picker for any vec3 with r,g,b
+
+![](./screenshots/color-picker.png)
+
+##### Code completion for glsl keywords and code snippets
+
+![](./screenshots/code-completion.png)
+
+---
+
 ## Author / Contact:
 
 [PatrykFalba (Patu)](http://patrykfalba.pl)
@@ -112,6 +128,8 @@ Please add issue with description before PR.
 [movAX13h](http://blog.thrill-project.com/)
 
 [cxw42](https://github.com/cxw42)
+
+[Ethan Lowenthal](https://ethansawesomewebsite.tk/)
 
 Render timing based on [shadertoy_gpu_timing.user.js](https://github.com/andrei-drexler/shadertoy-userscripts/blob/master/shadertoy_gpu_timing.user.js) by [Andrei Drexler](https://github.com/andrei-drexler)
 

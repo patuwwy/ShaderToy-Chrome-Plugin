@@ -1,5 +1,9 @@
 ## ShaderToy extension changelog:
 
+-   0.13.215 (30-11-2020)
+
+    -   Add code completion and color picker extentions to code editor
+
 -   0.13.201 (28-11-2020)
 
     -   Temporary fix for resoultion decrease. (doesn't change resoltion when entering fullscreen)
