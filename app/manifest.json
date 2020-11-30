@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Shadertoy unofficial plugin.",
-    "version": "0.13.213",
+    "version": "0.13.215",
     "description": "Shadertoy.com unofficial plugin.",
     "homepage_url": "https://github.com/patuwwy/ShaderToy-Chrome-Plugin",
     "background": {
@@ -30,6 +30,7 @@
         "popup.js",
         "shadertoy-plugin.js",
         "shadertoy-plugin-common.js",
+        "add-ons/shadertoy-plugin-codemirror.js",
         "shadertoy-plugin-profile.js",
         "shadertoy-plugin-home.js",
         "scripts/jszip-3.1.5.js",

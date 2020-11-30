@@ -19,6 +19,12 @@
          * @const {string}
          */
         HOME_EXTENSION_FILENAME = 'shadertoy-plugin-home.js',
+        /**
+         * Code editor extention filename.
+         *
+         * @const {string}
+         */
+        CODEMIRROR_EXTENTION_FILENAME = 'add-ons/shadertoy-plugin-codemirror.js',
         COMMON_FILENAME = 'shadertoy-plugin-common.js',
         STATE_STORAGE_KEY = 'STE-state',
         state = {
@@ -144,6 +150,15 @@
             loadScript(HOME_EXTENSION_FILENAME);
         }
     }
+    
+    /**
+     * Loads codemirror extention on editing and new shader page
+     */
+    function initializeCodemirror() {
+        if (document.location.href.match(/shadertoy.com\/(new|(view\/.{6}))/)) {
+            loadScript(CODEMIRROR_EXTENTION_FILENAME);
+        }
+    }
 
     /**
      * Initializes extension.
@@ -156,6 +171,7 @@
         loadScript(COMMON_FILENAME);
 
         initializeProfilePage();
+        initializeCodemirror();
         initializeHomePage();
 
         bindMessagesListener();
