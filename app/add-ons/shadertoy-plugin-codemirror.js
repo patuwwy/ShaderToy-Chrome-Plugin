@@ -1,6 +1,12 @@
-(function shadertoyPluginCodemirror() {
-    //window.addEventListener('load', event => {
-    // ----- color picker extention
+//
+// By Ethan Lowenthal 2020
+// https://www.shadertoy.com/user/Jinkweiq
+//
+// Started as a tapermonkey script, adapted to be part of
+// shadertoy extention.
+//
+
+(function shadertoyPluginColorPicker() {
     function hexToRgb(hex) {
         const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
         hex = hex.replace(shorthandRegex, function (m, r, g, b) {
@@ -10,16 +16,16 @@
         const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result
             ? {
-                  r: (parseInt(result[1], 16) / 255).toFixed(3),
-                  g: (parseInt(result[2], 16) / 255).toFixed(3),
-                  b: (parseInt(result[3], 16) / 255).toFixed(3)
-              }
+                r: (parseInt(result[1], 16) / 255).toFixed(3),
+                g: (parseInt(result[2], 16) / 255).toFixed(3),
+                b: (parseInt(result[3], 16) / 255).toFixed(3)
+            }
             : null;
     }
     function rgbToHex(r, g, b) {
-        r = Math.round(r);
-        g = Math.round(g);
-        b = Math.round(b);
+        r = Math.round(r * 255);
+        g = Math.round(g * 255);
+        b = Math.round(b * 255);
         if (Math.max(r, g, b) > 255) {
             r /= Math.max(r, g, b) / 255;
             g /= Math.max(r, g, b) / 255;
@@ -35,35 +41,217 @@
         if (colorPickerNode && colorPickerNode.parentNode) {
             colorPickerNode.parentNode.removeChild(colorPickerNode);
         }
-        // regex matches glsl vec3 with 3 floats in it. Can't use regex repetition for the (\.\d+|\d+\.|\d+\.\d+), part because it will extract all the values later
-        const vec3Regex = /vec3(\s+)?\((\s+)?(\.\d+|\d+\.|\d+\.\d+)(\s+)?,(\s+)?(\.\d+|\d+\.|\d+\.\d+)(\s+)?,(\s+)?(\.\d+|\d+\.|\d+\.\d+)(\s+)?\)/g;
-        [...doc.getValue().matchAll(vec3Regex)].forEach(result => {
-            const cursor = doc.indexFromPos(doc.getCursor());
-            if (cursor < result.index + result[0].length && cursor > result.index) {
-                const startPos = doc.posFromIndex(result.index);
-                const endPos = doc.posFromIndex(result.index + result[0].length);
+        const regexSearchRange = 250;
+        const cursor = doc.indexFromPos(doc.getCursor());
+        const content = doc.getRange(doc.posFromIndex(cursor - regexSearchRange), doc.posFromIndex(cursor + regexSearchRange));
+        const vec3Regex = /vec3\s*\(\s*(\d*\.?\d*)\s*,\s*(\d*\.?\d*)\s*,\s*(\d*\.?\d*)\s*\)/g;
+        [...content.matchAll(vec3Regex)].forEach(result => {
+            const r = parseFloat(result[1]),
+                g = parseFloat(result[2]),
+                b = parseFloat(result[3]);
 
-                colorPickerNode = document.createElement('div');
-                colorPickerNode.className = 'cm-colorpicker-wrapper';
-                const colorPickerInput = document.createElement('input');
-                colorPickerInput.type = 'color';
-                colorPickerInput.className = 'cm-colorpicker';
-                colorPickerInput.value = rgbToHex(parseFloat(result[3]) * 255, parseFloat(result[6]) * 255, parseFloat(result[9]) * 255);
-                colorPickerNode.style.backgroundColor = colorPickerInput.value;
-                colorPickerInput.addEventListener('change', event => {
-                    const newColor = hexToRgb(event.target.value);
-                    doc.replaceRange(`vec3(${newColor.r},${newColor.g},${newColor.b})`, startPos, endPos);
-                    colorPickerNode.style.backgroundColor = event.target.value;
-                });
-                colorPickerNode.appendChild(colorPickerInput);
-                cm.addWidget(startPos, colorPickerNode, true);
+            if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
+                const startPos = result.index + cursor - min(cursor, regexSearchRange);
+                const endPos = result.index + result[0].length + cursor - min(cursor, regexSearchRange);
+
+                if (cursor < endPos && cursor > startPos) {
+                    colorPickerNode = document.createElement('div');
+                    colorPickerNode.className = 'cm-colorpicker-wrapper';
+
+                    const colorPickerInput = document.createElement('input');
+                    colorPickerInput.type = 'color';
+                    colorPickerInput.className = 'cm-colorpicker';
+                    colorPickerInput.value = rgbToHex(r, g, b);
+                    colorPickerNode.style.backgroundColor = colorPickerInput.value;
+
+                    colorPickerInput.addEventListener('change', event => {
+                        const newColor = hexToRgb(event.target.value);
+                        doc.replaceRange(`vec3(${newColor.r},${newColor.g},${newColor.b})`, doc.posFromIndex(startPos), doc.posFromIndex(endPos));
+                        colorPickerNode.style.backgroundColor = event.target.value;
+                    });
+
+                    colorPickerNode.appendChild(colorPickerInput);
+                    cm.addWidget(doc.posFromIndex(startPos), colorPickerNode, true);
+                }
+
             }
         });
     };
 
-    // ----- code completion extention - (modified https://codemirror.net/doc/manual.html#addon_show-hint)
-    const HINT_ELEMENT_CLASS = 'CodeMirror-hint';
-    const ACTIVE_HINT_ELEMENT_CLASS = 'CodeMirror-hint-active';
+    let t;
+    t = setTimeout(() => {
+        try {
+            gShaderToy.mCodeEditor.on('cursorActivity', CodeMirror.colorPicker);
+            clearTimeout(t);
+        } catch { }
+    }, 100);
+})();
+
+(function shadertoyPluginCodeCompletion() {
+    // modified https://codemirror.net/doc/manual.html#addon_show-hint
+    const HINT_ELEMENT_CLASS = 'cm-hint';
+    const ACTIVE_HINT_ELEMENT_CLASS = 'cm-hint-active';
+    // all the keywords, (and code samples)
+    const glslKeywords = [
+        'const',
+        'uniform',
+        'break',
+        'continue',
+        'do',
+        'for',
+        'while',
+        'if',
+        'else',
+        'switch',
+        'case',
+        'in',
+        'out',
+        'inout',
+        'float',
+        'int',
+        'uint',
+        'void',
+        'bool',
+        'true',
+        'false',
+        'invariant',
+        'discard',
+        'return',
+        'mat2',
+        'mat3',
+        'mat2x2',
+        'mat2x3',
+        'mat2x4',
+        'mat3x2',
+        'mat3x3',
+        'mat3x4',
+        'mat4x2',
+        'mat4x3',
+        'mat4x4',
+        'mat4',
+        'vec2',
+        'vec3',
+        'vec4',
+        'ivec2',
+        'ivec3',
+        'ivec4',
+        'uvec2',
+        'uvec3',
+        'uvec4',
+        'bvec2',
+        'bvec3',
+        'bvec4',
+        'sampler2D',
+        'samplerCube',
+        'sampler3D',
+        'structradians',
+        'degrees',
+        'sin',
+        'cos',
+        'tan',
+        'asin',
+        'acos',
+        'atan',
+        'pow',
+        'sinh',
+        'cosh',
+        'tanh',
+        'asinh',
+        'acosh',
+        'atanh',
+        'exp',
+        'log',
+        'exp2',
+        'log2',
+        'sqrt',
+        'inversesqrt',
+        'abs',
+        'sign',
+        'floor',
+        'ceil',
+        'round',
+        'trunc',
+        'fract',
+        'mod',
+        'modf',
+        'min',
+        'max',
+        'clamp',
+        'mix',
+        'step',
+        'smoothstep',
+        'length',
+        'distance',
+        'dot',
+        'cross',
+        'determinant',
+        'inverse',
+        'normalize',
+        'faceforward',
+        'reflect',
+        'refract',
+        'matrixCompMult',
+        'outerProduct',
+        'transpose',
+        'lessThan',
+        'lessThanEqual',
+        'greaterThan',
+        'greaterThanEqual',
+        'equal',
+        'notEqual',
+        'any',
+        'all',
+        'not',
+        'packUnorm2x16',
+        'unpackUnorm2x16',
+        'packSnorm2x16',
+        'unpackSnorm2x16',
+        'packHalf2x16',
+        'unpackHalf2x16',
+        'dFdx',
+        'dFdy',
+        'fwidth',
+        'textureSize',
+        'texture',
+        'textureProj',
+        'textureLod',
+        'textureGrad',
+        'texelFetch',
+        'texelFetchOffset',
+        'textureProjLod',
+        'textureLodOffset',
+        'textureGradOffset',
+        'textureProjLodOffset',
+        'textureProjGrad',
+        'intBitsToFloat',
+        'uintBitsToFloat',
+        'floatBitsToInt',
+        'floatBitsToUint',
+        'isnan',
+        'isinffragColor',
+        'fragCoord',
+        'fragColor',
+        'iResolution',
+        'iTime',
+        'iTimeDelta',
+        'iFrame',
+        'iMouse',
+        'iDate',
+        'iChannelTime',
+        'iChannel0',
+        'iChannel1',
+        'iChannel2',
+        'iChannel3',
+        'iSampleRate',
+        `void mainImage( out vec4 fragColor, in vec2 fragCoord ){
+}`,
+        'vec2 uv = (fragCoord - .5*iResolution.xy) / min(iResolution.x, iResolution.y)',
+        '#define PI acos(-1.)',
+        `mat2 rotate(float angle){
+    return mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+}`,
+        'for(int i=0;i<10;i++){}',
+    ];
 
     CodeMirror.showHint = function (cm, getHints, options) {
         if (!getHints) return cm.showHint(options);
@@ -305,7 +493,7 @@
 
         const hints = (this.hints = ownerDocument.createElement('ul'));
         const { theme } = completion.cm.options;
-        hints.className = `CodeMirror-hints ${theme}`;
+        hints.className = `cm-hints ${theme}`;
         this.selectedHint = data.selectedHint || 0;
 
         const completions = data.list;
@@ -533,13 +721,6 @@
         }
     };
 
-    function applicableHelpers(cm, helpers) {
-        if (!cm.somethingSelected()) return helpers;
-        const result = [];
-        for (let i = 0; i < helpers.length; i++) if (helpers[i].supportsSelection) result.push(helpers[i]);
-        return result;
-    }
-
     function fetchHints(hint, cm, options, callback) {
         if (hint.async) {
             hint(cm, callback, options);
@@ -579,168 +760,6 @@
             };
     });
 
-    // all the keywords, (and code samples)
-    const glslKeywords = [
-        'const',
-        'uniform',
-        'break',
-        'continue',
-        'do',
-        'for',
-        'while',
-        'if',
-        'else',
-        'switch',
-        'case',
-        'in',
-        'out',
-        'inout',
-        'float',
-        'int',
-        'uint',
-        'void',
-        'bool',
-        'true',
-        'false',
-        'invariant',
-        'discard',
-        'return',
-        'mat2',
-        'mat3',
-        'mat2x2',
-        'mat2x3',
-        'mat2x4',
-        'mat3x2',
-        'mat3x3',
-        'mat3x4',
-        'mat4x2',
-        'mat4x3',
-        'mat4x4',
-        'mat4',
-        'vec2',
-        'vec3',
-        'vec4',
-        'ivec2',
-        'ivec3',
-        'ivec4',
-        'uvec2',
-        'uvec3',
-        'uvec4',
-        'bvec2',
-        'bvec3',
-        'bvec4',
-        'sampler2D',
-        'samplerCube',
-        'sampler3D',
-        'structradians',
-        'degrees',
-        'sin',
-        'cos',
-        'tan',
-        'asin',
-        'acos',
-        'atan',
-        'pow',
-        'sinh',
-        'cosh',
-        'tanh',
-        'asinh',
-        'acosh',
-        'atanh',
-        'exp',
-        'log',
-        'exp2',
-        'log2',
-        'sqrt',
-        'inversesqrt',
-        'abs',
-        'sign',
-        'floor',
-        'ceil',
-        'round',
-        'trunc',
-        'fract',
-        'mod',
-        'modf',
-        'min',
-        'max',
-        'clamp',
-        'mix',
-        'step',
-        'smoothstep',
-        'length',
-        'distance',
-        'dot',
-        'cross',
-        'determinant',
-        'inverse',
-        'normalize',
-        'faceforward',
-        'reflect',
-        'refract',
-        'matrixCompMult',
-        'outerProduct',
-        'transpose',
-        'lessThan',
-        'lessThanEqual',
-        'greaterThan',
-        'greaterThanEqual',
-        'equal',
-        'notEqual',
-        'any',
-        'all',
-        'not',
-        'packUnorm2x16',
-        'unpackUnorm2x16',
-        'packSnorm2x16',
-        'unpackSnorm2x16',
-        'packHalf2x16',
-        'unpackHalf2x16',
-        'dFdx',
-        'dFdy',
-        'fwidth',
-        'textureSize',
-        'texture',
-        'textureProj',
-        'textureLod',
-        'textureGrad',
-        'texelFetch',
-        'texelFetchOffset',
-        'textureProjLod',
-        'textureLodOffset',
-        'textureGradOffset',
-        'textureProjLodOffset',
-        'textureProjGrad',
-        'intBitsToFloat',
-        'uintBitsToFloat',
-        'floatBitsToInt',
-        'floatBitsToUint',
-        'isnan',
-        'isinffragColor',
-        'fragCoord',
-        'fragColor',
-        'iResolution',
-        'iTime',
-        'iTimeDelta',
-        'iFrame',
-        'iMouse',
-        'iDate',
-        'iChannelTime',
-        'iChannel',
-        'iChannel0',
-        'iChannel1',
-        'iChannel2',
-        'iChannel3',
-        'iSampleRate',
-        `void mainImage( out vec4 fragColor, in vec2 fragCoord ){
-}`,
-        'vec2 uv = (fragCoord - .5*iResolution.xy) / min(iResolution.x, iResolution.y)',
-        '#define pi acos(-1.)',
-        `mat2 rotate(float angle){
-    return mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
-}`
-    ];
-
     CodeMirror.commands.autocomplete = CodeMirror.showHint;
     var defaultOptions = {
         words: glslKeywords,
@@ -762,15 +781,12 @@
     let t;
     t = setTimeout(() => {
         try {
-            // maybe we can make this a setting? I dont like this keybind but can use just tab without some more logic or else
-            // indents will not work
             gShaderToy.mCodeEditor.options.extraKeys['Shift-Tab'] = 'autocomplete';
-            // lags petty bad at about 180k chars.. but nobody has shaders that large.
-            gShaderToy.mCodeEditor.on('cursorActivity', CodeMirror.colorPicker);
             clearTimeout(t);
-        } catch {}
+        } catch { }
     }, 100);
-
+})();
+(function () {
     const style = document.createElement('style');
     style.type = 'text/css';
     style.innerHTML = `
@@ -792,7 +808,7 @@ border: 4px solid white;
 transform: translate(0, 1px);
 z-index: 10;
 }
-.CodeMirror-hints {
+.cm-hints {
 position: absolute;
 z-index: 10;
 overflow: hidden;
@@ -815,7 +831,7 @@ max-height: 20em;
 overflow-y: auto;
 }
 
-.CodeMirror-hint {
+.cm-hint {
 margin: 0;
 padding: 0 4px;
 border-radius: 2px;
@@ -824,11 +840,10 @@ color: black;
 cursor: pointer;
 }
 
-li.CodeMirror-hint-active {
+li.cm-hint-active {
 background: #08f;
 color: white;
 }
 `;
     document.getElementsByTagName('head')[0].appendChild(style);
-    //});
-})();
+})()

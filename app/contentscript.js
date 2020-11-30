@@ -1,4 +1,4 @@
-(function () {
+(function() {
     'use strict';
 
     /**
@@ -20,11 +20,11 @@
          */
         HOME_EXTENSION_FILENAME = 'shadertoy-plugin-home.js',
         /**
-         * Extention to code editor - adds color picker and code completion
+         * Code editor extention filename.
          *
          * @const {string}
          */
-        CODEMIRROR_EXTENTION_FILENAME = 'shadertoy-plugin-codemirror.js',
+        CODEMIRROR_EXTENTION_FILENAME = 'add-ons/shadertoy-plugin-codemirror.js',
         COMMON_FILENAME = 'shadertoy-plugin-common.js',
         STATE_STORAGE_KEY = 'STE-state',
         state = {
@@ -65,11 +65,13 @@
         onStateUpdate(state);
     };
 
-    const saveState = newState => {
+    const saveState = (newState) => {
         let oldState = state;
 
         try {
-            oldState = JSON.parse(window.localStorage.getItem(STATE_STORAGE_KEY)) || state;
+            oldState =
+                JSON.parse(window.localStorage.getItem(STATE_STORAGE_KEY)) ||
+                state;
         } catch (_ignore) {}
 
         const changes = Object.keys(newState).reduce(
@@ -83,12 +85,15 @@
             {}
         );
 
-        window.localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(newState));
+        window.localStorage.setItem(
+            STATE_STORAGE_KEY,
+            JSON.stringify(newState)
+        );
 
         onStateUpdate(changes);
     };
 
-    const onStateUpdate = changes => {
+    const onStateUpdate = (changes) => {
         document.dispatchEvent(
             new CustomEvent('STE:mainState:updated', {
                 detail: window.chrome ? changes : cloneInto(changes, window)
@@ -100,7 +105,11 @@
      * Listens to extension messages.
      */
     function bindMessagesListener() {
-        chrome.runtime.onMessage.addListener(function (request, _sender, sendResponse) {
+        chrome.runtime.onMessage.addListener(function(
+            request,
+            _sender,
+            sendResponse
+        ) {
             if (request.data.get === 'state') {
                 restoreState();
                 sendResponse(state);
@@ -120,7 +129,7 @@
             {
                 present: true
             },
-            function () {}
+            function() {}
         );
     }
 
@@ -141,9 +150,9 @@
             loadScript(HOME_EXTENSION_FILENAME);
         }
     }
-
+    
     /**
-     * Loads codemirrir extention on editing and new shader page
+     * Loads codemirror extention on editing and new shader page
      */
     function initializeCodemirror() {
         if (document.location.href.match(/shadertoy.com\/(new|(view\/.{6}))/)) {
