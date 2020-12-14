@@ -44,16 +44,17 @@
         const regexSearchRange = 250;
         const cursor = doc.indexFromPos(doc.getCursor());
         const content = doc.getRange(doc.posFromIndex(cursor - regexSearchRange), doc.posFromIndex(cursor + regexSearchRange));
-        const vec3Regex = /vec3\s*\(\s*(\d*\.?\d*)\s*,\s*(\d*\.?\d*)\s*,\s*(\d*\.?\d*)\s*\)/g;
-        [...content.matchAll(vec3Regex)].forEach(result => {
-            const r = parseFloat(result[1]),
-                g = parseFloat(result[2]),
-                b = parseFloat(result[3]);
+        const vec3Regex = /(vec3)\s*\(\s*(\d*\.?\d*)\s*,\s*(\d*\.?\d*)\s*,\s*(\d*\.?\d*)\s*\)/g;
+        const vec4Regex = /(vec4)\s*\(\s*(\d*\.?\d*)\s*,\s*(\d*\.?\d*)\s*,\s*(\d*\.?\d*)\s*,\s*(\d*\.?\d*)\s*\)/g;
+        [...content.matchAll(vec3Regex),...content.matchAll(vec4Regex)].forEach(result => {
+            const r = parseFloat(result[2]),
+                g = parseFloat(result[3]),
+                b = parseFloat(result[4]);
 
-            if (!isNaN(r) && !isNaN(g) && !isNaN(b)) {
-                const startPos = result.index + cursor - min(cursor, regexSearchRange);
-                const endPos = result.index + result[0].length + cursor - min(cursor, regexSearchRange);
-
+            const startPos = result.index + cursor - min(cursor, regexSearchRange);
+            const endPos = result.index + result[0].length + cursor - min(cursor, regexSearchRange);
+            const preceding = doc.getRange(doc.posFromIndex(startPos-1),doc.posFromIndex(startPos));
+            if (!isNaN(r) && !isNaN(g) && !isNaN(b) && !['i','b','u'].includes(preceding)) {
                 if (cursor < endPos && cursor > startPos) {
                     colorPickerNode = document.createElement('div');
                     colorPickerNode.className = 'cm-colorpicker-wrapper';
@@ -63,10 +64,13 @@
                     colorPickerInput.className = 'cm-colorpicker';
                     colorPickerInput.value = rgbToHex(r, g, b);
                     colorPickerNode.style.backgroundColor = colorPickerInput.value;
-
                     colorPickerInput.addEventListener('change', event => {
                         const newColor = hexToRgb(event.target.value);
-                        doc.replaceRange(`vec3(${newColor.r},${newColor.g},${newColor.b})`, doc.posFromIndex(startPos), doc.posFromIndex(endPos));
+                        doc.replaceRange(
+                            `${result[1]}(${newColor.r},${newColor.g},${newColor.b}${(result[5]!==undefined)?`,${result[5]}`:''})`,
+                            doc.posFromIndex(startPos),
+                            doc.posFromIndex(endPos)
+                        );
                         colorPickerNode.style.backgroundColor = event.target.value;
                     });
 
@@ -243,6 +247,7 @@
         'iChannel2',
         'iChannel3',
         'iSampleRate',
+        /*
         `void mainImage( out vec4 fragColor, in vec2 fragCoord ){
 }`,
         'vec2 uv = (fragCoord - .5*iResolution.xy) / min(iResolution.x, iResolution.y)',
@@ -251,6 +256,7 @@
     return mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
 }`,
         'for(int i=0;i<10;i++){}',
+        */
     ];
 
     CodeMirror.showHint = function (cm, getHints, options) {
@@ -743,14 +749,15 @@
             term = '';
             from = cur;
         }
+        term = term.toLowerCase();
         const found = [];
         for (let i = 0; i < options.words.length; i++) {
-            const word = options.words[i];
-            if (word.slice(0, term.length) == term) found.push(word);
+            const word = options.words[i].toLowerCase();
+            if (word.slice(0, term.length) == term) found.push(options.words[i]);
         }
         for (let i = 0; i < options.words.length; i++) {
-            const word = options.words[i];
-            if (word.includes(term) && !found.includes(word)) found.push(word);
+            const word = options.words[i].toLowerCase();
+            if (word.includes(term) && !found.includes(word)) found.push(options.words[i]);
         }
         if (found.length)
             return {
@@ -781,7 +788,7 @@
     let t;
     t = setTimeout(() => {
         try {
-            gShaderToy.mCodeEditor.options.extraKeys['Shift-Tab'] = 'autocomplete';
+            gShaderToy.mCodeEditor.options.extraKeys['Ctrl-M'] = 'autocomplete';
             clearTimeout(t);
         } catch { }
     }, 100);
