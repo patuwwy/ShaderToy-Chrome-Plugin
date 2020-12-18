@@ -1056,8 +1056,7 @@
         finishShaderFork() {
             var storedShader = window.localStorage.getItem(
                     LOCALSTORAGE_SHADER_FORK_KEYNAME
-                ),
-                ctx = gShaderToy.mEffect.mGLContext;
+                );
 
             if (!storedShader) {
                 return;
@@ -1065,10 +1064,10 @@
 
             try {
                 gShaderToy.mEffect.mGLContext = null;
+                gShaderToy.mEffect.DestroyPass(0);
+
                 setTimeout(function() {
-                    dataLoadShader(JSON.parse('[' + storedShader + ']'));
-                    gShaderToy.mEffect.mGLContext = ctx;
-                    gShaderToy.startRendering();
+                    gShaderToy.Load(JSON.parse('[' + storedShader + ']')[0]);
                     window.localStorage.setItem(
                         LOCALSTORAGE_SHADER_FORK_KEYNAME,
                         ''
