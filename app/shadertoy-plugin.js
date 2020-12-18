@@ -669,14 +669,14 @@
                                     var text = reader.result;
 
                                     try {
-                                        dataLoadShader(
-                                            JSON.parse('[' + text + ']')
-                                        );
+                                        while(gShaderToy.mEffect.mPasses.length) {
+                                            gShaderToy.mEffect.DestroyPass(0);
+                                        }
+
+                                        gShaderToy.Load(JSON.parse(text, true));
                                     } catch (error) {
                                         window.alert('Failed to load shader!');
                                     }
-
-                                    gShaderToy.mInfo.id = '-1';
                                 };
 
                                 reader.readAsText(file);
@@ -1067,7 +1067,11 @@
                 gShaderToy.mEffect.DestroyPass(0);
 
                 setTimeout(function() {
-                    gShaderToy.Load(JSON.parse('[' + storedShader + ']')[0]);
+                    while(gShaderToy.mEffect.mPasses.length) {
+                         gShaderToy.mEffect.DestroyPass(0);
+                    }
+
+                    gShaderToy.Load(JSON.parse(storedShader), true);
                     window.localStorage.setItem(
                         LOCALSTORAGE_SHADER_FORK_KEYNAME,
                         ''
