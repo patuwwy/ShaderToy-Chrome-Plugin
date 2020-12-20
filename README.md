@@ -117,6 +117,10 @@ Please add issue with description before PR.
 
 ![](./screenshots/code-completion.png)
 
+##### BBCode buttons to make writing comments easier
+
+![](./screenshots/bbcode-buttons.png)
+
 ---
 
 ## Author / Contact:
