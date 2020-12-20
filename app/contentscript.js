@@ -25,6 +25,12 @@
          * @const {string}
          */
         CODEMIRROR_EXTENTION_FILENAME = 'add-ons/shadertoy-plugin-codemirror.js',
+         /**
+         * BBCode button extention filename.
+         *
+         * @const {string}
+         */
+        BBCODE_EXTENTION_FILENAME = 'add-ons/shadertoy-plugin-bbcode.js',
         COMMON_FILENAME = 'shadertoy-plugin-common.js',
         STATE_STORAGE_KEY = 'STE-state',
         state = {
@@ -159,6 +165,15 @@
             loadScript(CODEMIRROR_EXTENTION_FILENAME);
         }
     }
+    /**
+     * Loads codemirror extention on editing and new shader page
+     */
+    function initializeBBCode() {
+        if (document.location.href.match(/shadertoy.com\/(new|(view\/.{6}))/)) {
+            loadScript(BBCODE_EXTENTION_FILENAME);
+        }
+    }
+
 
     /**
      * Initializes extension.
@@ -172,6 +187,7 @@
 
         initializeProfilePage();
         initializeCodemirror();
+        initializeBBCode();
         initializeHomePage();
 
         bindMessagesListener();
