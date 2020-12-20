@@ -5,6 +5,7 @@
 // Started as a tapermonkey script, adapted to be part of
 // shadertoy extention.
 //
+
 (function shadertoyPluginBBCode() {
     // bootstrap icons
 
@@ -233,3 +234,94 @@ transform: translate(4px, calc(-100% - 4px));`;
         }
     })();
 })();
+
+
+function commentCodeHighlighting() {
+    commentsContents = document.querySelectorAll('#myComments .commentContent');
+
+    if (commentsContents.length) {
+        const code = [];
+        commentsContents.forEach(c => {
+            code.push(...c.getElementsByTagName('pre'))
+        });
+        code.forEach(codeElem => {
+            const copyButton = document.createElement('button');
+            copyButton.innerHTML = 'copy';
+            copyButton.type = 'button';
+            copyButton.className = 'copy-button';
+            copyButton.addEventListener("mouseout", () => {
+                copyButton.innerHTML = 'copy';
+            }, false);
+            copyButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                var tempInput = document.createElement("textarea");
+                tempInput.value = codeElem.innerText;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempInput);
+                copyButton.innerHTML = 'copied!';
+            });
+            const codeMirrorWrapper = document.createElement('div');
+            codeMirrorWrapper.style = `
+            display: grid;
+            position: relative;
+            margin-top: 3px;`;
+            codeElem.parentNode.insertBefore(codeMirrorWrapper, codeElem);
+            CodeMirror(codeMirrorWrapper,
+                {
+                    lineNumbers: false,
+                    indentWithTabs: false,
+                    tabSize: 4,
+                    indentUnit: 4,
+                    mode: "text/x-glsl",
+                    readOnly: true,
+                    value: codeElem.innerText.trim(),
+                })
+            codeElem.remove();
+            codeMirrorWrapper.appendChild(copyButton);
+
+        })
+        var css = `
+        .CodeMirror:not(:hover) + .copy-button {
+            display: none;
+        }
+        .copy-button {
+            background: transparent;
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            cursor: pointer;
+            z-index: 10;
+            border: 1px solid #808080;
+            color: #808080;
+            border-radius: 4px;
+            padding: 2px 7px;
+            font-size: inherit;
+        }
+        .copy-button:hover {
+            display: block !important;
+            color: black;
+            background: #808080;
+        }
+        .copy-button:focus {
+            outline: none;
+        }
+        
+        `;
+        var style = document.createElement('style');
+
+        if (style.styleSheet) {
+            style.styleSheet.cssText = css;
+        } else {
+            style.appendChild(document.createTextNode(css));
+        }
+
+        document.getElementsByTagName('head')[0].appendChild(style);
+
+    } else {
+        setTimeout(commentCodeHighlighting, 200);
+    }
+}
+commentCodeHighlighting();
+
