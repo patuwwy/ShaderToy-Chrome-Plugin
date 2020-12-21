@@ -12,7 +12,7 @@
     chrome.runtime.onInstalled.addListener(function(d) {
         if (d.reason === 'install') {
             chrome.tabs.create({
-                url: 'https://github.com/patuwwy/ShaderToy-Chrome-Plugin'
+                url: 'https://github.com/patuwwy/ShaderToy-Chrome-Plugin/blob/master/CHANGELOG.md'
             });
         }
     });
