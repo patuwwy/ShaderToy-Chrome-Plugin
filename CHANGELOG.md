@@ -1,4 +1,4 @@
-## ShaderToy extension changelog:
+## ShaderToy extension changelog (major changes only):
 
 -   0.13.215 (30-11-2020)
 
@@ -6,7 +6,7 @@
 
 -   0.13.201 (28-11-2020)
 
-    -   Temporary fix for resoultion decrease. (doesn't change resoltion when entering fullscreen)
+    -   Temporary fix for resoultion decrease. (doesn't change resolution when entering fullscreen)
 
 -   0.13.200
 
