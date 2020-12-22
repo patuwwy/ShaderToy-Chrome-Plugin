@@ -608,7 +608,7 @@
                 zip.file('readme.txt', readme, { binary: false });
                 zip.file(
                     id + '.json',
-                    JSON.stringify(gShaderToy.exportToJSON()),
+                    JSON.stringify(gShaderToy.Save()),
                     { binary: false }
                 );
 
