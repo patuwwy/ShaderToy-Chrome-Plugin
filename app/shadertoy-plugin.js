@@ -529,7 +529,7 @@
 
                     window.ToyPlug.common.downloadJson(
                         name + '.json',
-                        JSON.stringify(gShaderToy.exportToJSON())
+                        JSON.stringify(gShaderToy.Save())
                     );
                 }
             );
@@ -1135,7 +1135,7 @@
          * Stores shader in localStorage and redirect to "new shader" page.
          */
         onButtonClick() {
-            var shaderData = gShaderToy.exportToJSON(),
+            var shaderData = gShaderToy.Save(),
                 banner = this.createBanner(shaderData.info);
 
             shaderData.renderpass.forEach(function(pass) {
