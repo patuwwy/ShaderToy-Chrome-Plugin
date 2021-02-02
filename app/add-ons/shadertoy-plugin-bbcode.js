@@ -120,6 +120,10 @@ position: absolute;
 transform: translate(4px, calc(-100% - 4px));`;
         textArea = document.getElementById('commentTextArea');
 
+        if (!textArea) {
+            return;
+        }
+
         function createList(icon, elems) {
             const wrapper = document.createElement('button');
             wrapper.type = 'button';
@@ -307,7 +311,7 @@ function commentCodeHighlighting() {
         .copy-button:focus {
             outline: none;
         }
-        
+
         `;
         var style = document.createElement('style');
 
