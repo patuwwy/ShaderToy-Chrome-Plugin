@@ -1058,6 +1058,7 @@
                     LOCALSTORAGE_SHADER_FORK_KEYNAME
                 );
 
+            window.gIsMyShader = true;
             if (!storedShader) {
                 return;
             }
@@ -1071,11 +1072,13 @@
                          gShaderToy.mEffect.DestroyPass(0);
                     }
 
-                    gShaderToy.Load(JSON.parse(storedShader), true);
+                    window.iLoadShader([JSON.parse(storedShader)]);
+
                     window.localStorage.setItem(
                         LOCALSTORAGE_SHADER_FORK_KEYNAME,
                         ''
                     );
+
                     gShaderToy.mInfo.username = 'None';
                     gShaderToy.mInfo.id = '-1';
                     gShaderToy.mNeedsSave = true;
