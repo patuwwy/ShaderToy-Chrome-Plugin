@@ -169,8 +169,9 @@
                     var linkElement = tr.querySelector('td + td a'),
                         link = linkElement.getAttribute('href'),
                         status =
-                            tr.lastElementChild.previousElementSibling
+                            tr.lastElementChild.previousElementSibling.previousElementSibling
                                 .textContent;
+
                     return new ShaderTile(
                         {
                             id: link.replace('/view/', ''),
