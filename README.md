@@ -8,6 +8,9 @@
 
 [Microsoft Edge extension](https://microsoftedge.microsoft.com/addons/detail/mjcddpebilehgjibahdplabcocgpfmdb)
 
+# Privacy Policy
+
+Privacy policy is available [here](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/blob/master/PRIVACY-POLICY.md)
 ## Contribution:
 
 Please report bugs and request features [here](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues).
