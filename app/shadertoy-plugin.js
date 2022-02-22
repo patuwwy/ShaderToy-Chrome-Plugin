@@ -1058,10 +1058,11 @@
                     LOCALSTORAGE_SHADER_FORK_KEYNAME
                 );
 
-            window.gIsMyShader = true;
             if (!storedShader) {
                 return;
             }
+
+            window.gIsMyShader = true;
 
             try {
                 gShaderToy.mEffect.mGLContext = null;
@@ -1069,7 +1070,7 @@
 
                 setTimeout(function() {
                     while(gShaderToy.mEffect.mPasses.length) {
-                         gShaderToy.mEffect.DestroyPass(0);
+                        gShaderToy.mEffect.DestroyPass(0);
                     }
 
                     window.iLoadShader([JSON.parse(storedShader)]);

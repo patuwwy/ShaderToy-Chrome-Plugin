@@ -1,5 +1,9 @@
 ## ShaderToy extension changelog (major changes only):
 
+-   0.13.247 (22-02-2022)
+
+    -   Fix marking shader as owned.
+
 -   0.13.215 (30-11-2020)
 
     -   Add code completion and color picker extentions to code editor
