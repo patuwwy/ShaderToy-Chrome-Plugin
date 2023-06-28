@@ -803,6 +803,7 @@
                     value: gShaderToy.mPass[gShaderToy.mActiveDoc].mDocs.getValue(),
                     language: 'glsl',
                     theme: 'vs-dark',
+                    mouseWheelZoom: true,
                     // automaticLayout: true
                 });
 
