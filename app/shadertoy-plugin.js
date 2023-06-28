@@ -50,6 +50,7 @@
      * @contructor
      */
     class ToyPlug {
+        state = {};
         constructor() {
             if (!this.initialized) {
                 this.init();
@@ -113,6 +114,14 @@
          * Inits ToyPlug functionality.
          */
         init() {
+            this.state = JSON.parse(window.localStorage.getItem(STATE_STORAGE_KEY) || "{}");
+
+            if (!this.state) {
+                window.localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify({}));
+                this.state = {};
+            }
+
+            console.log(this.state)
             this.common = new ToyPlugCommon();
 
             if (this.isEditPage()) {
@@ -121,10 +130,8 @@
 
             this.setListener();
 
-            let state = JSON.parse(window.localStorage.getItem(STATE_STORAGE_KEY));
-
-            if (state && state.renderMode) {
-                this.setRenderMode(state.renderMode);
+            if (this.state && this.state.renderMode) {
+                this.setRenderMode(this.state.renderMode);
             }
         }
 
@@ -178,6 +185,9 @@
     class ToyPlugEditPage {
         constructor() {
             this.init();
+            let ok = false;
+
+            this.loadMonacoEditor();
         }
 
         /**
@@ -689,6 +699,195 @@
                     }
                 );
             }
+        }
+
+        loadMonacoEditor() {
+            this.state = JSON.parse(window.localStorage.getItem(STATE_STORAGE_KEY) || "{}");
+
+            var f_add_glsl_language_to_monaco_editor = function(monaco){
+                monaco.languages.register({ id: 'glsl' });
+
+                monaco.languages.setLanguageConfiguration('glsl', {
+                    wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\#\$\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/g,
+                    comments: {
+                        lineComment: '//',
+                        blockComment: ['/*', '*/']
+                    },
+                    brackets: [
+                        ['{', '}'],
+                        ['[', ']'],
+                        ['(', ')']
+                    ],
+                    autoClosingPairs: [
+                        { open: '[', close: ']' },
+                        { open: '{', close: '}' },
+                        { open: '(', close: ')' },
+                        { open: "'", close: "'", notIn: ['string', 'comment'] },
+                        { open: '"', close: '"', notIn: ['string'] }
+                    ]
+                });
+
+                monaco.languages.setMonarchTokensProvider('glsl', {
+                    defaultToken: '',
+                    tokenPostfix: '.glsl',
+                    types: [ 'bool', 'bvec2', 'bvec3', 'bvec4', 'float', 'int', 'ivec2', 'ivec3', 'ivec4', 'mat2', 'mat2x2', 'mat2x3', 'mat2x4', 'mat3', 'mat3x2', 'mat3x3', 'mat3x4', 'mat4', 'mat4x2', 'mat4x3', 'mat4x4', 'uint', 'uvec2', 'uvec3', 'uvec4', 'vec2', 'vec3', 'vec4', 'void' ],
+                    keywords: [ 'attribute', 'break', 'case', 'centroid', 'const', 'continue', 'default', 'discard', 'do', 'else', 'false', 'flat', 'for', 'highp', 'if', 'in', 'inout', 'invariant', 'isampler2D', 'isampler2DArray', 'isampler3D', 'isamplerCube', 'layout', 'lowp', 'mediump', 'out', 'precision', 'return', 'sampler2D', 'sampler2DArray', 'sampler2DArrayShadow', 'sampler2DShadow', 'sampler3D', 'samplerCube', 'samplerCubeShadow', 'smooth', 'struct', 'switch', 'true', 'uniform', 'usampler2D', 'usampler2DArray', 'usampler3D', 'usamplerCube', 'varying', 'while' ],
+                    functions: [ 'radians', 'degrees', 'sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'sinh', 'cosh', 'tanh', 'asinh', 'acosh', 'atanh', 'pow', 'exp', 'log', 'exp2', 'log2', 'sqrt', 'inversesqrt', 'abs', 'sign', 'floor', 'trunc', 'round', 'roundEven', 'ceil', 'fract', 'mod', 'modf', 'min', 'max', 'clamp', 'mix', 'step', 'smoothstep', 'isnan', 'isinf', 'floatBitsToInt', 'floatBitsToUint', 'intBitsToFloat', 'uintBitsToFloat', 'packSnorm2x16', 'unpackSnorm2x16', 'packUnorm2x16', 'unpackUnorm2x16', 'packHalf2x16', 'unpackHalf2x16', 'length', 'distance', 'dot', 'cross', 'normalize', 'faceforward', 'reflect', 'refract', 'matrixCompMult', 'outerProduct', 'transpose', 'determinant', 'inverse', 'lessThan', 'lessThanEqual', 'greaterThan', 'greaterThanEqual', 'equal', 'notEqual', 'any', 'all', 'not', 'textureSize', 'texture', 'texture2D', 'textureCube', 'texture2DProj', 'texture2DLodEXT', 'texture2DProjLodEXT', 'textureCubeLodEXT', 'texture2DGradEXT', 'texture2DProjGradEXT', 'textureCubeGradEXT', 'textureProj', 'textureLod', 'textureOffset', 'texelFetch', 'texelFetchOffset', 'textureProjOffset', 'textureLodOffset', 'textureProjLod', 'textureProjLodOffset', 'textureGrad', 'textureGradOffset', 'textureProjGrad', 'textureProjGradOffset', 'dFdx', 'dFdy', 'fwidth' ],
+                    operators: [ '++', '--', '+', '-', '~', '!', '*', '/', '%', '<<', '>>', '<', '>', '<=', '>=', '==', '!=', '&', '^', '|', '&&', '^^', '||', '?', ':', '=', '+=', '-=', '*=', '/=', '%=', '<<=', '>>=', '&=', '^=', '|=', ',' ],
+                    brackets: [
+                        { token: 'delimiter.curly', open: '{', close: '}' },
+                        { token: 'delimiter.parenthesis', open: '(', close: ')' },
+                        { token: 'delimiter.square', open: '[', close: ']' },
+                        { token: 'delimiter.angle', open: '<', close: '>' }
+                    ],
+                    symbols: /[=><!~?:&|+\-*\/\^%]+/,
+                    integersuffix: /[uU]?/,
+                    floatsuffix: /[fF]?/,
+                    func: /[a-zA-Z_0-9]+/,
+                    tokenizer: {
+                        root: [
+                            [/\d*\d+[eE]([\-+]?\d+)?(@floatsuffix)/, 'number.float'],
+                            [/\d*\.\d+([eE][\-+]?\d+)?(@floatsuffix)/, 'number.float'],
+                            [/0[xX][0-9a-fA-F']*[0-9a-fA-F](@integersuffix)/, 'number.hex'],
+                            [/([+-]?)\d+(@integersuffix)/, 'number.integer'],
+                            [/#(version|define|undef|ifdef|ifndef|else|elsif|endif)/, 'keyword.directive'],
+                            [/\$[a-zA-Z0-9]*/, 'regexp'],
+                            [/\s[A-Z_][A-Z_0-9]*/, 'constant'],
+                            [/gl_[a-zA-Z_0-9]+/, 'keyword.gl'],
+                            [
+                                /([a-zA-Z_][a-zA-Z_0-9]*)/,
+                                {
+                                    cases: {
+                                        '@types': { token: 'keyword.$0' },
+                                        '@keywords': { token: 'keyword.$0' },
+                                        '@functions': { token: 'keyword.builtins.$0' },
+                                        '@default': 'identifier'
+                                    }
+                                }
+                            ],
+                            [/(\d+(\.\d+))/, 'number.float'],
+                            [/\d+/, 'keyword'],
+                            [/\/\/.+/, 'comment'],
+                            [/\/\*.+?(\*\/)/, 'comment'],
+                            [/[{}()\[\]]/, '@brackets'],
+                            [
+                                /@symbols/,
+                                {
+                                    cases: {
+                                        '@operators': 'delimiter',
+                                        '@default': ''
+                                    }
+                                }
+                            ],
+                            [/[;,.]/, 'delimiter'],
+                        ],
+                    }
+                });
+            }
+            var o_script = document.createElement('script');
+
+            o_script.type = 'text/javascript';
+            o_script.src = 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.min.js';
+            document.head.appendChild(o_script);
+
+            var o_editor_monaco = null;
+
+            const registerEditorEvents = () => {
+                if (!gShaderToy.mPass[gShaderToy.mActiveDoc]) {
+                    setTimeout(registerEditorEvents, 100);
+                    return;
+                }
+
+                f_add_glsl_language_to_monaco_editor(monaco);
+                o_editor_monaco = monaco.editor.create(document.getElementById('editor'), {
+                    value: gShaderToy.mPass[gShaderToy.mActiveDoc].mDocs.getValue(),
+                    language: 'glsl',
+                    theme: 'vs-dark',
+                    // automaticLayout: true
+                });
+
+                window.onresize = function() {
+                    o_editor_monaco.layout();
+                };
+
+                o_editor_monaco.getModel().onDidChangeContent((event) => {
+                    //var s_code = o_editor_monaco.getModel().getValue();
+                    //gShaderToy.mPass[gShaderToy.mActiveDoc].mDocs.setValue(s_code);
+                    //document.querySelector("#compileButton").click();
+                });
+
+                document.querySelector(".monaco-editor").addEventListener("keydown", function (e) {
+                    if (e.key === 's' && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+                        e.preventDefault();
+                        // o_self.f_run_o_program();
+                        document.querySelector("#saveButton").click();
+                    }
+                    if (e.key === 'Enter' && (navigator.platform.match("Mac") ? e.metaKey : e.altKey)) {
+                        e.preventDefault();
+                        // o_self.f_run_o_program();
+                        var s_code = o_editor_monaco.getModel().getValue();
+                        gShaderToy.mPass[gShaderToy.mActiveDoc].mDocs.setValue(s_code);
+                        document.querySelector("#compileButton").click();
+                    }
+                }, false);
+
+                if (this.state.monaco === true) {
+                    this.f_display_editor('#editor .monaco-editor', true);
+                } else {
+                    this.f_display_editor('#editor .CodeMirror', false);
+                }
+            }
+
+            o_script.onload = function() {
+                require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs' }});
+                require(["vs/editor/editor.main"], registerEditorEvents);
+            }
+
+            var f_ChangePass_old = ShaderToy.prototype.ChangePass;
+
+            ShaderToy.prototype.ChangePass = function(n_id) {
+                f_ChangePass_old.call(this, n_id)
+
+                var s_code = gShaderToy.mPass[gShaderToy.mActiveDoc].mDocs.getValue();
+
+                o_editor_monaco && o_editor_monaco.getModel().setValue(s_code);
+            }
+
+            var s_html_editor_choice = `
+                <div id="editorManager" style="margin-bottom: 5px">
+                    <div id="tab0" onclick="ToyPlug.editPage.f_display_editor('#editor .CodeMirror', false)" class="tab"><label>Orginal Shadertoy Editor</label></div>
+                    <div id="tab1" onclick="ToyPlug.editPage.f_display_editor('#editor .monaco-editor', true)" class="tab"><label>VScode (Monaco) Editor</label></div>
+                </div>
+            `;
+
+            var o_div_html_editor_choice = document.createElement("div");
+
+            o_div_html_editor_choice.innerHTML = s_html_editor_choice;
+
+            document.querySelector(".block1").insertBefore(
+                o_div_html_editor_choice,
+                document.querySelector(".block1").firstChild,
+            );
+        }
+
+        f_display_editor(s_selector, monaco) {
+            Array.prototype.slice.apply(document.querySelectorAll('#editorManager .tab'))
+                .forEach(o => o.classList.remove("selected"));
+
+            document.querySelectorAll(`#editorManager > div`)[Number(monaco)].classList.add("selected");
+
+            [`#editor .CodeMirror`, '#editor .monaco-editor']
+                .forEach(sel => document.querySelector(sel).style.display = "none");
+
+            document.querySelector(s_selector).style.display = "block";
+            window.localStorage.setItem(
+                STATE_STORAGE_KEY, JSON.stringify(
+                    {
+                        ...JSON.parse(window.localStorage.getItem(STATE_STORAGE_KEY) || "{}"),
+                        monaco
+                    }
+                )
+            )
         }
     }
 
