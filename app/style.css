@@ -556,3 +556,20 @@ body div#header {
 .ste-rendering-meters .fastest {
     color: #0a0;
 }
+
+#editorManager {
+    display: flex;
+    justify-content: space-between;
+}
+
+#editorManager .tab {
+    float: none;
+    width: 50%;
+}
+#editorManager .tab.selected {
+    background: rgb(25, 103, 160);
+}
+
+#editorManager .tab:not(.selected), #editorManager .tab:not(.selected) label {
+    cursor: pointer;
+}

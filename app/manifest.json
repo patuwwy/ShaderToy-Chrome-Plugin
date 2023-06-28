@@ -1,18 +1,17 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "Shadertoy unofficial plugin.",
-    "version": "0.13.249",
+    "version": "0.14.250",
     "description": "Shadertoy.com unofficial plugin.",
     "homepage_url": "https://github.com/patuwwy/ShaderToy-Chrome-Plugin",
     "background": {
-        "scripts": ["background.js"],
-        "persistent": false
+        "service_worker": "background.js"
     },
-    "permissions": ["https://www.shadertoy.com/*"],
+    "host_permissions": ["https://www.shadertoy.com/*"],
     "icons": {
         "128": "assets/icon_active_128.png"
     },
-    "page_action": {
+    "action": {
         "default_title": "ShaderToy plugin",
         "default_icon": "assets/icon_active_128.png",
         "default_popup": "popup.html"
@@ -27,14 +26,19 @@
         }
     ],
     "web_accessible_resources": [
-        "popup.js",
-        "shadertoy-plugin.js",
-        "shadertoy-plugin-common.js",
-        "add-ons/shadertoy-plugin-codemirror.js",
-        "add-ons/shadertoy-plugin-bbcode.js",
-        "shadertoy-plugin-profile.js",
-        "shadertoy-plugin-home.js",
-        "scripts/jszip-3.1.5.js",
-        "scripts/node-sanitize-filename.js"
+        {
+            "resources": [
+                "popup.js",
+                "shadertoy-plugin.js",
+                "shadertoy-plugin-common.js",
+                "add-ons/shadertoy-plugin-codemirror.js",
+                "add-ons/shadertoy-plugin-bbcode.js",
+                "shadertoy-plugin-profile.js",
+                "shadertoy-plugin-home.js",
+                "scripts/jszip-3.1.5.js",
+                "scripts/node-sanitize-filename.js"
+            ],
+            "matches": ["https://www.shadertoy.com/*"]
+        }
     ]
 }
