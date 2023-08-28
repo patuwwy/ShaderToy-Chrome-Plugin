@@ -1,11 +1,13 @@
 (function() {
     'use strict';
 
-    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-        if (request.present) {
-            chrome.pageAction.show(sender.tab.id);
-        }
-        sendResponse({});
+    chrome.action.onClicked.addListener((tab) => {
+        chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            function: () => {
+                // code to be executed in the current tab
+            }
+        });
     });
 
     // Check whether new version is installed
