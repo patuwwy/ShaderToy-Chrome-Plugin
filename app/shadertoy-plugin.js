@@ -837,6 +837,8 @@
                 } else {
                     this.f_display_editor('#editor .CodeMirror', false);
                 }
+
+                this.setCompilationErrorsHandler(o_editor_monaco);
             }
 
             o_script.onload = function() {
@@ -847,7 +849,7 @@
             var f_ChangePass_old = ShaderToy.prototype.ChangePass;
 
             ShaderToy.prototype.ChangePass = function(n_id) {
-                f_ChangePass_old.call(this, n_id)
+                f_ChangePass_old.call(this, n_id);
 
                 var s_code = gShaderToy.mPass[gShaderToy.mActiveDoc].mDocs.getValue();
 
@@ -856,8 +858,8 @@
 
             var s_html_editor_choice = `
                 <div id="editorManager" style="margin-bottom: 5px">
-                    <div id="tab0" onclick="ToyPlug.editPage.f_display_editor('#editor .CodeMirror', false)" class="tab"><label>Orginal Shadertoy Editor</label></div>
-                    <div id="tab1" onclick="ToyPlug.editPage.f_display_editor('#editor .monaco-editor', true)" class="tab"><label>VScode (Monaco) Editor</label></div>
+                    <div onclick="ToyPlug.editPage.f_display_editor('#editor .CodeMirror', false)" class="tab"><label>Orginal Shadertoy Editor</label></div>
+                    <div onclick="ToyPlug.editPage.f_display_editor('#editor .monaco-editor', true)" class="tab"><label>VScode (Monaco) Editor</label></div>
                 </div>
             `;
 
@@ -889,6 +891,37 @@
                     }
                 )
             )
+        }
+
+        handleErrors(errors, isError, errorStr, fromScript, editor) {
+            console.log("SetModelMarkers");
+            console.dir(errors)
+            const monacoErrors = errors.map((shError) => ({
+                startLineNumber: shError.line.parent.lines.findIndex((p) => Array.isArray(p.widgets)) + 1,
+                startColumn: 0,
+                endLineNumber: shError.height,
+                endColumn: shError.line.text.length + 1,
+                message: errorStr,
+                severity: 8
+            }));
+            monaco.editor.setModelMarkers(editor.getModel(), "owner", monacoErrors);
+            console.dir(monacoErrors)
+        }
+
+        setCompilationErrorsHandler(editor) {
+            console.log("setCompilationErrorsHandler", editor)
+            const t = this;
+            const defaultHandler = ShaderToy.prototype.SetErrors;
+
+            ShaderToy.prototype.SetErrors = function(isError, errorStr, fromScript) {
+                defaultHandler.call(this, isError, errorStr, fromScript);
+
+                if (isError) {
+                    t.handleErrors(this.mErrors, isError, errorStr, fromScript, editor);
+                } else {
+                    monaco.editor.setModelMarkers(editor.getModel(), "owner", []);
+                }
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Shadertoy unofficial plugin.",
-    "version": "0.14.250",
+    "version": "0.14.252",
     "description": "Shadertoy.com unofficial plugin.",
     "homepage_url": "https://github.com/patuwwy/ShaderToy-Chrome-Plugin",
     "background": {
