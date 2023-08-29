@@ -804,6 +804,9 @@
                     language: 'glsl',
                     theme: 'vs-dark',
                     mouseWheelZoom: true,
+                    showUnused: true,
+                    smoothScrolling: true,
+                    "bracketPairColorization": true
                     // automaticLayout: true
                 });
 

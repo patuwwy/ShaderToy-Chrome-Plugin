@@ -573,3 +573,11 @@ body div#header {
 #editorManager .tab:not(.selected), #editorManager .tab:not(.selected) label {
     cursor: pointer;
 }
+
+.fullscreen-edit .container .block1 {
+    grid-row: span 2;
+    position: fixed;
+    z-index: 10;
+    right: 2em;
+    opacity: 0.7;
+}
