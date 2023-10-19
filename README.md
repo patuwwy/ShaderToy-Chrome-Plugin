@@ -2,11 +2,37 @@
 
 **WebExtension** for **Shadertoy** to make users coding more conveniently.
 
+# Installing:
+
+## Stores: 
+
 [Chrome extension](https://chrome.google.com/webstore/detail/shadertoy-unofficial-plug/ohicbclhdmkhoabobgppffepcopomhgl?hl=pl)
 
 [Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/shadertoy-unofficial-plugin/)
 
 [Microsoft Edge extension](https://microsoftedge.microsoft.com/addons/detail/mjcddpebilehgjibahdplabcocgpfmdb)
+
+## Manual installation
+
+Download latest **zip** from [Releases](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/releases)
+
+## Google Chrome
+1. Download the extension from the provided link and unzip it.
+2. Open Chrome and go to `chrome://extensions/`.
+3. In the top right corner, enable developer mode.
+4. Drag and drop downloaded file.
+
+## Mozilla Firefox
+1. Download the extension from the provided link and unzip it.
+2. Open Firefox and go to `about:debugging`.
+3. Click `This Firefox`.
+4. Click `Load Temporary Add-on…` and select the manifest.json file in the folder with the unpacked extension.
+
+## Microsoft Edge
+1. Download the extension from the provided link and unzip it.
+2. Open Edge and go to `edge://extensions/`.
+3. In the top right corner, enable developer mode.
+4. Click `Load unpacked` and select the folder with the unpacked extension.
 
 # Privacy Policy
 
