@@ -24,7 +24,7 @@ jobs:
 
     - name: Zip subdirectory
       run: >
-        cd ${{ env.SOURCE_SUBDIRECTORY }}/* &&
+        cd ${{ env.SOURCE_SUBDIRECTORY }} &&
         zip -r ${{ env.RELEASE_ZIP_FILENAME }}-${{ steps.version.outputs.version }}.zip ./
 
     - name: Create Release
