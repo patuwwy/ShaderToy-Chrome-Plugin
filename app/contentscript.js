@@ -156,7 +156,7 @@
             loadScript(HOME_EXTENSION_FILENAME);
         }
     }
-    
+
     /**
      * Loads codemirror extention on editing and new shader page
      */
@@ -164,6 +164,7 @@
         if (document.location.href.match(/shadertoy.com\/(new|(view\/.{6}))/)) {
             loadScript(CODEMIRROR_EXTENTION_FILENAME);
         }
+
     }
     /**
      * Loads codemirror extention on editing and new shader page
@@ -180,6 +181,7 @@
      */
     function init() {
         loadScript(MAIN_EXTENSION_FILENAME);
+
         loadScript('scripts/node-sanitize-filename.js');
         loadScript('scripts/jszip-3.1.5.js');
 

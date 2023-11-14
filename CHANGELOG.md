@@ -8,6 +8,19 @@
 
     - Monaco code editor added (see [Issue #](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/164))
 
+-   0.14.257
+
+    - Temporary remove monaco editor
+
+-   0.14.254 (28-08-2023)
+
+    - Compilation errors in Monaco Editor
+    - Zoomable Monaco Editor
+
+-   0.14.250 (28-06-2023)
+
+    - Monaco code editor added (see [Issue #](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/164))
+
 -   0.13.247 (22-02-2022)
 
     -   Fix marking shader as owned.
