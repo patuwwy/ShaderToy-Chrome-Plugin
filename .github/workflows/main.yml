@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      SOURCE_SUBDIRECTORY: app
+      RELEASE_ZIP_FILENAME: shadertoy-unofficial-plugin
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install zip and jq
+      run: sudo apt-get install zip jq
+
+    - name: Get version from manifest.json
+      id: version
+      run: echo "::set-output name=version::$(jq -r .version manifest.json)"
+
+    - name: Zip subdirectory
+      run: zip -r $RELEASE_ZIP_FILENAME-${{ steps.version.outputs.version }}.zip ./$SOURCE_SUBDIRECTORY/
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./$RELEASE_ZIP_FILENAME-${{ steps.version.outputs.version }}.zip
+        asset_name: $RELEASE_ZIP_FILENAME-${{ steps.version.outputs.version }}.zip
+        asset_content_type: application/zip
