@@ -6,7 +6,7 @@ on:
       - '*'
 
 jobs:
-  build:
+  zip-release:
     runs-on: ubuntu-latest
     env:
       SOURCE_SUBDIRECTORY: app
@@ -20,7 +20,7 @@ jobs:
 
     - name: Get version from manifest.json
       id: version
-      run: echo "::set-output name=version::$(jq -r .version manifest.json)"
+      run: echo "::set-output name=version::$(jq -r .version app/manifest.json)"
 
     - name: Zip subdirectory
       run: zip -r $RELEASE_ZIP_FILENAME-${{ steps.version.outputs.version }}.zip ./$SOURCE_SUBDIRECTORY/
