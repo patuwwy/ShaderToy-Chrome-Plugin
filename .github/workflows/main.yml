@@ -23,7 +23,7 @@ jobs:
       run: echo "::set-output name=version::$(jq -r .version app/manifest.json)"
 
     - name: Zip subdirectory
-      run: zip -r ${{ env.RELEASE_ZIP_FILENAME }}-${{ steps.version.outputs.version }}.zip ./${{ env.SOURCE_SUBDIRECTORY }}/
+      run: zip -r ${{ env.RELEASE_ZIP_FILENAME }}-${{ steps.version.outputs.version }}.zip ./${{ env.SOURCE_SUBDIRECTORY }}/*
 
     - name: Create Release
       id: create_release
