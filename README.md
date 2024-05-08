@@ -171,7 +171,7 @@ Render timing based on [shadertoy_gpu_timing.user.js](https://github.com/andrei-
 If you find this extension useful, I'd love to hug a beer [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VDFNBT9N3ANHW&source=url). :beer:
 
 ```
-int totalBeers = 2;
+int totalBeers = 3;
 ```
 
 ## Changelog:
