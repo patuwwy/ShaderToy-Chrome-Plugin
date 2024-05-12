@@ -25,12 +25,19 @@
          * @const {string}
          */
         CODEMIRROR_EXTENTION_FILENAME = 'add-ons/shadertoy-plugin-codemirror.js',
-         /**
+        /**
          * BBCode button extention filename.
          *
          * @const {string}
          */
         BBCODE_EXTENTION_FILENAME = 'add-ons/shadertoy-plugin-bbcode.js',
+        /**
+         * Parameters extention filename.
+         *
+         * @const {string}
+         */
+        PARAMETERS_EXTENTION_FILENAME = 'add-ons/shadertoy-plugin-parameters.js',
+
         COMMON_FILENAME = 'shadertoy-plugin-common.js',
         STATE_STORAGE_KEY = 'STE-state',
         state = {
@@ -174,6 +181,14 @@
             loadScript(BBCODE_EXTENTION_FILENAME);
         }
     }
+    /**
+     * Loads parameters extention
+     */
+    function initializeParameters() {
+        if (document.location.href.match(/shadertoy.com\/(new|(view\/.{6}))/)) {
+            loadScript(PARAMETERS_EXTENTION_FILENAME);
+        }
+    }
 
 
     /**
@@ -187,6 +202,7 @@
 
         loadScript(COMMON_FILENAME);
 
+        initializeParameters();
         initializeProfilePage();
         initializeCodemirror();
         initializeBBCode();
