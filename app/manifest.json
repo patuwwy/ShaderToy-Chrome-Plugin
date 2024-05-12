@@ -32,6 +32,7 @@
                 "shadertoy-plugin.js",
                 "shadertoy-plugin-common.js",
                 "add-ons/shadertoy-plugin-codemirror.js",
+                "add-ons/shadertoy-plugin-parameters.js",
                 "add-ons/shadertoy-plugin-bbcode.js",
                 "shadertoy-plugin-profile.js",
                 "shadertoy-plugin-home.js",
