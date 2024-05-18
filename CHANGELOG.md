@@ -1,25 +1,30 @@
 ## ShaderToy extension changelog (major changes only):
+
+-   0.14.260 (18-05-2024)
+
+    -   Custom params (by [Dakotys](https://github.com/Dakotys)) [see docs](./docs/custom-params.md)
+
 -   0.14.254 (28-08-2023)
 
-    - Compilation errors in Monaco Editor
-    - Zoomable Monaco Editor
+    -   Compilation errors in Monaco Editor
+    -   Zoomable Monaco Editor
 
 -   0.14.250 (28-06-2023)
 
-    - Monaco code editor added (see [Issue #](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/164))
+    -   Monaco code editor added (see [Issue #](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/164))
 
 -   0.14.257
 
-    - Temporary remove monaco editor
+    -   Temporary remove monaco editor
 
 -   0.14.254 (28-08-2023)
 
-    - Compilation errors in Monaco Editor
-    - Zoomable Monaco Editor
+    -   Compilation errors in Monaco Editor
+    -   Zoomable Monaco Editor
 
 -   0.14.250 (28-06-2023)
 
-    - Monaco code editor added (see [Issue #](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/164))
+    -   Monaco code editor added (see [Issue #](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/164))
 
 -   0.13.247 (22-02-2022)
 
