@@ -4,7 +4,7 @@
 
 # Installing:
 
-## Stores: 
+## Stores:
 
 [Chrome extension](https://chrome.google.com/webstore/detail/shadertoy-unofficial-plug/ohicbclhdmkhoabobgppffepcopomhgl?hl=pl)
 
@@ -17,18 +17,21 @@
 Download latest **zip** from [Releases](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/releases)
 
 ## Google Chrome
+
 1. Download the extension from the provided link and unzip it.
 2. Open Chrome and go to `chrome://extensions/`.
 3. In the top right corner, enable developer mode.
 4. Drag and drop downloaded file.
 
 ## Mozilla Firefox
+
 1. Download the extension from the provided link and unzip it.
 2. Open Firefox and go to `about:debugging`.
 3. Click `This Firefox`.
 4. Click `Load Temporary Add-on…` and select the manifest.json file in the folder with the unpacked extension.
 
 ## Microsoft Edge
+
 1. Download the extension from the provided link and unzip it.
 2. Open Edge and go to `edge://extensions/`.
 3. In the top right corner, enable developer mode.
@@ -37,6 +40,7 @@ Download latest **zip** from [Releases](https://github.com/patuwwy/ShaderToy-Chr
 # Privacy Policy
 
 Privacy policy is available [here](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/blob/master/PRIVACY-POLICY.md)
+
 ## Contribution:
 
 Please report bugs and request features [here](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues).
@@ -44,6 +48,9 @@ Please report bugs and request features [here](https://github.com/patuwwy/Shader
 Please add issue with description before PR.
 
 ## Features:
+
+-   **Custom parameters** -
+    [See documentation](./docs/custom-params.md)
 
 -   **Fork** any shader.
 
