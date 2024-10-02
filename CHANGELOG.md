@@ -1,4 +1,7 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.14.266 (02-10-2024)
+
+    -   Resoulution can be multiplied (alt + shift + 1...9)
 
 -   0.14.260 (18-05-2024)
 

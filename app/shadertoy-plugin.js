@@ -242,7 +242,7 @@
             this.performanceIndicators = new RenderMeters();
 
             window.addEventListener("resize", () => {
-                this.decreaseRes(this.currentDivider);
+                this.multiplyRes(this.currentDivider);
             })
         }
 
@@ -311,13 +311,13 @@
          * Changes Shader resolution.
          * Resolution calculation is based on divider.
          *
-         * @param {number} divider
+         * @param {number} multiplier
          */
-        decreaseRes(divider) {
+        multiplyRes(multiplier) {
             var b = this.c.getBoundingClientRect(),
                 n = {
-                    w: Math.floor(b.width / divider),
-                    h: Math.floor(b.height / divider)
+                    w: Math.floor(b.width * multiplier),
+                    h: Math.floor(b.height * multiplier)
                 };
 
             var mE = gShaderToy.mEffect;
@@ -336,7 +336,7 @@
             mE.ResizeBuffers(xres, yres);
 
             gShaderToy.iSetResolution(xres, yres);
-            this.currentDivider = divider;
+            this.currentDivider = multiplier;
         }
 
         /**
@@ -381,7 +381,11 @@
                     if (e.altKey || e.metaKey) {
                         // 1...9 Keys
                         if (which === Math.max(49, Math.min(57, which))) {
-                            self.decreaseRes(which - 48);
+                            if (!e.shiftKey) {
+                                self.multiplyRes(1 / (which - 48))
+                            } else {
+                                self.multiplyRes(which - 48);
+                            }
                         }
                         if (e.key === 'ArrowUp') {
                             gShaderToy.pauseTime();
@@ -429,7 +433,7 @@
             document.body.classList[isFS ? 'remove' : 'add'](
                 this.FULLSCREEN_MODE_CLASS
             );
-            this.decreaseRes(this.currentDivider);
+            this.multiplyRes(this.currentDivider);
         }
 
         setRenderMode(mode) {
@@ -445,7 +449,7 @@
                 gShaderToy.pauseTime();
             }
 
-            this.decreaseRes(currentDivider * 0.25);
+            this.multiplyRes(currentDivider * 0.25);
 
             window.setTimeout(function getImageData() {
                 imageData = gShaderToy.mEffect.mGLContext.canvas.toDataURL('image/png');
