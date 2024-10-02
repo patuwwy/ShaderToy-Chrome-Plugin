@@ -13,10 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Dependencies
+      - name: Cleanup
         run: |
-          sudo apt-get update
-          sudo apt-get -y install zip ca-certificates jq
+          rm output -rf
 
       - name: Zip the extension
         run: |
