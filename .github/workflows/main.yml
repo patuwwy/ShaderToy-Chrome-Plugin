@@ -1,4 +1,4 @@
-name: Release
+name: CI/CD for Chrome Extension
 
 on:
   push:
@@ -6,46 +6,69 @@ on:
       - 'v*'
 
 jobs:
-  zip-release:
-    runs-on: ubuntu-latest
-    env:
-      SOURCE_SUBDIRECTORY: app
-      RELEASE_ZIP_FILENAME: shadertoy-unofficial-plugin
+  build:
+    runs-on: self-hosted
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Install zip and jq
-      run: sudo apt-get install zip jq
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install zip ca-certificates jq
 
-    - name: Get version from manifest.json
-      id: version
-      run: echo "::set-output name=version::$(jq -r .version app/manifest.json)"
+      - name: Zip the extension
+        run: |
+          mkdir output
+          VERSION=$(jq -r '.version' ./app/manifest.json)
+          zip -r ./output/ShaderToy-Chrome-Plugin-$VERSION.zip ./app
+          echo $VERSION >> ./output/version.txt
 
-    - name: Zip subdirectory
-      run: >
-        cd ${{ env.SOURCE_SUBDIRECTORY }} &&
-        zip -r ../${{ env.RELEASE_ZIP_FILENAME }}-${{ steps.version.outputs.version }}.zip ./ &&
-        cd ..
+      - name: Upload output as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: output
+          path: output/
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
+  publish:
+    runs-on: self-hosted
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Download output artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: output
 
-    - name: Upload Release Asset
-      id: upload-release-asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ env.RELEASE_ZIP_FILENAME }}-${{ steps.version.outputs.version }}.zip
-        asset_name: ${{ env.RELEASE_ZIP_FILENAME }}-${{ steps.version.outputs.version }}.zip
-        asset_content_type: application/zip
+      - name: Install Dependencies for Publishing
+        run: |
+          npm install -g chrome-webstore-upload-cli
+
+      - name: Upload & Publish Extension to Chrome Store
+        run: |
+          VERSION=$(cat ./output/version.txt)
+          chrome-webstore-upload upload \\
+            --source ./output/ShaderToy-Chrome-Plugin-$VERSION.zip \\
+            --extension-id $APP_ID \\
+            --client-id $CLIENT_ID \\
+            --client-secret $CLIENT_SECRET \\
+            --refresh-token $REFRESH_TOKEN
+
+  release:
+    runs-on: self-hosted
+    needs: build
+    steps:
+      - name: Download output artifact for release
+        uses: actions/download-artifact@v2
+        with:
+          name: output
+
+      - name: Install GitHub CLI
+        run: sudo apt-get install gh -y
+
+      - name: Publish Release on GitHub
+        env:
+          GITHUB_TOKEN: $GITHUB_TOKEN
+        run: |
+          VERSION=$(cat ./output/version.txt)
+          gh release create $VERSION ./output/ShaderToy-Chrome-Plugin-$VERSION.zip --title "$VERSION" --notes "Release of version $VERSION"
