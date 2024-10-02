@@ -1,6 +1,6 @@
 # ShaderToy unofficial plugin.
 
-**WebExtension** for **Shadertoy** to make users coding more conveniently.
+ShaderToy unofficial plugin is a web extension designed to enhance the coding experience for users of Shadertoy.
 
 # Installing:
 
