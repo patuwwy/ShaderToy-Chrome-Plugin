@@ -59,7 +59,7 @@ jobs:
     needs: build
     steps:
       - name: Download output artifact for release
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: output
 
