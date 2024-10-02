@@ -3,7 +3,8 @@ name: CI/CD for Chrome Extension
 on:
   push:
     tags:
-      - 'v*'
+      - '*'
+  workflow_dispatch:
 
 jobs:
   build:
