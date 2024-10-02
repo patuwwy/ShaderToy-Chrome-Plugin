@@ -63,9 +63,6 @@ jobs:
         with:
           name: output
 
-      - name: Install GitHub CLI
-        run: sudo apt-get install gh -y
-
       - name: Publish Release on GitHub
         env:
           GITHUB_TOKEN: $GITHUB_TOKEN
