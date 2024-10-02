@@ -24,3 +24,9 @@ common tab:
 :+1: Base64 encoded URL is allowed
 
 :-1: Gifs are not animated
+
+
+## How to use
+
+![](../screenshots/params1.png)
+![](../screenshots/params2.png)
