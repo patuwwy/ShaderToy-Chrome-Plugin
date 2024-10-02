@@ -240,6 +240,10 @@
 
             this.anchorsMaker = new AnchorsMaker();
             this.performanceIndicators = new RenderMeters();
+
+            window.addEventListener("resize", () => {
+                this.decreaseRes(this.currentDivider);
+            })
         }
 
         /**
