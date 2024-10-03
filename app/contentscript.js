@@ -196,6 +196,16 @@
      */
     function init() {
         loadScript(MAIN_EXTENSION_FILENAME);
+        setTimeout(() => {
+            window.postMessage({
+                type: "MonacoAssetsData", cfg: {
+                    monacoLoader: chrome.runtime.getURL('add-ons/monaco/loader.min.js'),
+                    monacoEditor: chrome.runtime.getURL('add-ons/monaco/min/vs/editor.main.js'),
+                    monacoEditorVSPath: chrome.runtime.getURL('add-ons/monaco/min/vs/editor.min.css').replace("/editor.min.css", "")
+                }
+            });
+            console.log("post message sent")
+        }, 1000);
 
         loadScript('scripts/node-sanitize-filename.js');
         loadScript('scripts/jszip-3.1.5.js');

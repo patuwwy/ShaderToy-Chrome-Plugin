@@ -66,6 +66,4 @@ jobs:
       - name: Publish Release on GitHub
         run: |
           VERSION=$(cat ./output/version.txt)
-          echo "GITHUB_TOKEN"
-          echo $GITHUB_TOKEN
           gh release create $VERSION ./output/ShaderToy-Chrome-Plugin-$VERSION.zip --title "$VERSION" --notes "Release of version $VERSION"

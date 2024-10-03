@@ -186,8 +186,15 @@
         constructor() {
             this.init();
             let ok = false;
+            console.log("waiting for message");
+            const monacoAssetsListener = (event) => {
+                if (event.source !== window) return;
+                if (event.data.type && event.data.type === "MonacoAssetsData") {
+                    this.loadMonacoEditor(event.data.cfg);
+                }
+            }
 
-            this.loadMonacoEditor();
+            window.addEventListener("message", monacoAssetsListener);
         }
 
         /**
@@ -709,7 +716,7 @@
             }
         }
 
-        loadMonacoEditor() {
+        loadMonacoEditor(monacoAssetsData) {
             this.state = JSON.parse(window.localStorage.getItem(STATE_STORAGE_KEY) || "{}");
 
             var f_add_glsl_language_to_monaco_editor = function(monaco){
@@ -795,7 +802,8 @@
             var o_script = document.createElement('script');
 
             o_script.type = 'text/javascript';
-            o_script.src = 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs/loader.min.js';
+            o_script.src = monacoAssetsData.monacoLoader;
+
             document.head.appendChild(o_script);
 
             var o_editor_monaco = null;
@@ -853,7 +861,7 @@
             }
 
             o_script.onload = function() {
-                require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.26.1/min/vs' }});
+                require.config({ paths: { 'vs': monacoAssetsData.monacoEditorVSPath }});
                 require(["vs/editor/editor.main"], registerEditorEvents);
             }
 

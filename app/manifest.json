@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Shadertoy unofficial plugin.",
-    "version": "0.14.268",
+    "version": "0.14.270",
     "description": "Shadertoy.com unofficial plugin.",
     "homepage_url": "https://github.com/patuwwy/ShaderToy-Chrome-Plugin",
     "background": {
@@ -34,6 +34,10 @@
                 "add-ons/shadertoy-plugin-codemirror.js",
                 "add-ons/shadertoy-plugin-parameters.js",
                 "add-ons/shadertoy-plugin-bbcode.js",
+                "add-ons/monaco/loader.min.js",
+                "add-ons/monaco/min/vs/editor/editor.main.js",
+                "add-ons/monaco/min/vs/editor/editor.main.css",
+                "add-ons/monaco/min/vs/base/worker/workerMain.js",
                 "shadertoy-plugin-profile.js",
                 "shadertoy-plugin-home.js",
                 "scripts/jszip-3.1.5.js",
