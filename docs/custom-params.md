@@ -25,8 +25,24 @@ common tab:
 
 :-1: Gifs are not animated
 
-
-## How to use
-
 ![](../screenshots/params1.png)
 ![](../screenshots/params2.png)
+
+## Canvas
+
+### Size
+
+```
+/* shadertoy-plugin parameters
+{
+    "canvas": {
+        "width": 800,
+        "height": 800
+    }
+}
+*/
+```
+
+
+
+
