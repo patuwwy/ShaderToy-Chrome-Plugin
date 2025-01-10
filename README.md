@@ -173,13 +173,9 @@ Please add issue with description before PR.
 
 Render timing based on [shadertoy_gpu_timing.user.js](https://github.com/andrei-drexler/shadertoy-userscripts/blob/master/shadertoy_gpu_timing.user.js) by [Andrei Drexler](https://github.com/andrei-drexler)
 
-## Beer? Sure.
+## Beer? Sure!
 
-If you find this extension useful, I'd love to hug a beer [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VDFNBT9N3ANHW&source=url). :beer:
-
-```
-int totalBeers = 3;
-```
+If you find this extension useful, I'd love to hug :beer: via [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VDFNBT9N3ANHW&source=url)
 
 ## Changelog:
 

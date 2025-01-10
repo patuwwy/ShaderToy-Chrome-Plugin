@@ -1,4 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.14.272 (11-01-2025)
+
+    -   Canvas size can be set with custom parameters object in common tab. [See documentation](./docs/custom-params.md)
+
 -   0.14.266 (02-10-2024)
 
     -   Resoulution can be multiplied (alt + shift + 1...9)
