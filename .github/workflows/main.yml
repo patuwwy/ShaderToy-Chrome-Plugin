@@ -21,7 +21,7 @@ jobs:
         run: |
           mkdir output
           VERSION=$(jq -r '.version' ./app/manifest.json)
-          zip -r ./output/ShaderToy-Chrome-Plugin-$VERSION.zip ./app
+          zip -r ./output/ShaderToy-Chrome-Plugin.zip ./app
           echo $VERSION >> ./output/version.txt
 
       - name: Upload output as artifact
@@ -34,24 +34,20 @@ jobs:
     runs-on: self-hosted
     needs: build
     steps:
-      - name: Download output artifact
+      - name: Download output artifact for publishing
         uses: actions/download-artifact@v4
         with:
           name: output
 
-      - name: Install Dependencies for Publishing
-        run: |
-          npm install -g chrome-webstore-upload-cli
-
-      - name: Upload & Publish Extension to Chrome Store
-        run: |
-          VERSION=$(cat ./output/version.txt)
-          chrome-webstore-upload upload \\
-            --source ./output/ShaderToy-Chrome-Plugin-$VERSION.zip \\
-            --extension-id $APP_ID \\
-            --client-id $CLIENT_ID \\
-            --client-secret $CLIENT_SECRET \\
-            --refresh-token $REFRESH_TOKEN
+      - name: Upload to Chrome Web Store
+        uses: mnao305/chrome-extension-upload@v5.0.0
+        with:
+          file-path: ./output/ShaderToy-Chrome-Plugin.zip
+          extension-id: $APP_ID
+          client-id: $CLIENT_ID
+          client-secret: $CLIENT_SECRET
+          refresh-token: $REFRESH_TOKEN
+          publish: true
 
   release:
     runs-on: self-hosted
