@@ -53,6 +53,44 @@
 				});
 			});
 		}
+
+		if (params.canvas) {
+			const canvas = document.getElementById("demogl");
+			canvas.style.margin = "auto";
+
+			const xres = params.canvas.width;
+			const yres = params.canvas.height;
+
+			if (!Number.isInteger(xres) || !Number.isInteger(yres)) {
+				return;
+			}
+
+			const mE = gShaderToy.mEffect;
+
+			mE.mCanvas.setAttribute('width', xres);
+			mE.mCanvas.setAttribute('height', yres);
+
+			mE.mCanvas.width = xres;
+			mE.mCanvas.height = yres;
+
+			mE.mXres = xres;
+			mE.mYres = yres;
+
+            mE.ResizeBuffers(xres, yres);
+
+			gShaderToy.iSetResolution(xres, yres);
+
+			canvas.style.aspectRatio = `${xres}/${yres}`;
+
+			if (xres <= canvas.clientWidth) {
+				canvas.style.width = `${xres}px`;
+			} else {
+				canvas.style.width = "100%";
+			}
+
+			console.log(canvas.clientWidth, canvas.clientHeight);
+			window.dispatchEvent(new Event("resize"));
+		}
 	}
 
 	// Evaluate parameters on load
