@@ -15,16 +15,36 @@ jobs:
 
       - name: Cleanup
         run: |
-          rm output -rf
+          rm -rf output
 
-      - name: Zip the extension
+      - name: Prepare output directory
         run: |
-          mkdir output
-          VERSION=$(jq -r '.version' ./app/manifest.json)
-          zip -r ./output/ShaderToy-Chrome-Plugin-$VERSION.zip ./app
-          echo $VERSION >> ./output/version.txt
+          mkdir -p output
+          mkdir -p output/chrome
+          mkdir -p output/firefox
+          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
+          echo $VERSION
 
-      - name: Upload output as artifact
+      - name: Zip the Chrome extension
+        run: |
+          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
+          cp ./app/* ./output/chrome -r
+          cp ./manifests/manifest-chrome.json ./output/chrome/manifest.json
+          jq --arg version "$VERSION" '.version = $version' ./output/chrome/manifest.json > ./output/chrome/manifest.json.tmp && mv ./output/chrome/manifest.json.tmp ./output/chrome/manifest.json
+          zip -r ./output/ShaderToy-Chrome-Plugin-$VERSION.zip ./output/chrome
+
+      - name: Zip the Firefox extension
+        env:
+          FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXT_ID }}
+        run: |
+          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
+          cp ./app/* ./output/firefox -r
+          cp ./manifests/manifest-firefox.json ./output/firefox/manifest.json
+          jq --arg id "$FIREFOX_EXTENSION_ID" '.browser_specific_settings.gecko.id = $id' ./output/firefox/manifest.json > ./output/firefox/manifest.json.tmp && mv ./output/firefox/manifest.json.tmp ./output/firefox/manifest.json
+          jq --arg version "$VERSION" '.version = $version' ./output/firefox/manifest.json > ./output/firefox/manifest.json.tmp && mv ./output/firefox/manifest.json.tmp ./output/firefox/manifest.json
+          zip -r ./output/ShaderToy-Firefox-Plugin-$VERSION.zip ./output/firefox
+
+      - name: Upload output as artifacts
         uses: actions/upload-artifact@v4
         with:
           name: output
@@ -41,17 +61,25 @@ jobs:
 
       - name: Install Dependencies for Publishing
         run: |
-          npm install -g chrome-webstore-upload-cli
+          npm install --save-dev publish-browser-extension
 
       - name: Upload & Publish Extension to Chrome Store
+        env:
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CHROME_PUBLISH_TARGET: trustedTesters
+          CHROME_SKIP_SUBMIT_REVIEW: true
+          FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXT_ID }}
+          FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
+          FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
+
         run: |
-          VERSION=$(cat ./output/version.txt)
-          chrome-webstore-upload upload \\
-            --source ./output/ShaderToy-Chrome-Plugin-$VERSION.zip \\
-            --extension-id $APP_ID \\
-            --client-id $CLIENT_ID \\
-            --client-secret $CLIENT_SECRET \\
-            --refresh-token $REFRESH_TOKEN
+          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
+          npx publish-extension \
+            --chrome-zip ./output/ShaderToy-Chrome-Plugin-$VERSION.zip \
+            --firefox-zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip
 
   release:
     runs-on: self-hosted
@@ -64,5 +92,6 @@ jobs:
 
       - name: Publish Release on GitHub
         run: |
-          VERSION=$(cat ./output/version.txt)
-          gh release create $VERSION ./output/ShaderToy-Chrome-Plugin-$VERSION.zip --title "$VERSION" --notes "Release of version $VERSION"
+          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
+          gh release create $VERSION ./output/ShaderToy-Chrome-Plugin-$VERSION.zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip --title "$VERSION" --notes "Release of version $VERSION (Chrome)"
+
