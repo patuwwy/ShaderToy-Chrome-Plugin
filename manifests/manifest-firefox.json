@@ -1,0 +1,57 @@
+{
+    "manifest_version": 3,
+    "name": "Shadertoy unofficial plugin.",
+    "version": "",
+    "description": "Shadertoy.com unofficial plugin.",
+    "homepage_url": "https://github.com/patuwwy/ShaderToy-Chrome-Plugin",
+    "browser_specific_settings": {
+        "gecko": {
+            "id": ""
+        }
+    },
+    "background": {
+        "scripts": [
+            "background.js"
+        ]
+    },
+    "host_permissions": ["https://www.shadertoy.com/*"],
+    "icons": {
+        "128": "assets/icon_active_128.png"
+    },
+    "action": {
+        "default_title": "ShaderToy plugin",
+        "default_icon": "assets/icon_active_128.png",
+        "default_popup": "popup.html"
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://www.shadertoy.com/*"],
+            "exclude_matches": ["https://www.shadertoy.com/signin"],
+            "js": ["contentscript.js"],
+            "css": ["style.css"],
+            "run_at": "document_end"
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "popup.js",
+                "shadertoy-plugin.js",
+                "shadertoy-plugin-common.js",
+                "add-ons/shadertoy-plugin-codemirror.js",
+                "add-ons/shadertoy-plugin-parameters.js",
+                "add-ons/shadertoy-plugin-bbcode.js",
+                "add-ons/monaco/loader.min.js",
+                "add-ons/monaco/min/vs/editor/editor.main.js",
+                "add-ons/monaco/min/vs/editor/editor.main.css",
+                "add-ons/monaco/min/vs/base/worker/workerMain.js",
+                "shadertoy-plugin-profile.js",
+                "shadertoy-plugin-home.js",
+                "scripts/jszip-3.1.5.js",
+                "scripts/node-sanitize-filename.js"
+            ],
+            "matches": ["https://www.shadertoy.com/*"]
+        }
+    ]
+
+}
