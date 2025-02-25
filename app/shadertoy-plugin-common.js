@@ -354,7 +354,7 @@
         }
 
         createComponent() {
-            let targetEL = document.querySelector('#headerBlock2 > a:nth-child(3)');
+            let targetEL = document.querySelector('.headerLinks[href="/new"]');
             let selectList = document.querySelector('#headerBlock2 > .select-list');
 
             this.loadTemplates();
