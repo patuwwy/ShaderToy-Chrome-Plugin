@@ -635,7 +635,7 @@ body div#header {
     position: relative;
     width: 80%;
     max-width: 800px;
-    max-height: 80vh;
+    height: 80vh;
     margin: 10vh auto;
     background: #191818;
     border-radius: 8px;
@@ -645,6 +645,11 @@ body div#header {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
+    overflow: scroll;
+}
+
+.code-editor-container .CodeMirror  {
+    height: 100%;
 }
 
 .code-editor-modal.active .modal-overlay {
@@ -713,7 +718,7 @@ body div#header {
 }
 
 .code-editor-container .CodeMirror {
-    height: 100% !important;
+    /* height: 100% !important; */
     font-family: 'Fira Code', monospace;
     background-color: #1b1b1b;
     font-size: 14px;
