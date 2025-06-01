@@ -6,9 +6,9 @@ ShaderToy unofficial plugin is a web extension designed to enhance the coding ex
 
 ## Stores:
 
-[Chrome extension](https://chrome.google.com/webstore/detail/shadertoy-unofficial-plug/ohicbclhdmkhoabobgppffepcopomhgl?hl=pl)
+[Chrome extension](https://chrome.google.com/webstore/detail/ohicbclhdmkhoabobgppffepcopomhgl)
 
-[Firefox add-on](https://addons.mozilla.org/en-US/firefox/addon/shadertoy-unofficial-plugin/)
+[Firefox add-on](https://addons.mozilla.org/firefox/addon/shadertoy-unofficial-plugin/)
 
 [Microsoft Edge extension](https://microsoftedge.microsoft.com/addons/detail/mjcddpebilehgjibahdplabcocgpfmdb)
 
