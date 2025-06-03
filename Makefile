@@ -1,6 +1,3 @@
-# --------------------------------------------------------------------
-# Variables
-# --------------------------------------------------------------------
 VERSION         := $(shell awk '{printf "%s", $$0}' ./manifests/version.txt)
 APP_DIR         := ./app
 MANIFESTS_DIR   := ./manifests
