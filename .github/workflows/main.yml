@@ -55,11 +55,7 @@ jobs:
           FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
           FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
 
-        run: |
-          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
-          npx publish-extension \
-            --chrome-zip ./output/ShaderToy-Chrome-Plugin-$VERSION.zip \
-            --firefox-zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip
+        run: make publish
 
   release:
     runs-on: self-hosted

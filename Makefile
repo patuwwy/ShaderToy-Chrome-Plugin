@@ -64,3 +64,9 @@ github-release: zip
 		$(OUT_DIR)/ShaderToy-Chrome-Plugin-$(VERSION).zip \
 		$(OUT_DIR)/ShaderToy-Firefox-Plugin-$(VERSION).zip \
 		--title "$(VERSION)"
+
+publish: zip
+	@echo "Publishing extensions"
+	npx publish-extension \
+		--chrome-zip $(OUT_DIR)/ShaderToy-Chrome-Plugin-$(VERSION).zip \
+		--firefox-zip $(OUT_DIR)/ShaderToy-Firefox-Plugin-$(VERSION).zip
