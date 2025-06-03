@@ -14,35 +14,15 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Cleanup
-        run: |
-          rm -rf output
-
-      - name: Prepare output directory
-        run: |
-          mkdir -p output
-          mkdir -p output/chrome
-          mkdir -p output/firefox
-          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
-          echo $VERSION
+        run: make clean
 
       - name: Zip the Chrome extension
-        run: |
-          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
-          cp ./app/* ./output/chrome -r
-          cp ./manifests/manifest-chrome.json ./output/chrome/manifest.json
-          jq --arg version "$VERSION" '.version = $version' ./output/chrome/manifest.json > ./output/chrome/manifest.json.tmp && mv ./output/chrome/manifest.json.tmp ./output/chrome/manifest.json
-          zip -r ./output/ShaderToy-Chrome-Plugin-$VERSION.zip ./output/chrome
+        run: make zip-chrome
 
       - name: Zip the Firefox extension
         env:
           FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXT_ID }}
-        run: |
-          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
-          cp ./app/* ./output/firefox -r
-          cp ./manifests/manifest-firefox.json ./output/firefox/manifest.json
-          jq --arg id "$FIREFOX_EXTENSION_ID" '.browser_specific_settings.gecko.id = $id' ./output/firefox/manifest.json > ./output/firefox/manifest.json.tmp && mv ./output/firefox/manifest.json.tmp ./output/firefox/manifest.json
-          jq --arg version "$VERSION" '.version = $version' ./output/firefox/manifest.json > ./output/firefox/manifest.json.tmp && mv ./output/firefox/manifest.json.tmp ./output/firefox/manifest.json
-          zip -r ./output/ShaderToy-Firefox-Plugin-$VERSION.zip ./output/firefox
+        run: make zip-firefox
 
       - name: Upload output as artifacts
         uses: actions/upload-artifact@v4
@@ -75,11 +55,7 @@ jobs:
           FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
           FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
 
-        run: |
-          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
-          npx publish-extension \
-            --chrome-zip ./output/ShaderToy-Chrome-Plugin-$VERSION.zip \
-            --firefox-zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip
+        run: make publish
 
   release:
     runs-on: self-hosted
@@ -91,7 +67,5 @@ jobs:
           name: output
 
       - name: Publish Release on GitHub
-        run: |
-          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
-          gh release create $VERSION ./output/ShaderToy-Chrome-Plugin-$VERSION.zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip --title "$VERSION" --notes "Release of version $VERSION (Chrome)"
+        run: make github-release
 
