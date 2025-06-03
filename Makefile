@@ -64,4 +64,3 @@ release: zip
 		$(OUT_DIR)/ShaderToy-Chrome-Plugin-$(VERSION).zip \
 		$(OUT_DIR)/ShaderToy-Firefox-Plugin-$(VERSION).zip \
 		--title "$(VERSION)"
-		--notes "Release of version $(VERSION) (Chrome)"
