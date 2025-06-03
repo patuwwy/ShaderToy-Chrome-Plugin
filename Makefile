@@ -58,7 +58,7 @@ endif
 	  ../../$(OUT_DIR)/ShaderToy-$(call capitalize_first,$*)-Plugin-$(VERSION).zip \
 	  ./*
 
-release: zip
+github-release: zip
 	@echo "Creating GitHub release for version $(VERSION)"
 	echo release create $(VERSION) \
 		$(OUT_DIR)/ShaderToy-Chrome-Plugin-$(VERSION).zip \

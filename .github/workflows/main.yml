@@ -71,5 +71,5 @@ jobs:
           name: output
 
       - name: Publish Release on GitHub
-        run: make release
+        run: make github-release
 
