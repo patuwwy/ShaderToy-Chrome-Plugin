@@ -53,7 +53,7 @@ ifeq ($*,firefox)
 		> $(OUT_DIR)/$*/manifest.json.tmp
 	mv $(OUT_DIR)/$*/manifest.json.tmp $(OUT_DIR)/$*/manifest.json
 endif
-
+	cd $(OUT_DIR)/$* && \
 	zip -r \
-	  $(OUT_DIR)/ShaderToy-$(call capitalize_first,$*)-Plugin-$(VERSION).zip \
-	  $(OUT_DIR)/$*
+	  ../../$(OUT_DIR)/ShaderToy-$(call capitalize_first,$*)-Plugin-$(VERSION).zip \
+	  ./*
