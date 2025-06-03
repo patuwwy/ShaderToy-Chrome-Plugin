@@ -71,7 +71,5 @@ jobs:
           name: output
 
       - name: Publish Release on GitHub
-        run: |
-          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
-          gh release create $VERSION ./output/ShaderToy-Chrome-Plugin-$VERSION.zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip --title "$VERSION" --notes "Release of version $VERSION (Chrome)"
+        run: make release
 

@@ -57,3 +57,11 @@ endif
 	zip -r \
 	  ../../$(OUT_DIR)/ShaderToy-$(call capitalize_first,$*)-Plugin-$(VERSION).zip \
 	  ./*
+
+release: zip
+	@echo "Creating GitHub release for version $(VERSION)"
+	echo release create $(VERSION) \
+		$(OUT_DIR)/ShaderToy-Chrome-Plugin-$(VERSION).zip \
+		$(OUT_DIR)/ShaderToy-Firefox-Plugin-$(VERSION).zip \
+		--title "$(VERSION)"
+		--notes "Release of version $(VERSION) (Chrome)"
