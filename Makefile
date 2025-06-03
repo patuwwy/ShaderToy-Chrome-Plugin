@@ -13,7 +13,7 @@ BROWSERS        := chrome firefox
 # Capitalize the first letter of the browser name for the ZIP file name
 capitalize_first = $(shell echo $(1) | sed 's/.*/\u&/')
 
-.PHONY: all clean zip prepare-% clean-% zip-%
+.PHONY: all clean zip prepare-% clean-% zip-% github-release publish
 
 all: zip
 
