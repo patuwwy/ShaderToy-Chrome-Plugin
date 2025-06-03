@@ -37,6 +37,12 @@
          * @const {string}
          */
         PARAMETERS_EXTENTION_FILENAME = 'add-ons/shadertoy-plugin-parameters.js',
+        /**
+         * CustomTextures extention filename.
+         * 
+         * @const {string}
+         */
+        CUSTOM_TEXTURES_EXTENTION_FILENAME = 'add-ons/shadertoy-plugin-custom-textures.js',
 
         COMMON_FILENAME = 'shadertoy-plugin-common.js',
         STATE_STORAGE_KEY = 'STE-state',
@@ -189,6 +195,15 @@
             loadScript(PARAMETERS_EXTENTION_FILENAME);
         }
     }
+    /**
+     * Loads file upload extension on editing and new shader page
+     */
+    function initializeCustomTextures() {
+        if (document.location.href.match(/shadertoy.com\/(new|(view\/.{6}))/)) {
+            loadScript(CUSTOM_TEXTURES_EXTENTION_FILENAME);
+        }
+    }
+
 
 
     /**
@@ -217,6 +232,7 @@
         initializeCodemirror();
         initializeBBCode();
         initializeHomePage();
+        initializeCustomTextures();
 
         bindMessagesListener();
         sendInitialMessage();
