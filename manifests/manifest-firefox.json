@@ -42,6 +42,7 @@
                 "add-ons/shadertoy-plugin-parameters.js",
                 "add-ons/shadertoy-plugin-bbcode.js",
                 "add-ons/shadertoy-plugin-custom-textures.js",
+                "assets/file.png",
                 "add-ons/monaco/loader.min.js",
                 "add-ons/monaco/min/vs/editor/editor.main.js",
                 "add-ons/monaco/min/vs/editor/editor.main.css",
