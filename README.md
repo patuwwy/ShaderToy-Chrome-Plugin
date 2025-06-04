@@ -112,6 +112,8 @@ Please add issue with description before PR.
 -   **Code completion** for glsl keywords in the code editor.
 
 -   **Color picker** for any vec3 with r,g,b values in the code editor.
+-   **Custom Inputs** - Upload custom channel input in the form of image, video or audio files.
+Supported formats: `jpeg`, `png`, `gif`, `webp`, `bmp`, `mp4`, `webm`, `ogg`, `mp3`, `wav`, `ogg`, `aac`
 
 ## Screenshots
 
@@ -156,6 +158,9 @@ Please add issue with description before PR.
 ##### BBCode buttons to make writing comments easier
 
 ![](./screenshots/bbcode-buttons.png)
+
+##### Custom input upload button
+![](./screenshots/custom-inputs.png)
 
 ---
 
