@@ -34,6 +34,8 @@
 
     const ASSET_ID = 9;
 
+    const PLUGIN_ASSETS_URL = document.querySelector('#plugin-assets-url')?.getAttribute('href')
+
     class MimeTypeError extends Error {
         /**
          * @param {string} adjective
@@ -193,48 +195,30 @@
      * @param {function} eventListener
      */
     function wrap(eventListener) {
-        const create = (...args) => document.createElement(...args);
-
-        const row = create('tr');
-        const td = create('td');
-
-        const divAsset = create('div');
-            divAsset.className = 'divAsset';
-            divAsset.id = 'miscAsset1';
-
-        const table = create('table');
-        const tbody = create('tbody');
-        const innerRow = create('tr');
-
-        const thumbnail = create('img');
-            thumbnail.className = 'inputThumbnail';
-            thumbnail.id = 'miscAssetThumnail1';
-            thumbnail.src = 'assets/file.png';
-
-        const triggerTd = create('td');
-
-        const infoTd = create('td');
-            infoTd.className = 'inputInfoColumn';
-
-        const infoDiv = create('div');
-            infoDiv.style.position = 'absolute';
-
-            infoDiv.innerHTML = `
-                <span class="spanName" id="miscAssetName${ASSET_ID}">File</span><br>
-                by <span class="spanUser" id="miscUserName${ASSET_ID}"><a class="user" href="/user/moti">moti</a></span><br><br>
-                <span class="spanDescription" id="miscInfo${ASSET_ID}">upload your own file</span>
-            `;
-
-        row.append(td);
-        td.append(divAsset);
-        divAsset.append(table);
-        table.append(tbody);
-        tbody.append(innerRow);
-        innerRow.append(triggerTd, infoTd);
-        infoTd.append(infoDiv);
-        triggerTd.appendChild(thumbnail);
-        thumbnail.addEventListener('click', eventListener);
-
+        if (!PLUGIN_ASSETS_URL) {
+            console.error('PLUGIN_ASSETS_URL is not defined.');
+            return;
+        }
+        const customInputUrl = `${PLUGIN_ASSETS_URL}/custom-input.template.html`;
+        const thumbnailUrl = `${PLUGIN_ASSETS_URL}/file.png`;
+        
+        const row = document.createElement('tr');
+        // read contents of custom input template
+        fetch(customInputUrl)
+            .then(response => response.text())
+            .then(template => {
+                row.innerHTML = template.replaceAll(
+                    '{{thumbnailUrl}}',
+                    thumbnailUrl,
+                ).replaceAll(
+                    '{{ASSET_ID}}',
+                    ASSET_ID,
+                );
+                row.querySelector(`#miscAssetThumnail${ASSET_ID}`).addEventListener('click', eventListener);
+            })
+            .catch(error => {
+                console.error('Failed to load custom input template:', error);
+            });
         return row;
     }
 
