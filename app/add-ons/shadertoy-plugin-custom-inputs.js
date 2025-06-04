@@ -25,10 +25,99 @@
  * @property {string[]} subTypes
  * @property {string} mID
  * @property {SamplerConfig} mSampler sampler configuration
+ * 
+ * @typedef {Object} SimpleMimeType
+ * @property {string} topLevelType
+ * @property {string} subType
+ * 
  */
 
 (function shadertoyPluginCustomInputs() {
     'use strict';
+
+    // Based on https://github.com/broofa/mime/blob/main/types/standard.ts
+    const MIME_TYPES = {
+        "audio/3gpp": ["*3gpp"],
+        "audio/aac": ["adts", "aac"],
+        "audio/adpcm": ["adp"],
+        "audio/amr": ["amr"],
+        "audio/basic": ["au", "snd"],
+        "audio/midi": ["mid", "midi", "kar", "rmi"],
+        "audio/mobile-xmf": ["mxmf"],
+        "audio/mp3": ["*mp3"],
+        "audio/mp4": ["m4a", "mp4a", "m4b"],
+        "audio/mpeg": ["mpga", "mp2", "mp2a", "mp3", "m2a", "m3a"],
+        "audio/ogg": ["oga", "ogg", "spx", "opus"],
+        "audio/s3m": ["s3m"],
+        "audio/silk": ["sil"],
+        "audio/wav": ["wav"],
+        "audio/wave": ["*wav"],
+        "audio/webm": ["weba"],
+        "audio/xm": ["xm"],
+        "image/aces": ["exr"],
+        "image/apng": ["apng"],
+        "image/avci": ["avci"],
+        "image/avcs": ["avcs"],
+        "image/avif": ["avif"],
+        "image/bmp": ["bmp", "dib"],
+        "image/cgm": ["cgm"],
+        "image/dicom-rle": ["drle"],
+        "image/dpx": ["dpx"],
+        "image/emf": ["emf"],
+        "image/fits": ["fits"],
+        "image/g3fax": ["g3"],
+        "image/gif": ["gif"],
+        "image/heic": ["heic"],
+        "image/heic-sequence": ["heics"],
+        "image/heif": ["heif"],
+        "image/heif-sequence": ["heifs"],
+        "image/hej2k": ["hej2"],
+        "image/ief": ["ief"],
+        "image/jaii": ["jaii"],
+        "image/jais": ["jais"],
+        "image/jls": ["jls"],
+        "image/jp2": ["jp2", "jpg2"],
+        "image/jpeg": ["jpg", "jpeg", "jpe"],
+        "image/jph": ["jph"],
+        "image/jphc": ["jhc"],
+        "image/jpm": ["jpm", "jpgm"],
+        "image/jpx": ["jpx", "jpf"],
+        "image/jxl": ["jxl"],
+        "image/jxr": ["jxr"],
+        "image/jxra": ["jxra"],
+        "image/jxrs": ["jxrs"],
+        "image/jxs": ["jxs"],
+        "image/jxsc": ["jxsc"],
+        "image/jxsi": ["jxsi"],
+        "image/jxss": ["jxss"],
+        "image/ktx": ["ktx"],
+        "image/ktx2": ["ktx2"],
+        "image/pjpeg": ["jfif"],
+        "image/png": ["png"],
+        "image/sgi": ["sgi"],
+        "image/svg+xml": ["svg", "svgz"],
+        "image/t38": ["t38"],
+        "image/tiff": ["tif", "tiff"],
+        "image/tiff-fx": ["tfx"],
+        "image/webp": ["webp"],
+        "image/wmf": ["wmf"],
+        "video/3gpp": ["3gp", "3gpp"],
+        "video/3gpp2": ["3g2"],
+        "video/h261": ["h261"],
+        "video/h263": ["h263"],
+        "video/h264": ["h264"],
+        "video/iso.segment": ["m4s"],
+        "video/jpeg": ["jpgv"],
+        "video/jpm": ["*jpm", "*jpgm"],
+        "video/mj2": ["mj2", "mjp2"],
+        "video/mp2t": ["ts", "m2t", "m2ts", "mts"],
+        "video/mp4": ["mp4", "mp4v", "mpg4"],
+        "video/mpeg": ["mpeg", "mpg", "mpe", "m1v", "m2v"],
+        "video/ogg": ["ogv"],
+        "video/quicktime": ["qt", "mov"],
+        "video/webm": ["webm"]
+    };
+
 
     const S_RGB = false;
 
@@ -39,9 +128,12 @@
     class MimeTypeError extends Error {
         /**
          * @param {string} adjective
-         * @param {string} mimeType
+         * @param {string|SimpleMimeType} mimeType
          */
         constructor(adjective, mimeType) {
+            if (typeof mimeType === 'object') {
+                mimeType = `${mimeType.topLevelType}/${mimeType.subType}`;
+            }
             let sentenceCaseAdjective = adjective.charAt(0).toUpperCase() + adjective.slice(1);
             super(`${sentenceCaseAdjective} Media type: ${mimeType}. Supported types are:\n` +
                 Object.entries(SUPPORTED_MEDIA_TYPES)
@@ -100,18 +192,60 @@
         },
     };
 
-    function findMediaType(mimeType) {
-        if (typeof mimeType !== 'string' || !mimeType.includes('/')) {
+
+    function getMimeSubType(extension) {
+        for (const type of Object.values(SUPPORTED_MEDIA_TYPES)) {
+            for (const subType of type.subTypes) {
+                if (subType === extension) return subType;
+            }
+        }
+        for (const type of Object.keys(MIME_TYPES)) {
+            if (MIME_TYPES[type].includes(extension)) {
+                return type.split('/')[1];
+            }
+        }
+    }
+
+    /**
+     * @param {string|URL} mimeType
+     */
+    function findMediaType(mimeTypeOrUrl) {
+        if (mimeTypeOrUrl instanceof URL) {
+            return findMediaTypeFromMimeType(getMimeSubType(mimeTypeOrUrl.pathname.split('.').pop()));
+        }
+        if (typeof mimeTypeOrUrl !== 'string' || !mimeTypeOrUrl.includes('/')) {
             throw new InvalidMimeTypeError(mimeType);
         }
-        const [ topLevelType, subType ] = mimeType.split('/');
+        const [ topLevelType, subType ] = mimeTypeOrUrl.split('/');
+        if (!subType) {
+            throw new InvalidMimeTypeError(mimeTypeOrUrl);
+        }
+        return findMediaTypeFromMimeType(subType, topLevelType);
+    }
+
+    /**
+     * @param {string} subType
+     * @param {string?} topLevelType
+     */
+    function findMediaTypeFromMimeType(subType, topLevelType) {
+        if (!topLevelType) {
+            for (const type in SUPPORTED_MEDIA_TYPES) {
+                try {
+                    return findMediaTypeFromMimeType(subType, type);
+                } catch (error) {
+                    if (!(error instanceof UnsupportedMimeTypeError)) {
+                        throw error; // rethrow unexpected errors
+                    }
+                }
+            }
+        }
         if (
             topLevelType in SUPPORTED_MEDIA_TYPES
             && SUPPORTED_MEDIA_TYPES[topLevelType].subTypes.includes(subType)
         ) {
             return SUPPORTED_MEDIA_TYPES[topLevelType];
         }
-        throw new UnsupportedMimeTypeError(mimeType);
+        throw new UnsupportedMimeTypeError({ topLevelType, subType });
     }
 
     function findMediaTypeOrAlert(mimeType) {
@@ -166,18 +300,19 @@
     /**
      * Applies a texture to the current channel.
      * @param {string} mimeType
-     * @param {string} dataUrl
+     * @param {URL} url
      * @param {MEDIA_TYPE} mediaType
      * @param {number} channelIndex
      */
-    function applyTexture(mimeType, dataUrl, mediaType = findMediaTypeOrAlert(mimeType), channelIndex = getCurrentChannelIndex()) {
+    function applyTexture(mimeType, url, mediaType = findMediaTypeOrAlert(mimeType), channelIndex = getCurrentChannelIndex()) {
+        url = new URL(url);
         try {
             const currentInput = gShaderToy.mEffect.mPasses[gShaderToy.mActiveDoc].mInputs[channelIndex];
             /** @type {ChannelInput} */
             const config = {
                 mType: mediaType.mType,
                 mID: mediaType.mID,
-                mSrc: dataUrl,
+                mSrc: url.href,
                 mSampler: {
                     srgb: `${S_RGB}`,
                     ...mediaType.mSampler,
@@ -256,8 +391,9 @@
                 const text = event.dataTransfer.getData('text');
                 if (text) { // text has been dropped
                     try {
-                        const mediaType = findMediaTypeOrAlert(text);
-                        applyTexture(mediaType.mType, text, mediaType, channelIndex);
+                        const url = new URL(text);
+                        const mediaType = findMediaTypeOrAlert(url);
+                        applyTexture(mediaType.mType, url, mediaType, channelIndex);
                     } catch (error) {
                         console.error('Failed to apply texture from URL:', error);
                     }
