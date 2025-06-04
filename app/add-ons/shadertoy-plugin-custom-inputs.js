@@ -238,7 +238,7 @@
         return row;
     }
 
-    function registerButton() {
+    function injectButton() {
         document.querySelector('#divMisc > table > tbody').appendChild(
             wrap((event) => {
                 event.preventDefault();
