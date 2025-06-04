@@ -248,7 +248,7 @@
     function injectDropHandlers() {
         const getChannel = (i) => document.getElementById(`myUnitCanvas${i++}`);
         let channel = getChannel(0);
-        for (let i = 0; channel; channel = getChannel(++i)) {
+        for (let channelIndex = 0; channel; channel = getChannel(++channelIndex)) {
             channel.addEventListener('drop', (event) => {
                 event.stopPropagation();
                 event.preventDefault();
@@ -257,12 +257,12 @@
                 if (text) { // text has been dropped
                     try {
                         const mediaType = findMediaTypeOrAlert(text);
-                        applyTexture(mediaType.mType, text, mediaType, i);
+                        applyTexture(mediaType.mType, text, mediaType, channelIndex);
                     } catch (error) {
                         console.error('Failed to apply texture from URL:', error);
                     }
                 } else if (event.dataTransfer.files.length > 0) { // a file has been dropped
-                    processFile(event.dataTransfer.files[0], i);
+                    processFile(event.dataTransfer.files[0], channelIndex);
                     if (event.dataTransfer.files.length > 1) {
                         [console.warn, alert].forEach(fn => fn(
                             `Multiple files dropped. Only the first file will be processed: ${event.dataTransfer.files[0].name}`
