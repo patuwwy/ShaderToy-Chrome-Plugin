@@ -238,22 +238,25 @@
         return row;
     }
 
-    document.querySelector('#divMisc > table > tbody').appendChild(
-        wrap((event) => {
-            event.preventDefault();
-            const fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.accept = Object.values(SUPPORTED_MEDIA_TYPES).flatMap(
-                type => type.subTypes.map(subType => `${type.mID}/${subType}`)
-            ).join(',');
-            fileInput.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    processFile(file);
-                }
-            };
-            fileInput.click();
-        })
-    );
+    function registerButton() {
+        document.querySelector('#divMisc > table > tbody').appendChild(
+            wrap((event) => {
+                event.preventDefault();
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = Object.values(SUPPORTED_MEDIA_TYPES).flatMap(
+                    type => type.subTypes.map(subType => `${type.mID}/${subType}`)
+                ).join(',');
+                fileInput.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        processFile(file);
+                    }
+                };
+                fileInput.click();
+            })
+        );
+    }
+    injectButton()
 
 })();
