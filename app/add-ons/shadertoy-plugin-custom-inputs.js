@@ -246,7 +246,7 @@
     }
 
     function injectDropHandlers() {
-        const getChannel = (i) => document.getElementById(`myUnitCanvas${i++}`);
+        const getChannel = (index) => document.getElementById(`myUnitCanvas${index++}`);
         let channel = getChannel(0);
         for (let channelIndex = 0; channel; channel = getChannel(++channelIndex)) {
             channel.addEventListener('drop', (event) => {
