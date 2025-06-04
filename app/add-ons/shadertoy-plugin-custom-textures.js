@@ -41,7 +41,10 @@
          */
         constructor(adjective, mimeType) {
             let sentenceCaseAdjective = adjective.charAt(0).toUpperCase() + adjective.slice(1);
-            super(`${sentenceCaseAdjective} MIME type: ${mimeType}`);
+            super(`${sentenceCaseAdjective} Media type: ${mimeType}. Supported types are:\n` +
+                Object.entries(SUPPORTED_MEDIA_TYPES)
+                    .map(([type, { subTypes }]) => `${type}: ${subTypes.join(', ')}`)
+                    .join('\n'));
             this.name = `${sentenceCaseAdjective}MimeTypeError`;
         }
     }
@@ -110,6 +113,20 @@
         }
         throw new UnsupportedMimeTypeError(mimeType);
     }
+
+    function findMediaTypeOrAlert(mimeType) {
+        try {
+            return findMediaType(mimeType);
+        } catch (error) {
+            if (error instanceof MimeTypeError) {
+                console.warn(error.message);
+                alert(error.message);
+            } else {
+                console.error('Unexpected error:', error);
+            }
+            throw error; // rethrow to stop further processing
+        }
+    }
     
     /**
      * Reads a file if valid and applies it to the current channel.
@@ -119,7 +136,7 @@
         if (!file) {
             throw new Error('No file provided');
         }
-        const mediaType = findMediaType(file.type);
+        const mediaType = findMediaTypeOrAlert(file.type);
         
         const reader = new FileReader();
         reader.onerror = () => {
@@ -152,7 +169,7 @@
      * @param {MEDIA_TYPE} mediaType
      * @param {number} channelIndex
      */
-    function applyTexture(mimeType, dataUrl, mediaType = findMediaType(mimeType), channelIndex = getCurrentChannelIndex()) {
+    function applyTexture(mimeType, dataUrl, mediaType = findMediaTypeOrAlert(mimeType), channelIndex = getCurrentChannelIndex()) {
         try {
             const currentInput = gShaderToy.mEffect.mPasses[gShaderToy.mActiveDoc].mInputs[channelIndex];
             /** @type {ChannelInput} */
