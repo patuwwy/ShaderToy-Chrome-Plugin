@@ -223,7 +223,7 @@
 
             infoDiv.innerHTML = `
                 <span class="spanName" id="miscAssetName${ASSET_ID}">File</span><br>
-                by <span class="spanUser" id="miscUserName${ASSET_ID}"><a class="user">you</a></span><br><br>
+                by <span class="spanUser" id="miscUserName${ASSET_ID}"><a class="user" href="/user/moti">moti</a></span><br><br>
                 <span class="spanDescription" id="miscInfo${ASSET_ID}">upload your own file</span>
             `;
 
