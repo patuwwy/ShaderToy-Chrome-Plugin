@@ -38,11 +38,11 @@
          */
         PARAMETERS_EXTENTION_FILENAME = 'add-ons/shadertoy-plugin-parameters.js',
         /**
-         * CustomTextures extention filename.
+         * CustomInputs extention filename.
          * 
          * @const {string}
          */
-        CUSTOM_TEXTURES_EXTENTION_FILENAME = 'add-ons/shadertoy-plugin-custom-textures.js',
+        CUSTOM_INPUTS_EXTENTION_FILENAME = 'add-ons/shadertoy-plugin-custom-inputs.js',
 
         COMMON_FILENAME = 'shadertoy-plugin-common.js',
         STATE_STORAGE_KEY = 'STE-state',
@@ -198,9 +198,9 @@
     /**
      * Loads file upload extension on editing and new shader page
      */
-    function initializeCustomTextures() {
+    function initializeCustomInputs() {
         if (document.location.href.match(/shadertoy.com\/(new|(view\/.{6}))/)) {
-            loadScript(CUSTOM_TEXTURES_EXTENTION_FILENAME);
+            loadScript(CUSTOM_INPUTS_EXTENTION_FILENAME);
         }
     }
 
@@ -232,7 +232,7 @@
         initializeCodemirror();
         initializeBBCode();
         initializeHomePage();
-        initializeCustomTextures();
+        initializeCustomInputs();
 
         bindMessagesListener();
         sendInitialMessage();

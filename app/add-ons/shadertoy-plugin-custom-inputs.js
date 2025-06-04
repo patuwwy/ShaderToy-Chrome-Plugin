@@ -27,7 +27,7 @@
  * @property {SamplerConfig} mSampler sampler configuration
  */
 
-(function shadertoyCustomTextures() {
+(function shadertoyCustomInputs() {
     'use strict';
 
     const S_RGB = false;
