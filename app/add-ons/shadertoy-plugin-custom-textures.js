@@ -21,9 +21,10 @@
  * @property {SamplerConfig} mSampler sampler configuration
  *
  * @typedef {object} MEDIA_TYPE
+ * @property {string} mType name
  * @property {string[]} subTypes
  * @property {string} mID
- * @property {SamplerConfig} config
+ * @property {SamplerConfig} mSampler sampler configuration
  */
 
 (function shadertoyCustomTextures() {
@@ -68,7 +69,7 @@
             mType: 'texture',
             subTypes: ['jpeg', 'png', 'gif', 'webp', 'bmp'],
             mID: '4dXGRn',
-            config: {
+            mSampler: {
                 wrap: 'repeat',
                 filter: 'mipmap',
                 vflip: 'true',
@@ -78,7 +79,7 @@
             mType: 'video',
             subTypes: ['mp4', 'webm', 'ogg'],
             mID: '4df3zn',
-            config: {
+            mSampler: {
                 wrap: 'clamp',
                 filter: 'linear',
                 vflip: 'true',
@@ -88,7 +89,7 @@
             mType: 'music',
             subTypes: ['mp3', 'wav', 'ogg', 'aac'],
             mID: '4sXGzn',
-            config: {
+            mSampler: {
                 wrap: 'clamp',
                 filter: 'linear',
                 vflip: 'false',
@@ -156,11 +157,9 @@
             const currentInput = gShaderToy.mEffect.mPasses[gShaderToy.mActiveDoc].mInputs[channelIndex];
             /** @type {ChannelInput} */
             const config = {
+                ...mediaType,
                 mSrc: dataUrl,
-                mType: mediaType.mType,
-                mID: mediaType.mID,
                 mSampler: {
-                    ...mediaType.config,
                     srgb: `${S_RGB}`,
                     ...currentInput?.globject ?? {} // overwrite with existing settings if available
                 }
