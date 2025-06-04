@@ -65,6 +65,7 @@
      */
     let SUPPORTED_MEDIA_TYPES = {
         image: {
+            mType: 'texture',
             subTypes: ['jpeg', 'png', 'gif', 'webp', 'bmp'],
             mID: '4dXGRn',
             config: {
@@ -74,6 +75,7 @@
             }
         },
         video: {
+            mType: 'video',
             subTypes: ['mp4', 'webm', 'ogg'],
             mID: '4df3zn',
             config: {
@@ -83,6 +85,7 @@
             }
         },
         audio: {
+            mType: 'music',
             subTypes: ['mp3', 'wav', 'ogg', 'aac'],
             mID: '4sXGzn',
             config: {
@@ -154,7 +157,7 @@
             /** @type {ChannelInput} */
             const config = {
                 mSrc: dataUrl,
-                mType: mimeType.split('/')[0],
+                mType: mediaType.mType,
                 mID: mediaType.mID,
                 mSampler: {
                     ...mediaType.config,
