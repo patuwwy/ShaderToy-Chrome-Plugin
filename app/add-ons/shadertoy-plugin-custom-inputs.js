@@ -257,6 +257,40 @@
             })
         );
     }
+
+    function injectDropHandlers() {
+        let channel;
+        for (let i = 0; channel; channel = document.getElementById(`myUnitCanvas${i++}`)) {
+            channel.addEventListener('drop', (event) => {
+                event.stopPropagation();
+                event.preventDefault();
+
+                const text = event.dataTransfer.getData('text');
+                if (text) { // text has been dropped
+                    try {
+                        const mediaType = findMediaTypeOrAlert(text);
+                        applyTexture(mediaType.mType, text, mediaType, i);
+                    } catch (error) {
+                        console.error('Failed to apply texture from URL:', error);
+                    }
+                } else if (event.dataTransfer.files.length > 0) { // a file has been dropped
+                    processFile(event.dataTransfer.files[0]);
+                    if (event.dataTransfer.files.length > 1) {
+                        [console.warn, alert].forEach(fn => fn(
+                            `Multiple files dropped. Only the first file will be processed: ${event.dataTransfer.files[0].name}`
+                        ));
+                    }
+                }
+            }, false);
+            channel.addEventListener('dragover', (event) => {
+                event.stopPropagation();
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'link';
+            }, false);
+        }
+    }
+
     injectButton()
+    injectDropHandlers();
 
 })();
