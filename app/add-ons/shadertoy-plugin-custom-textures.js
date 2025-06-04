@@ -97,9 +97,12 @@
         if (typeof mimeType !== 'string' || !mimeType.includes('/')) {
             throw new InvalidMimeTypeError(mimeType);
         }
-        const { type, subtype } = mimeType.split('/');
-        if (type in SUPPORTED_MEDIA_TYPES && subtype in SUPPORTED_MEDIA_TYPES[type].subTypes) {
-            return SUPPORTED_MEDIA_TYPES[type].config;
+        const [ topLevelType, subType ] = mimeType.split('/');
+        if (
+            topLevelType in SUPPORTED_MEDIA_TYPES
+            && SUPPORTED_MEDIA_TYPES[topLevelType].subTypes.includes(subType)
+        ) {
+            return SUPPORTED_MEDIA_TYPES[topLevelType];
         }
         throw new UnsupportedMimeTypeError(mimeType);
     }
