@@ -118,10 +118,11 @@
         "video/webm": ["webm"]
     };
 
+    const DESCRIPTION_LINE_LENGTH = 'Viewport Resolution'.length; // the longest line in other descriptions
 
     const S_RGB = false;
 
-    const ASSET_ID = 9;
+    const MISC_INPUT_COUNT = 9;
 
     const PLUGIN_ASSETS_URL = document.querySelector('#plugin-assets-url')?.getAttribute('href')
 
@@ -331,37 +332,58 @@
     /**
      * Wraps the eventListener in a ridiculous construction to fit in with the other input options on the misc tab.
      * @param {function} eventListener
+     * @param {int} assetId
+     * @param {string} title
+     * @param {string} thumbnailUrl
+     * @param {string} description
      */
-    function wrap(eventListener) {
+    function wrap(eventListener, assetId, title, thumbnailUrl, description) {
         if (!PLUGIN_ASSETS_URL) {
             console.error('PLUGIN_ASSETS_URL is not defined.');
             return;
         }
         const customInputUrl = `${PLUGIN_ASSETS_URL}/custom-input.template.html`;
-        const thumbnailUrl = `${PLUGIN_ASSETS_URL}/file.png`;
         
-        const row = document.createElement('tr');
+        const result = document.createElement('td');
         // read contents of custom input template
         fetch(customInputUrl)
             .then(response => response.text())
             .then(template => {
-                row.innerHTML = template.replaceAll(
+                result.innerHTML = template.replaceAll(
                     '{{thumbnailUrl}}',
                     thumbnailUrl,
                 ).replaceAll(
-                    '{{ASSET_ID}}',
-                    ASSET_ID,
+                    '{{assetId}}',
+                    assetId,
+                ).replaceAll(
+                    '{{title}}',
+                    title,
+                ).replaceAll(
+                    '{{description}}',
+                    description.split('').reduce((acc, char) => {
+                        if (acc.length >= DESCRIPTION_LINE_LENGTH && char.match(/\s/)) {
+                            acc += '\n';
+                        } else {
+                            acc += char;
+                        }
+                        return acc;
+                    }
+                    , ''),                    
                 );
-                row.querySelector(`#miscAssetThumnail${ASSET_ID}`).addEventListener('click', eventListener);
+                result.querySelector(`#miscAssetThumnail${assetId}`).addEventListener('click', eventListener);
             })
             .catch(error => {
                 console.error('Failed to load custom input template:', error);
             });
-        return row;
+        return result;
     }
 
-    function injectButton() {
-        document.querySelector('#divMisc > table > tbody').appendChild(
+    function injectButtons() {
+        const table = document.querySelector('#divMisc > table > tbody')
+        const row = document.createElement('tr');
+        table.appendChild(row);
+        row.append(
+            // Upload handler
             wrap((event) => {
                 event.preventDefault();
                 const fileInput = document.createElement('input');
@@ -376,7 +398,20 @@
                     }
                 };
                 fileInput.click();
-            })
+            }, MISC_INPUT_COUNT + 1, 'Upload File', `${PLUGIN_ASSETS_URL}/file.png`, 'Upload your own file.'),
+            // URL handler
+            wrap((event) => {
+                event.preventDefault();
+                const url = new URL(prompt('Enter the URL of the texture:'))
+                try {
+                    if (url) {
+                        const mediaType = findMediaTypeOrAlert(url);
+                        applyTexture(mediaType.mType, url, mediaType);
+                    }
+                } catch (error) {
+                    console.error('Failed to apply texture from URL:', error);
+                }
+            }, MISC_INPUT_COUNT + 2, 'Apply URL', `${PLUGIN_ASSETS_URL}/file.png`, 'Load a file from a URL on shadertoy.com.')
         );
     }
 
@@ -414,7 +449,7 @@
         }
     }
 
-    injectButton()
+    injectButtons()
     injectDropHandlers();
 
 })();
