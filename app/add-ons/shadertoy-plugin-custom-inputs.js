@@ -209,23 +209,23 @@
         const innerRow = create('tr');
 
         const thumbnail = create('img');
-        thumbnail.className = 'inputThumbnail';
-        thumbnail.id = 'miscAssetThumnail1';
-        thumbnail.src = 'assets/file.png';
+            thumbnail.className = 'inputThumbnail';
+            thumbnail.id = 'miscAssetThumnail1';
+            thumbnail.src = 'assets/file.png';
 
         const triggerTd = create('td');
 
         const infoTd = create('td');
-        infoTd.className = 'inputInfoColumn';
+            infoTd.className = 'inputInfoColumn';
 
         const infoDiv = create('div');
-        infoDiv.style.position = 'absolute';
+            infoDiv.style.position = 'absolute';
 
-        infoDiv.innerHTML = `
-            <span class="spanName" id="miscAssetName${ASSET_ID}">File</span><br>
-            by <span class="spanUser" id="miscUserName${ASSET_ID}"><a class="user">you</a></span><br><br>
-            <span class="spanDescription" id="miscInfo${ASSET_ID}">upload your own file</span>
-        `;
+            infoDiv.innerHTML = `
+                <span class="spanName" id="miscAssetName${ASSET_ID}">File</span><br>
+                by <span class="spanUser" id="miscUserName${ASSET_ID}"><a class="user">you</a></span><br><br>
+                <span class="spanDescription" id="miscInfo${ASSET_ID}">upload your own file</span>
+            `;
 
         row.append(td);
         td.append(divAsset);
