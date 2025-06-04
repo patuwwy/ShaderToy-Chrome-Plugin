@@ -37,6 +37,7 @@
                 "add-ons/shadertoy-plugin-custom-inputs.js",
                 "assets/custom-input.template.html",
                 "assets/file.png",
+                "assets/link.png",
                 "add-ons/monaco/loader.min.js",
                 "add-ons/monaco/min/vs/editor/editor.main.js",
                 "add-ons/monaco/min/vs/editor/editor.main.css",
