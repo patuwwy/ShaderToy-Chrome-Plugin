@@ -174,11 +174,13 @@
             const currentInput = gShaderToy.mEffect.mPasses[gShaderToy.mActiveDoc].mInputs[channelIndex];
             /** @type {ChannelInput} */
             const config = {
-                ...mediaType,
+                mType: mediaType.mType,
+                mID: mediaType.mID,
                 mSrc: dataUrl,
                 mSampler: {
                     srgb: `${S_RGB}`,
-                    ...currentInput?.globject ?? {} // overwrite with existing settings if available
+                    ...mediaType.mSampler,
+                    ...currentInput?.globject.mInfo ?? {} // overwrite with existing settings if available
                 }
             }
             gShaderToy.mEffect.NewTexture(gShaderToy.mActiveDoc, channelIndex, config);
