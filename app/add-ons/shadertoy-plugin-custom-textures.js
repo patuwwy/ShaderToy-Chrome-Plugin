@@ -106,6 +106,71 @@
         }
         throw new UnsupportedMimeTypeError(mimeType);
     }
+    
+    /**
+     * Reads a file if valid and applies it to the current channel.
+     * @param {File} file
+     */
+    function processFile(file) {
+        if (!file) {
+            throw new Error('No file provided');
+        }
+        const mediaType = findMediaType(file.type);
+        
+        const reader = new FileReader();
+        reader.onerror = () => {
+            throw new Error(`Failed to read file: ${file.name}: ${reader.error.message}`);
+        };
+
+        reader.onload = (event) => {
+            applyTexture(file.type, event.target.result, mediaType);
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+    /**
+     * Extracts the current channel index from the dialog title.
+     * @returns {number}
+     */
+    function getCurrentChannelIndex() {
+        const result = parseInt(document.querySelector('#pickTextureDialogTitle')?.textContent.at(-1));
+        if (isNaN(result)) {
+            throw new Error('No channnel selected');
+        }
+        return result;
+    }
+    
+    /**
+     * Applies a texture to the current channel.
+     * @param {string} mimeType
+     * @param {string} dataUrl
+     * @param {MEDIA_TYPE} mediaType
+     * @param {number} channelIndex
+     */
+    function applyTexture(mimeType, dataUrl, mediaType = findMediaType(mimeType), channelIndex = getCurrentChannelIndex()) {
+        try {
+            const currentInput = gShaderToy.mEffect.mPasses[gShaderToy.mActiveDoc].mInputs[channelIndex];
+            /** @type {ChannelInput} */
+            const config = {
+                mSrc: dataUrl,
+                mType: mimeType.split('/')[0],
+                mID: mediaType.mID,
+                mSampler: {
+                    ...mediaType.config,
+                    srgb: `${S_RGB}`,
+                    ...currentInput?.globject ?? {} // overwrite with existing settings if available
+                }
+            }
+            gShaderToy.mEffect.NewTexture(gShaderToy.mActiveDoc, channelIndex, config);
+            gShaderToy.mNeedsSave = true;
+            
+            console.log(`Applied ${config.type} to channel ${channelIndex}`);
+        } catch (error) {
+            console.error('Failed to apply texture:', error);
+        }
+    }
+    
     /**
      * Wraps the eventListener in a ridiculous construction to fit in with the other input options on the misc tab.
      * @param {function} eventListener
@@ -158,7 +223,19 @@
 
     document.querySelector('#divMisc > table > tbody').appendChild(
         wrap((event) => {
-            alert('Not Implemented');
+            event.preventDefault();
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = Object.values(SUPPORTED_MEDIA_TYPES).flatMap(
+                type => type.subTypes.map(subType => `${type.mID}/${subType}`)
+            ).join(',');
+            fileInput.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    processFile(file);
+                }
+            };
+            fileInput.click();
         })
     );
 
