@@ -62,8 +62,6 @@
     class Texture {
         
     }
-    
-    const CHANNELS = 4;
     /**
      * @enum {MEDIA_TYPE} 
      */
