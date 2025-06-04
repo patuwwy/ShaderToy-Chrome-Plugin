@@ -316,7 +316,7 @@
                 mSampler: {
                     srgb: `${S_RGB}`,
                     ...mediaType.mSampler,
-                    ...currentInput?.globject.mInfo ?? {} // overwrite with existing settings if available
+                    ...currentInput?.mInfo.mSampler ?? {} // overwrite with existing settings if available
                 }
             }
             gShaderToy.mEffect.NewTexture(gShaderToy.mActiveDoc, channelIndex, config);
