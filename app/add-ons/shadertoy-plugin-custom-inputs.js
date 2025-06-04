@@ -131,8 +131,9 @@
     /**
      * Reads a file if valid and applies it to the current channel.
      * @param {File} file
+     * @param {number?} channelIndex
      */
-    function processFile(file) {
+    function processFile(file, channelIndex) {
         if (!file) {
             throw new Error('No file provided');
         }
@@ -144,7 +145,7 @@
         };
 
         reader.onload = (event) => {
-            applyTexture(file.type, event.target.result, mediaType);
+            applyTexture(file.type, event.target.result, mediaType, channelIndex);
         };
 
         reader.readAsDataURL(file);
@@ -261,7 +262,7 @@
                         console.error('Failed to apply texture from URL:', error);
                     }
                 } else if (event.dataTransfer.files.length > 0) { // a file has been dropped
-                    processFile(event.dataTransfer.files[0]);
+                    processFile(event.dataTransfer.files[0], i);
                     if (event.dataTransfer.files.length > 1) {
                         [console.warn, alert].forEach(fn => fn(
                             `Multiple files dropped. Only the first file will be processed: ${event.dataTransfer.files[0].name}`
