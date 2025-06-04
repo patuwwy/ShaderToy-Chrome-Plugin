@@ -27,6 +27,7 @@ SOFTWARE.
  - Patu/Aberration Creations ^ Futuris (main author)
  - movAX13h
  - cxw/Incline ^ Necroposters
+ - Moritz Tim W.
 
 # Third-party license information
 

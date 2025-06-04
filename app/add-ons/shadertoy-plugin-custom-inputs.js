@@ -1,6 +1,6 @@
 //
 // By Moritz Tim W.
-// https://github.com/moritztim
+// https://moritztim.dev
 // Inspired by ShadertoyCustomTextures
 // https://github.com/ahillss/ShadertoyCustomTextures
 //

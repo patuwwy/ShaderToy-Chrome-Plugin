@@ -176,7 +176,11 @@ Supported formats: `jpeg`, `png`, `gif`, `webp`, `bmp`, `mp4`, `webm`, `ogg`, `m
 
 [Ethan Lowenthal](https://ethansawesomewebsite.tk/)
 
+[Moritz Tim W.](https://moritztimw.dev)
+
 Render timing based on [shadertoy_gpu_timing.user.js](https://github.com/andrei-drexler/shadertoy-userscripts/blob/master/shadertoy_gpu_timing.user.js) by [Andrei Drexler](https://github.com/andrei-drexler)
+
+Custom inputs inspired by [ShaderToy Custom Inputs](https://github.com/ahillss/ShadertoyCustomTextures) by [ahillss](https://github.com/ahillss)
 
 ## Beer? Sure!
 
