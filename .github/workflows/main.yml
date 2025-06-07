@@ -31,7 +31,9 @@ jobs:
           cp ./app/* ./output/chrome -r
           cp ./manifests/manifest-chrome.json ./output/chrome/manifest.json
           jq --arg version "$VERSION" '.version = $version' ./output/chrome/manifest.json > ./output/chrome/manifest.json.tmp && mv ./output/chrome/manifest.json.tmp ./output/chrome/manifest.json
-          zip -r ./output/ShaderToy-Chrome-Plugin-$VERSION.zip ./output/chrome
+          cd ./output/chrome
+          zip -r ../ShaderToy-Chrome-Plugin-$VERSION.zip ./*
+          cd ../..
 
       - name: Zip the Firefox extension
         env:
@@ -42,7 +44,8 @@ jobs:
           cp ./manifests/manifest-firefox.json ./output/firefox/manifest.json
           jq --arg id "$FIREFOX_EXTENSION_ID" '.browser_specific_settings.gecko.id = $id' ./output/firefox/manifest.json > ./output/firefox/manifest.json.tmp && mv ./output/firefox/manifest.json.tmp ./output/firefox/manifest.json
           jq --arg version "$VERSION" '.version = $version' ./output/firefox/manifest.json > ./output/firefox/manifest.json.tmp && mv ./output/firefox/manifest.json.tmp ./output/firefox/manifest.json
-          zip -r ./output/ShaderToy-Firefox-Plugin-$VERSION.zip ./output/firefox
+          cd ./output/firefox
+          zip -r ../ShaderToy-Firefox-Plugin-$VERSION.zip ./*
 
       - name: Upload output as artifacts
         uses: actions/upload-artifact@v4
