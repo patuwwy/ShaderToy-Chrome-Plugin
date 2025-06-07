@@ -323,8 +323,8 @@
         multiplyRes(multiplier) {
             var b = this.c.getBoundingClientRect(),
                 n = {
-                    w: Math.floor(b.width * multiplier),
-                    h: Math.floor(b.height * multiplier)
+                    w: Math.floor(b.width * multiplier * window.devicePixelRatio),
+                    h: Math.floor(b.height * multiplier * window.devicePixelRatio)
                 };
 
             var mE = gShaderToy.mEffect;
