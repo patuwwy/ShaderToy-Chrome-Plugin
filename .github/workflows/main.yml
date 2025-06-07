@@ -42,10 +42,11 @@ jobs:
           VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
           cp ./app/* ./output/firefox -r
           cp ./manifests/manifest-firefox.json ./output/firefox/manifest.json
-          jq --arg id "$FIREFOX_EXTENSION_ID" '.browser_specific_settings.gecko.id = $id' ./output/firefox/manifest.json > ./output/firefox/manifest.json.tmp && mv ./output/firefox/manifest.json.tmp ./output/firefox/manifest.json
+          jq --arg id "$FIREFOX_EXTENSION_ID" '.browser_specific_settings.gecko.id = "{" + $id + "}"' ./output/firefox/manifest.json > ./output/firefox/manifest.json.tmp && mv ./output/firefox/manifest.json.tmp ./output/firefox/manifest.json
           jq --arg version "$VERSION" '.version = $version' ./output/firefox/manifest.json > ./output/firefox/manifest.json.tmp && mv ./output/firefox/manifest.json.tmp ./output/firefox/manifest.json
           cd ./output/firefox
           zip -r ../ShaderToy-Firefox-Plugin-$VERSION.zip ./*
+          cd ../..
 
       - name: Upload output as artifacts
         uses: actions/upload-artifact@v4
