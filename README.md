@@ -113,6 +113,7 @@ Please add issue with description before PR.
 
 -   **Color picker** for any vec3 with r,g,b values in the code editor.
 -   **Custom Inputs** - Upload custom channel inputs in the form of image, video or audio files.
+    Files can be uploaded in the input selector dialogue or via drag and drop into the channel.
     Supported formats: `jpeg`, `png`, `gif`, `webp`, `bmp`, `mp4`, `webm`, `ogg`, `mp3`, `wav`, `ogg`, `aac`
 
 ## Screenshots
