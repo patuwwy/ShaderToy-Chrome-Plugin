@@ -411,7 +411,7 @@
                 } catch (error) {
                     console.error('Failed to apply texture from URL:', error);
                 }
-            }, MISC_INPUT_COUNT + 2, 'Apply URL', `${PLUGIN_ASSETS_URL}/file.png`, 'Load a file from a URL on shadertoy.com.')
+            }, MISC_INPUT_COUNT + 2, 'Apply URL', `${PLUGIN_ASSETS_URL}/link.png`, 'Load a file from a URL on shadertoy.com.')
         );
     }
 
