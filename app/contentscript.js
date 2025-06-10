@@ -37,6 +37,12 @@
          * @const {string}
          */
         PARAMETERS_EXTENTION_FILENAME = 'add-ons/shadertoy-plugin-parameters.js',
+        /**
+         * CustomInputs extention filename.
+         * 
+         * @const {string}
+         */
+        CUSTOM_INPUTS_EXTENTION_FILENAME = 'add-ons/shadertoy-plugin-custom-inputs.js',
 
         COMMON_FILENAME = 'shadertoy-plugin-common.js',
         STATE_STORAGE_KEY = 'STE-state',
@@ -44,6 +50,8 @@
             alternateProfile: false,
             renderMode: 'default'
         };
+
+    const PLUGIN_ASSETS_URL = chrome.runtime.getURL('assets');
 
     /**
      * Load a script directly from our extension.  The script should be
@@ -189,6 +197,19 @@
             loadScript(PARAMETERS_EXTENTION_FILENAME);
         }
     }
+    /**
+     * Loads file upload extension on editing and new shader page
+     */
+    function initializeCustomInputs() {
+        if (document.location.href.match(/shadertoy.com\/(new|(view\/.{6}))/)) {
+            loadScript(CUSTOM_INPUTS_EXTENTION_FILENAME);
+            const link = document.createElement('link');
+            link.href = PLUGIN_ASSETS_URL;
+            link.id = 'plugin-assets-url';
+            (document.head || document.documentElement).appendChild(link);
+        }
+    }
+
 
 
     /**
@@ -217,6 +238,7 @@
         initializeCodemirror();
         initializeBBCode();
         initializeHomePage();
+        initializeCustomInputs();
 
         bindMessagesListener();
         sendInitialMessage();
