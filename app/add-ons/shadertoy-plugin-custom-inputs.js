@@ -445,6 +445,17 @@
                 event.stopPropagation();
                 event.preventDefault();
                 event.dataTransfer.dropEffect = 'link';
+                channel.classList.add('hover');
+            }, false);
+            channel.addEventListener('dragleave', (event) => {
+                event.stopPropagation();
+                event.preventDefault();
+                channel.classList.remove('hover');
+            }, false);
+            channel.addEventListener('dragend', (event) => {
+                event.stopPropagation();
+                event.preventDefault();
+                channel.classList.remove('hover');
             }, false);
         }
     }
