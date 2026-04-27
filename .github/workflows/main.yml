@@ -90,8 +90,12 @@ jobs:
 
         run: |
           VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
-          npx publish-extension \
-            --firefox-zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip
+          for attempt in 1 2 3; do
+            echo "Firefox publish attempt $attempt/3"
+            npx publish-extension \
+              --firefox-zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip && break
+            [ $attempt -lt 3 ] && echo "Retrying in 30s..." && sleep 30
+          done
 
       - name: Upload & Publish Extension to Chrome Store
         continue-on-error: true
