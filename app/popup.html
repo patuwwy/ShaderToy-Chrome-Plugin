@@ -22,6 +22,8 @@
             outline: 0;
             padding: 0;
             margin: 0;
+            position: relative;
+            overflow: hidden;
         }
 
         a {
@@ -194,6 +196,29 @@
             color: #fff;
         }
 
+        body:before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(74, 199, 255, 0.35), transparent 45%),
+                radial-gradient(circle at 80% 75%, rgba(255, 88, 88, 0.25), transparent 40%),
+                linear-gradient(125deg, #0f1f2f 0%, #1e3a4b 45%, #3e2f3f 100%);
+            animation: popup-bg-shift 12s ease-in-out infinite alternate;
+        }
+
+        @keyframes popup-bg-shift {
+            0% {
+                transform: scale(1) translate3d(0, 0, 0);
+                filter: hue-rotate(0deg);
+            }
+            100% {
+                transform: scale(1.08) translate3d(-2%, -1%, 0);
+                filter: hue-rotate(18deg);
+            }
+        }
+
         .title-subtext {
             clear: both;
             font-size: 12px;
@@ -207,6 +232,16 @@
             left: 0;
             top: -2.5%;
             pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.35s ease;
+        }
+
+        body.shader-bg-ready iframe {
+            opacity: 0.9;
+        }
+
+        body.shader-bg-failed iframe {
+            display: none;
         }
 
         .beer {
@@ -228,7 +263,7 @@
 </head>
 <body>
     <div class="wrapper">
-        <iframe frameborder="0" src="https://www.shadertoy.com/embed/3djSRd?gui=false&t=10&paused=false&muted=true"></iframe>
+        <iframe id="popup-background" frameborder="0" src="https://www.shadertoy.com/embed/3djSRd?gui=false&t=10&paused=false&muted=true"></iframe>
         <section class="settings">
             <ul>
                 <li title="Shows shaders on Your page in a grid, with big previews">
