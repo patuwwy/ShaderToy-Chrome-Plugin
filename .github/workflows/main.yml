@@ -57,6 +57,7 @@ jobs:
   publish:
     runs-on: self-hosted
     needs: build
+    timeout-minutes: 35
     steps:
       - name: Download output artifact
         uses: actions/download-artifact@v4
@@ -79,14 +80,10 @@ jobs:
         run: |
           npm install --save-dev publish-browser-extension
 
-      - name: Upload & Publish Extension to Chrome Store
+      - name: Upload & Publish Extension to Firefox Add-on Store
+        continue-on-error: true
+        timeout-minutes: 20
         env:
-          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
-          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
-          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
-          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
-          CHROME_PUBLISH_TARGET: trustedTesters
-          CHROME_SKIP_SUBMIT_REVIEW: true
           FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXT_ID }}
           FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
           FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
@@ -94,8 +91,23 @@ jobs:
         run: |
           VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
           npx publish-extension \
-            --chrome-zip ./output/ShaderToy-Chrome-Plugin-$VERSION.zip \
             --firefox-zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip
+
+      - name: Upload & Publish Extension to Chrome Store
+        continue-on-error: true
+        timeout-minutes: 10
+        env:
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CHROME_PUBLISH_TARGET: trustedTesters
+          CHROME_SKIP_SUBMIT_REVIEW: true
+
+        run: |
+          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
+          npx publish-extension \
+            --chrome-zip ./output/ShaderToy-Chrome-Plugin-$VERSION.zip
 
   release:
     runs-on: self-hosted
