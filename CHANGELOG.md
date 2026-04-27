@@ -1,4 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.14.280 (27-04-2026)
+
+    -   Fix popup background not loading on some browsers (fallback background + safer embed handling). [Issue #217](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/217)
+
 -   0.14.272 (11-01-2025)
 
     -   Canvas size can be set with custom parameters object in common tab. [See documentation](./docs/custom-params.md)

@@ -1,5 +1,6 @@
 class Popup {
     constructor() {
+        this.bindBackgroundEmbed();
         this.bindRenderModeSelect();
         this.bindAlternateProfileInput();
 
@@ -27,6 +28,54 @@ class Popup {
 
         document.getElementById('version').innerText =
             'v' + chrome.runtime.getManifest().version;
+    }
+
+    /**
+     * Shows embedded shader only when it successfully loads.
+     * Keeps a local CSS background as the fallback on failure.
+     */
+    bindBackgroundEmbed() {
+        const body = document.body;
+        const backgroundFrame = document.getElementById('popup-background');
+
+        if (!backgroundFrame) {
+            return;
+        }
+
+        let isSettled = false;
+        const loadTimeoutMs = 1800;
+
+        const markLoaded = () => {
+            if (isSettled) {
+                return;
+            }
+
+            isSettled = true;
+            body.classList.remove('shader-bg-failed');
+            body.classList.add('shader-bg-ready');
+        };
+
+        const markFailed = () => {
+            if (isSettled) {
+                return;
+            }
+
+            isSettled = true;
+            body.classList.remove('shader-bg-ready');
+            body.classList.add('shader-bg-failed');
+        };
+
+        const timeout = window.setTimeout(markFailed, loadTimeoutMs);
+
+        backgroundFrame.addEventListener('load', () => {
+            window.clearTimeout(timeout);
+            markLoaded();
+        });
+
+        backgroundFrame.addEventListener('error', () => {
+            window.clearTimeout(timeout);
+            markFailed();
+        });
     }
 
     /**
