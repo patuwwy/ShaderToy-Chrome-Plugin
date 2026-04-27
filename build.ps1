@@ -23,7 +23,8 @@ Write-Host "Chrome ZIP: output/ShaderToy-Chrome-Plugin-$VERSION.zip"
 # FIREFOX_EXTENSION_ID can be passed as env variable or set here directly
 $FIREFOX_EXTENSION_ID = $env:FIREFOX_EXTENSION_ID
 if (-not $FIREFOX_EXTENSION_ID) {
-    Write-Warning "FIREFOX_EXTENSION_ID not set - skipping gecko id injection"
+    $FIREFOX_EXTENSION_ID = "shadertoy-dev@localhost"
+    Write-Host "FIREFOX_EXTENSION_ID not set - using temporary dev ID: $FIREFOX_EXTENSION_ID"
 }
 Copy-Item ./app/* ./output/firefox -Recurse -Force
 Copy-Item ./manifests/manifest-firefox.json ./output/firefox/manifest.json -Force
