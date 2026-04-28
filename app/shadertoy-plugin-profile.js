@@ -394,18 +394,21 @@
      */
     class ToyPlugProfilePage {
         constructor() {
+            var stateRaw = window.localStorage.getItem(STATE_STORAGE_KEY),
+                state = { alternateProfile: false };
+
             helpers = new Helpers({});
+
+            if (typeof stateRaw === 'string') {
+                try {
+                    state = JSON.parse(stateRaw) || state;
+                } catch (_ignore) {}
+            }
 
             if (document.head.textContent) {
                 this.sortableShaderList = new SortableShaderList();
 
-                if (
-                    JSON.parse(
-                        window.localStorage.getItem(STATE_STORAGE_KEY) || {
-                            alternateProfile: false
-                        }
-                    ).alternateProfile
-                ) {
+                if (state.alternateProfile) {
                     this.tilesView = new TilesView();
                 }
 

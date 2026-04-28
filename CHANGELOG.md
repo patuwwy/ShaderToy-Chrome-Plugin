@@ -1,4 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.14.286 (28-04-2026)
+
+    -   Fix profile page console error from unsafe state parsing (`JSON.parse` on non-string fallback) that could break profile enhancements. [Issue #152](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/152)
+
 -   0.14.285 (28-04-2026)
 
     -   Add dedicated undo/redo history for comment textarea to prevent Ctrl/Cmd+Z from crossing into Monaco/CodeMirror history after mixed typing. [Issue #168](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/168)
