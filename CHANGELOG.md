@@ -1,4 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.14.283 (28-04-2026)
+
+    -   Improve Cloudflare challenge detection (localized title, challenge platform and Turnstile markers) so plugin scripts are not injected during verification on shader URLs. [Issue #215](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/215)
+
 -   0.14.281 (28-04-2026)
 
     -   Fix Monaco editor buffer tabs losing unsaved text after switching tabs. [Issue #218](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/218)
