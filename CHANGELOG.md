@@ -1,4 +1,12 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.14.285 (28-04-2026)
+
+    -   Add dedicated undo/redo history for comment textarea to prevent Ctrl/Cmd+Z from crossing into Monaco/CodeMirror history after mixed typing. [Issue #168](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/168)
+
+-   0.14.284 (28-04-2026)
+
+    -   Fix code editor undo/redo shortcuts being mixed with browser history (e.g. chat input), by forcing Ctrl/Cmd+Z and redo shortcuts to stay in the shader editor. [Issue #168](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/168)
+
 -   0.14.283 (28-04-2026)
 
     -   Improve Cloudflare challenge detection (localized title, challenge platform and Turnstile markers) so plugin scripts are not injected during verification on shader URLs. [Issue #215](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/215)
