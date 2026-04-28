@@ -377,9 +377,111 @@
          * Attaches additional keys support.
          */
         bindKeys() {
-            var self = this;
+            var self = this,
+                commentHistory = {
+                    undoStack: [],
+                    redoStack: [],
+                    lastSnapshot: null,
+                    isApplying: false
+                };
+
+            function isCommentTextArea(target) {
+                return target && target.id === 'commentTextArea';
+            }
+
+            function getSnapshot(target) {
+                return {
+                    value: target.value,
+                    start: target.selectionStart,
+                    end: target.selectionEnd
+                };
+            }
+
+            function applySnapshot(target, snapshot) {
+                target.value = snapshot.value;
+                if (typeof snapshot.start === 'number' && typeof snapshot.end === 'number') {
+                    target.selectionStart = snapshot.start;
+                    target.selectionEnd = snapshot.end;
+                }
+            }
+
+            function pushSnapshot(stack, snapshot) {
+                stack.push(snapshot);
+                if (stack.length > 200) {
+                    stack.shift();
+                }
+            }
+
+            document.addEventListener('focusin', function(e) {
+                if (isCommentTextArea(e.target)) {
+                    commentHistory.lastSnapshot = getSnapshot(e.target);
+                }
+            }, true);
+
+            document.addEventListener('input', function(e) {
+                if (!isCommentTextArea(e.target)) {
+                    return;
+                }
+
+                var currentSnapshot = getSnapshot(e.target);
+
+                if (commentHistory.isApplying) {
+                    commentHistory.lastSnapshot = currentSnapshot;
+                    return;
+                }
+
+                if (!commentHistory.lastSnapshot) {
+                    commentHistory.lastSnapshot = currentSnapshot;
+                    return;
+                }
+
+                if (commentHistory.lastSnapshot.value !== currentSnapshot.value) {
+                    pushSnapshot(commentHistory.undoStack, commentHistory.lastSnapshot);
+                    commentHistory.redoStack = [];
+                }
+
+                commentHistory.lastSnapshot = currentSnapshot;
+            }, true);
 
             document.addEventListener('keydown', function(e) {
+                var target = e.target,
+                    key = (e.key || '').toLowerCase(),
+                    isMac = navigator.platform.match('Mac'),
+                    isCmdOrCtrl = isMac ? e.metaKey : e.ctrlKey,
+                    isUndoShortcut = isCmdOrCtrl && !e.altKey && key === 'z' && !e.shiftKey,
+                    isRedoShortcut = isCmdOrCtrl && !e.altKey && (key === 'y' || (key === 'z' && e.shiftKey)),
+                    isCodeEditorTarget = target && target.closest && target.closest('#editor .CodeMirror');
+
+                if ((isUndoShortcut || isRedoShortcut) && isCommentTextArea(target)) {
+                    var fromStack = isUndoShortcut ? commentHistory.undoStack : commentHistory.redoStack,
+                        toStack = isUndoShortcut ? commentHistory.redoStack : commentHistory.undoStack,
+                        nextSnapshot = fromStack.pop();
+
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+
+                    if (nextSnapshot) {
+                        pushSnapshot(toStack, getSnapshot(target));
+                        commentHistory.isApplying = true;
+                        applySnapshot(target, nextSnapshot);
+                        commentHistory.isApplying = false;
+                        commentHistory.lastSnapshot = getSnapshot(target);
+                    }
+
+                    return;
+                }
+
+                // Keep undo/redo scoped to the shader code editor and prevent
+                // browser-level history from jumping into other text fields.
+                if ((isUndoShortcut || isRedoShortcut) && isCodeEditorTarget && gShaderToy.mCodeEditor) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    gShaderToy.mCodeEditor.execCommand(isUndoShortcut ? 'undo' : 'redo');
+                    gShaderToy.mCodeEditor.focus();
+                    return;
+                }
+
                 var which = e.which,
                     code = e.code;
                 if (e.target.id === self.MAIN_SHADERTOY_DEMO_ID) {
