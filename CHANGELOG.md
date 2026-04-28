@@ -1,4 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.14.288 (28-04-2026)
+
+    -   Fix time range input values being floored to integers when validating decimal values (e.g. 3.1, 3.2). Changed `parseInt` to `parseFloat` in time range handlers to preserve decimal places. [Issue #161](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/161)
+
 -   0.14.287 (28-04-2026)
 
     -   Fix profile page console error from unsafe state parsing (`JSON.parse` on non-string fallback) that could break profile enhancements. [Issue #152](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/152)
