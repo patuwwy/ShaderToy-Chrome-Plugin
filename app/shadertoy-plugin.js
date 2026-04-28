@@ -808,6 +808,20 @@
 
             var o_editor_monaco = null;
 
+            const syncMonacoToActiveDoc = () => {
+                if (!o_editor_monaco || !gShaderToy.mPass[gShaderToy.mActiveDoc]) {
+                    return;
+                }
+
+                var s_code = o_editor_monaco.getModel().getValue();
+                var o_active_doc = gShaderToy.mPass[gShaderToy.mActiveDoc].mDocs;
+
+                if (o_active_doc.getValue() !== s_code) {
+                    o_active_doc.setValue(s_code);
+                    gShaderToy.mNeedsSave = true;
+                }
+            };
+
             const registerEditorEvents = () => {
                 if (!gShaderToy.mPass[gShaderToy.mActiveDoc]) {
                     setTimeout(registerEditorEvents, 100);
@@ -830,10 +844,8 @@
                     o_editor_monaco.layout();
                 };
 
-                o_editor_monaco.getModel().onDidChangeContent((event) => {
-                    //var s_code = o_editor_monaco.getModel().getValue();
-                    //gShaderToy.mPass[gShaderToy.mActiveDoc].mDocs.setValue(s_code);
-                    //document.querySelector("#compileButton").click();
+                o_editor_monaco.getModel().onDidChangeContent(() => {
+                    syncMonacoToActiveDoc();
                 });
 
                 document.querySelector(".monaco-editor").addEventListener("keydown", function (e) {
@@ -845,8 +857,7 @@
                     if (e.key === 'Enter' && (navigator.platform.match("Mac") ? e.metaKey : e.altKey)) {
                         e.preventDefault();
                         // o_self.f_run_o_program();
-                        var s_code = o_editor_monaco.getModel().getValue();
-                        gShaderToy.mPass[gShaderToy.mActiveDoc].mDocs.setValue(s_code);
+                        syncMonacoToActiveDoc();
                         document.querySelector("#compileButton").click();
                     }
                 }, false);
@@ -868,6 +879,7 @@
             var f_ChangePass_old = ShaderToy.prototype.ChangePass;
 
             ShaderToy.prototype.ChangePass = function(n_id) {
+                syncMonacoToActiveDoc();
                 f_ChangePass_old.call(this, n_id);
 
                 var s_code = gShaderToy.mPass[gShaderToy.mActiveDoc].mDocs.getValue();
