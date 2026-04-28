@@ -1505,6 +1505,15 @@
          * Stores shader in localStorage and redirect to "new shader" page.
          */
         onButtonClick() {
+            if (
+                gShaderToy.mNeedsSave &&
+                !window.confirm(
+                    'This shader has unsaved changes. Forking now may cause you to lose edits in the current draft.\n\nSave first, or use "Save as new draft" instead of Fork. Continue anyway?'
+                )
+            ) {
+                return;
+            }
+
             var shaderData = gShaderToy.Save(),
                 banner = this.createBanner(shaderData.info);
 
