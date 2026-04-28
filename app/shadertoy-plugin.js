@@ -446,11 +446,18 @@
             document.addEventListener('keydown', function(e) {
                 var target = e.target,
                     key = (e.key || '').toLowerCase(),
-                    isMac = navigator.platform.match('Mac'),
-                    isCmdOrCtrl = isMac ? e.metaKey : e.ctrlKey,
-                    isUndoShortcut = isCmdOrCtrl && !e.altKey && key === 'z' && !e.shiftKey,
-                    isRedoShortcut = isCmdOrCtrl && !e.altKey && (key === 'y' || (key === 'z' && e.shiftKey)),
-                    isCodeEditorTarget = target && target.closest && target.closest('#editor .CodeMirror');
+                    code = e.code || '',
+                    activeElement = document.activeElement,
+                    isCmdOrCtrl = e.ctrlKey || e.metaKey,
+                    isUndoShortcut = isCmdOrCtrl && !e.altKey && !e.shiftKey && (key === 'z' || code === 'KeyZ'),
+                    isRedoShortcut = isCmdOrCtrl && !e.altKey && (
+                        key === 'y' || code === 'KeyY' ||
+                        (e.shiftKey && (key === 'z' || code === 'KeyZ'))
+                    ),
+                    isCodeEditorTarget =
+                        (target && target.closest && target.closest('#editor .CodeMirror')) ||
+                        (activeElement && activeElement.closest && activeElement.closest('#editor .CodeMirror')) ||
+                        (gShaderToy.mCodeEditor && typeof gShaderToy.mCodeEditor.hasFocus === 'function' && gShaderToy.mCodeEditor.hasFocus());
 
                 if ((isUndoShortcut || isRedoShortcut) && isCommentTextArea(target)) {
                     var fromStack = isUndoShortcut ? commentHistory.undoStack : commentHistory.redoStack,
