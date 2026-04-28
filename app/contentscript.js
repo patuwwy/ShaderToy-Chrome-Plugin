@@ -146,6 +146,44 @@
         );
     }
 
+    function isCloudflareChallengePage() {
+        var path = document.location.pathname || '';
+        var search = document.location.search || '';
+        var title = (document.title || '').toLowerCase();
+        var challengePlatformScript = document.querySelector(
+            'script[src*="/cdn-cgi/challenge-platform/"]'
+        );
+        var turnstileScript = document.querySelector(
+            'script[src*="challenges.cloudflare.com/turnstile/"]'
+        );
+        var challengeCSP = document.querySelector(
+            'meta[http-equiv="content-security-policy"][content*="challenges.cloudflare.com"]'
+        );
+
+        if (path.indexOf('/cdn-cgi/') === 0) {
+            return true;
+        }
+
+        if (search.indexOf('__cf_chl_') !== -1 || search.indexOf('cf_chl') !== -1) {
+            return true;
+        }
+
+        if (title.indexOf('just a moment') !== -1) {
+            return true;
+        }
+
+        return Boolean(
+            challengePlatformScript ||
+            turnstileScript ||
+            challengeCSP ||
+            document.getElementById('challenge-form') ||
+            document.getElementById('challenge-running') ||
+            document.getElementById('challenge-success-text') ||
+            document.getElementById('challenge-error-text') ||
+            document.querySelector('.cf-challenge')
+        );
+    }
+
     /**
      * Loads profile script on profile page.
      */
@@ -195,6 +233,10 @@
      * Initializes extension.
      */
     function init() {
+        if (isCloudflareChallengePage()) {
+            return;
+        }
+
         loadScript(MAIN_EXTENSION_FILENAME);
         setTimeout(() => {
             window.postMessage({
