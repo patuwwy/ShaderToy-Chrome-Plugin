@@ -1,4 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.14.281 (28-04-2026)
+
+    -   Fix Monaco editor buffer tabs losing unsaved text after switching tabs. [Issue #218](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/218)
+
 -   0.14.280 (27-04-2026)
 
     -   Fix popup background not loading on some browsers (fallback background + safer embed handling). [Issue #217](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/217)
