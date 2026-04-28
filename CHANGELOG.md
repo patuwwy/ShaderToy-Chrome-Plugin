@@ -1,4 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.14.290 (28-04-2026)
+
+    -   Fix remaining redo shortcut regression in the shader editor by improving Ctrl/Cmd detection and CodeMirror focus checks across keyboard layouts. [Issue #168](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/168)
+
 -   0.14.289 (28-04-2026)
 
     -   Add a confirmation prompt before Fork when the current shader has unsaved changes, with guidance to save first or use "Save as new draft". [Issue #59](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/59)
