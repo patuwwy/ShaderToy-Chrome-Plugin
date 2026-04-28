@@ -1255,23 +1255,23 @@
         }
 
         onChangeMinInput() {
-            this.maxValueInput.min = parseInt(this.minValueInput.value, 10) + 1;
+            this.maxValueInput.min = parseFloat(this.minValueInput.value) + 0.1;
             this.maxValueInput.value = Math.max(
-                parseInt(this.maxValueInput.value, 10),
-                parseInt(this.minValueInput.value, 10) + 1
+                parseFloat(this.maxValueInput.value),
+                parseFloat(this.minValueInput.value) + 0.1
             );
             this.sliderInput.min =
-                parseInt(this.minValueInput.value, 10) * 1000;
+                parseFloat(this.minValueInput.value) * 1000;
         }
 
         onChangeMaxInput() {
-            this.minValueInput.max = parseInt(this.maxValueInput.value, 10);
+            this.minValueInput.max = parseFloat(this.maxValueInput.value);
             this.minValueInput.value = Math.min(
-                parseInt(this.maxValueInput.value, 10) - 1,
-                parseInt(this.minValueInput.value, 10)
+                parseFloat(this.maxValueInput.value) - 0.1,
+                parseFloat(this.minValueInput.value)
             );
             this.sliderInput.max =
-                parseInt(this.maxValueInput.value, 10) * 1000;
+                parseFloat(this.maxValueInput.value) * 1000;
         }
 
         /**
