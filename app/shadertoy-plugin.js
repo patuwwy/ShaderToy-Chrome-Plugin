@@ -917,7 +917,31 @@
 
             var o_editor_monaco = null;
 
+            const isMonacoSelected = () => {
+                return !!(this.state && this.state.monaco === true);
+            };
+
             const syncMonacoToActiveDoc = () => {
+                if (!isMonacoSelected() || !o_editor_monaco || !gShaderToy.mPass[gShaderToy.mActiveDoc]) {
+                    return;
+                }
+
+                var s_code = o_editor_monaco.getModel().getValue();
+                var o_active_doc = gShaderToy.mPass[gShaderToy.mActiveDoc].mDocs;
+
+                if (o_active_doc.getValue() !== s_code) {
+                    o_active_doc.setValue(s_code);
+                    gShaderToy.mNeedsSave = true;
+                }
+
+                if (gShaderToy.mCodeEditor && gShaderToy.mCodeEditor.getValue && gShaderToy.mCodeEditor.setValue) {
+                    if (gShaderToy.mCodeEditor.getValue() !== s_code) {
+                        gShaderToy.mCodeEditor.setValue(s_code);
+                    }
+                }
+            };
+
+            const forceSyncMonacoToActiveDoc = () => {
                 if (!o_editor_monaco || !gShaderToy.mPass[gShaderToy.mActiveDoc]) {
                     return;
                 }
@@ -929,7 +953,28 @@
                     o_active_doc.setValue(s_code);
                     gShaderToy.mNeedsSave = true;
                 }
+
+                if (gShaderToy.mCodeEditor && gShaderToy.mCodeEditor.getValue && gShaderToy.mCodeEditor.setValue) {
+                    if (gShaderToy.mCodeEditor.getValue() !== s_code) {
+                        gShaderToy.mCodeEditor.setValue(s_code);
+                    }
+                }
             };
+
+            const syncActiveDocToMonaco = () => {
+                if (!o_editor_monaco || !gShaderToy.mPass[gShaderToy.mActiveDoc]) {
+                    return;
+                }
+
+                var s_code = gShaderToy.mPass[gShaderToy.mActiveDoc].mDocs.getValue();
+
+                if (o_editor_monaco.getModel().getValue() !== s_code) {
+                    o_editor_monaco.getModel().setValue(s_code);
+                }
+            };
+
+            this.forceSyncMonacoToActiveDoc = forceSyncMonacoToActiveDoc;
+            this.syncActiveDocToMonaco = syncActiveDocToMonaco;
 
             const registerEditorEvents = () => {
                 if (!gShaderToy.mPass[gShaderToy.mActiveDoc]) {
@@ -988,12 +1033,27 @@
             var f_ChangePass_old = ShaderToy.prototype.ChangePass;
 
             ShaderToy.prototype.ChangePass = function(n_id) {
-                syncMonacoToActiveDoc();
+                var n_prev_active_doc = this.mActiveDoc,
+                    s_prev_monaco_code = null;
+
+                if (isMonacoSelected()) {
+                    if (o_editor_monaco && o_editor_monaco.getModel) {
+                        s_prev_monaco_code = o_editor_monaco.getModel().getValue();
+                    }
+
+                    forceSyncMonacoToActiveDoc();
+                }
+
                 f_ChangePass_old.call(this, n_id);
 
-                var s_code = gShaderToy.mPass[gShaderToy.mActiveDoc].mDocs.getValue();
+                if (typeof s_prev_monaco_code === 'string' && this.mPass[n_prev_active_doc] && this.mPass[n_prev_active_doc].mDocs) {
+                    if (this.mPass[n_prev_active_doc].mDocs.getValue() !== s_prev_monaco_code) {
+                        this.mPass[n_prev_active_doc].mDocs.setValue(s_prev_monaco_code);
+                        this.mNeedsSave = true;
+                    }
+                }
 
-                o_editor_monaco && o_editor_monaco.getModel().setValue(s_code);
+                syncActiveDocToMonaco();
             }
 
             var s_html_editor_choice = `
@@ -1014,6 +1074,26 @@
         }
 
         f_display_editor(s_selector, monaco) {
+            this.state = this.state || {};
+
+            if (monaco && this.syncActiveDocToMonaco) {
+                this.syncActiveDocToMonaco();
+            }
+
+            if (!monaco && this.forceSyncMonacoToActiveDoc) {
+                this.forceSyncMonacoToActiveDoc();
+            }
+
+            this.state.monaco = monaco;
+
+            if (!monaco && gShaderToy.mCodeEditor && gShaderToy.mPass[gShaderToy.mActiveDoc]) {
+                var o_active_doc = gShaderToy.mPass[gShaderToy.mActiveDoc].mDocs;
+
+                if (gShaderToy.mCodeEditor.getDoc && gShaderToy.mCodeEditor.swapDoc && gShaderToy.mCodeEditor.getDoc() !== o_active_doc) {
+                    gShaderToy.mCodeEditor.swapDoc(o_active_doc);
+                }
+            }
+
             Array.prototype.slice.apply(document.querySelectorAll('#editorManager .tab'))
                 .forEach(o => o.classList.remove("selected"));
 
@@ -1023,11 +1103,20 @@
                 .forEach(sel => document.querySelector(sel).style.display = "none");
 
             document.querySelector(s_selector).style.display = "block";
+
+            if (!monaco && gShaderToy.mCodeEditor && gShaderToy.mCodeEditor.refresh) {
+                gShaderToy.mCodeEditor.refresh();
+            }
+
+            if (monaco && o_editor_monaco && o_editor_monaco.layout) {
+                o_editor_monaco.layout();
+            }
+
             window.localStorage.setItem(
                 STATE_STORAGE_KEY, JSON.stringify(
                     {
                         ...JSON.parse(window.localStorage.getItem(STATE_STORAGE_KEY) || "{}"),
-                        monaco
+                        monaco: this.state.monaco
                     }
                 )
             )
