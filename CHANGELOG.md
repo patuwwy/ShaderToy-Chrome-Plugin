@@ -1,4 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.14.291 (20-05-2026)
+
+    -   Fix editor synchronization regressions: prevent tab-switch resets in original editor mode and keep Monaco/Original editor changes synchronized (including Monaco tab switching without losing unsaved edits). [Issue #229](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/229)
+
 -   0.14.290 (28-04-2026)
 
     -   Fix remaining redo shortcut regression in the shader editor by improving Ctrl/Cmd detection and CodeMirror focus checks across keyboard layouts. [Issue #168](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/168)
