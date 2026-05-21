@@ -30,6 +30,11 @@
             "js": ["contentscript.js"],
             "css": ["style.css"],
             "run_at": "document_end"
+        },
+        {
+            "matches": ["https://www.shadertoy.com/view/*"],
+            "js": ["shadertoy-splitter.js"],
+            "run_at": "document_end"
         }
     ],
     "web_accessible_resources": [
@@ -47,6 +52,7 @@
                 "add-ons/monaco/min/vs/base/worker/workerMain.js",
                 "shadertoy-plugin-profile.js",
                 "shadertoy-plugin-home.js",
+                "shadertoy-splitter.js",
                 "scripts/jszip-3.1.5.js",
                 "scripts/node-sanitize-filename.js"
             ],
