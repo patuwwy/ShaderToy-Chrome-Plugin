@@ -112,6 +112,10 @@ Please add issue with description before PR.
 -   **Code completion** for glsl keywords in the code editor.
 
 -   **Color picker** for any vec3 with r,g,b values in the code editor.
+-   **Custom Inputs** - Upload custom channel inputs in the form of image, video or audio files.
+    Files can be added via upload or URL in the input selector dialogue or via drag and drop into the channel.
+    Due to security constraints, only URLS within shadertoy.com are allowed.
+    Supported formats: `jpeg`, `png`, `gif`, `webp`, `bmp`, `mp4`, `webm`, `ogg`, `mp3`, `wav`, `ogg`, `aac`
 
 ## Screenshots
 
@@ -157,6 +161,10 @@ Please add issue with description before PR.
 
 ![](./screenshots/bbcode-buttons.png)
 
+##### Custom input upload button
+
+![](./screenshots/custom-inputs.png)
+
 ---
 
 ## Author / Contact:
@@ -171,7 +179,11 @@ Please add issue with description before PR.
 
 [Ethan Lowenthal](https://ethansawesomewebsite.tk/)
 
+[Moritz Tim W.](https://moritztimw.dev)
+
 Render timing based on [shadertoy_gpu_timing.user.js](https://github.com/andrei-drexler/shadertoy-userscripts/blob/master/shadertoy_gpu_timing.user.js) by [Andrei Drexler](https://github.com/andrei-drexler)
+
+Custom inputs inspired by [ShaderToy Custom Inputs](https://github.com/ahillss/ShadertoyCustomTextures) by [ahillss](https://github.com/ahillss)
 
 ## Beer? Sure!
 
