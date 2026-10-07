@@ -16,6 +16,19 @@
             "options": {
                 "printWidth": 200
             }
+        },
+        {
+            "files": "*.md",
+            "options": {
+                "proseWrap": "always"
+            }
+        },
+        {
+            "files": "Makefile",
+            "options": {
+                "tabWidth": 8,
+                "useTabs": true
+            }
         }
     ]
 }
