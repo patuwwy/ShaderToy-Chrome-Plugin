@@ -159,7 +159,6 @@ jobs:
           npm install --save-dev publish-browser-extension
 
       - name: Upload & Publish Extension to Chrome Store
-
         timeout-minutes: 10
         env:
           CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
@@ -171,3 +170,40 @@ jobs:
           VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
           npx publish-extension \
             --chrome-zip ./output/ShaderToy-Chrome-Plugin-$VERSION.zip
+
+  publish-edge:
+    runs-on: self-hosted
+    needs: build
+    timeout-minutes: 15
+    steps:
+      - name: Download output artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: output
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Verify Node.js runtime
+        run: |
+          which node
+          node -v
+          which npm
+          npm -v
+
+      - name: Install Dependencies for Publishing
+        run: |
+          npm install --save-dev publish-browser-extension
+
+      - name: Upload & Publish Extension to Microsoft Edge Add-ons
+        timeout-minutes: 10
+        env:
+          EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
+          EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
+          EDGE_API_KEY: ${{ secrets.EDGE_API_KEY }}
+        run: |
+          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
+          npx publish-extension \
+            --edge-zip ./output/ShaderToy-Chrome-Plugin-$VERSION.zip

@@ -1,4 +1,11 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.14.293 (07-10-2026)
+
+    -   Add ESLint configuration with linting steps in build script and CI workflow.
+    -   Fix Monaco assets CSS path and improve initialization reliability in content script.
+    -   Split and isolate store publish workflows (Firefox, Chrome, Microsoft Edge) and decouple GitHub release from store publishing.
+    -   Fix Firefox extension ID validation during add-on submission.
+
 -   0.14.291 (20-05-2026)
 
     -   Fix editor synchronization regressions: prevent tab-switch resets in original editor mode and keep Monaco/Original editor changes synchronized (including Monaco tab switching without losing unsaved edits). [Issue #229](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/229)
