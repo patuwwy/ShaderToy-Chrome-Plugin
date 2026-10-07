@@ -6,6 +6,14 @@ $ErrorActionPreference = 'Stop'
 $VERSION = (Get-Content ./manifests/version.txt -Raw).Trim()
 Write-Host "Building version: $VERSION"
 
+# Lint source files
+Write-Host "Running ESLint on app/*.js..."
+npx eslint "app/*.js"
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "ESLint found errors! Build aborted."
+    exit 1
+}
+
 # Cleanup and prepare output directories
 if (Test-Path ./output) { Remove-Item ./output -Recurse -Force }
 New-Item -ItemType Directory -Path ./output/chrome, ./output/firefox | Out-Null

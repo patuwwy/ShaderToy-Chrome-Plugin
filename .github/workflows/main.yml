@@ -7,8 +7,24 @@ on:
   workflow_dispatch:
 
 jobs:
+  lint:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Lint source files
+        run: |
+          npx eslint "app/*.js"
+
   build:
     runs-on: self-hosted
+    needs: lint
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -143,7 +159,7 @@ jobs:
           npm install --save-dev publish-browser-extension
 
       - name: Upload & Publish Extension to Chrome Store
-        continue-on-error: true
+
         timeout-minutes: 10
         env:
           CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
@@ -155,4 +171,3 @@ jobs:
           VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
           npx publish-extension \
             --chrome-zip ./output/ShaderToy-Chrome-Plugin-$VERSION.zip
-
