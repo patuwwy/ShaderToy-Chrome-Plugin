@@ -113,7 +113,7 @@ jobs:
       - name: Upload & Publish Extension to Firefox Add-on Store
         timeout-minutes: 20
         env:
-          FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXT_ID }}
+          FIREFOX_EXTENSION_ID: shadertoy-unofficial-plugin
           FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
           FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
         run: |
@@ -121,7 +121,9 @@ jobs:
           success=0
           for attempt in 1 2 3; do
             echo "Firefox publish attempt $attempt/3"
-            if npx publish-extension --firefox-zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip; then
+            if npx publish-extension \
+              --firefox-extension-id "$FIREFOX_EXTENSION_ID" \
+              --firefox-zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip; then
               success=1
               break
             fi
