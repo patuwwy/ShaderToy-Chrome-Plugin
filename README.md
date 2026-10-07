@@ -74,19 +74,22 @@ Please add issue with description before PR.
 -   ~~Shaders previews on "My profile" page.~~
     (feature removed - implemented natively in Shadertoy. Big preview on mouse over is still available)
 
--   **Change resolution** in windowed and fullscreen mode by pressing keys ALT + 1...9.
+-   **Change resolution** in windowed and fullscreen mode by pressing keys ALT + 1...9 (decrease resolution) or ALT + SHIFT + 1...9 (increase/multiply resolution).
 
     Resolution is divided by pressed key value, for example:
 
     Key '2' divides by 2, 1920x1080 becomes 960x540.
     Key '8' divides by 8, 1920x1080 becomes 240x135.
 
-    This allows to run shaders smoothly (even in fullscreen) on non-top GPUs.
-    ~~Notice that lower resolution is interpolated to original size. This causes blurrish rendering.~~
-    Notice, antialiasing is enabled by default on Shadertoy WebGL canvas.
-    For "pixelated" image, rendering mode switch has been added in extension's popup (click on green S icon) ~~(chrome only)~~.
+    With SHIFT pressed, resolution is multiplied instead.
 
--   Take HQ screenshot. Screenshot resolution is 2 \* current resolution (including current resolution divider). 1920x1080 becomes 3840x2160.
+    This allows to run shaders smoothly (even in fullscreen) on non-top GPUs or render high-res details.
+    Notice, antialiasing is enabled by default on Shadertoy WebGL canvas.
+    For "pixelated" image, rendering mode switch has been added in extension's popup (click on green S icon).
+
+-   Take HQ screenshot (SHIFT + CTRL + S).
+
+-   Record video / canvas capture (SHIFT + CTRL + R).
 
 -   Pause/Restart in fullscreen mode.
 

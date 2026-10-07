@@ -32,6 +32,8 @@ common tab:
 
 ### Size
 
+Resize Shadertoy canvas to a custom resolution by declaring width and height:
+
 ```
 /* shadertoy-plugin parameters
 {
@@ -43,6 +45,5 @@ common tab:
 */
 ```
 
-
-
-
+> [!NOTE]
+> Custom parameters should be placed in the `Common` tab and are evaluated on shader load and when clicking the compile button.

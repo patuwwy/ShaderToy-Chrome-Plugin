@@ -123,6 +123,10 @@
             _sender,
             sendResponse
         ) {
+            if (!request || !request.data) {
+                return;
+            }
+
             if (request.data.get === 'state') {
                 restoreState();
                 sendResponse(state);
@@ -142,7 +146,11 @@
             {
                 present: true
             },
-            function() {}
+            function() {
+                if (chrome.runtime.lastError) {
+                    // Ignored: receiver may not be open yet
+                }
+            }
         );
     }
 
@@ -243,7 +251,7 @@
                 type: "MonacoAssetsData", cfg: {
                     monacoLoader: chrome.runtime.getURL('add-ons/monaco/loader.min.js'),
                     monacoEditor: chrome.runtime.getURL('add-ons/monaco/min/vs/editor.main.js'),
-                    monacoEditorVSPath: chrome.runtime.getURL('add-ons/monaco/min/vs/editor.min.css').replace("/editor.min.css", "")
+                    monacoEditorVSPath: chrome.runtime.getURL('add-ons/monaco/min/vs/editor/editor.main.css').replace("/editor/editor.main.css", "")
                 }
             });
             console.log("post message sent")
@@ -266,5 +274,9 @@
         restoreState();
     }
 
-    window.addEventListener('load', init);
+    if (document.readyState === 'complete') {
+        init();
+    } else {
+        window.addEventListener('load', init);
+    }
 })();
