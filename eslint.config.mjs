@@ -36,7 +36,13 @@ export default [
         },
         rules: {
             'no-undef': 'error',
-            'no-unused-vars': ['warn', { 'vars': 'all', 'args': 'none', 'ignoreRestSiblings': true }]
+            'no-unused-vars': ['warn', {
+                'vars': 'all',
+                'varsIgnorePattern': '^_|^ignore',
+                'args': 'none',
+                'caughtErrors': 'none',
+                'ignoreRestSiblings': true
+            }]
         }
     }
 ];

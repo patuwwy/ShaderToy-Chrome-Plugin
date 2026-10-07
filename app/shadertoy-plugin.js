@@ -1,4 +1,4 @@
-/* global gShaderToy, dataLoadShader, window, document, Effect */
+/* global gShaderToy, window, document, Effect */
 
 (function shadertoyPlugin() {
     'use strict';
@@ -41,8 +41,7 @@
             '{tags}\n{description}\n' +
             '-------------------------------------------------------------\n' +
             'You can upload the JSON file of the shader using\n' +
-            'https://github.com/patuwwy/ShaderToy-Chrome-Plugin\n',
-        renderTimersVisible = false;
+            'https://github.com/patuwwy/ShaderToy-Chrome-Plugin\n';
 
     /**
      * ToyPlug.
@@ -185,16 +184,15 @@
     class ToyPlugEditPage {
         constructor() {
             this.init();
-            let ok = false;
-            console.log("waiting for message");
+            console.log('waiting for message');
             const monacoAssetsListener = (event) => {
                 if (event.source !== window) return;
-                if (event.data.type && event.data.type === "MonacoAssetsData") {
+                if (event.data.type && event.data.type === 'MonacoAssetsData') {
                     this.loadMonacoEditor(event.data.cfg);
                 }
-            }
+            };
 
-            window.addEventListener("message", monacoAssetsListener);
+            window.addEventListener('message', monacoAssetsListener);
         }
 
         /**
@@ -641,10 +639,7 @@
          * Create the UI controls to download the JSON file of the current shader
          */
         downloadShader() {
-            var container =
-                    document.getElementById('shaderPublished') ||
-                    document.getElementById('shaderButtons'),
-                download = document.createElement('div');
+            var download = document.createElement('div');
 
             download.classList.add('formButton');
             download.classList.add('formButton-extension');
