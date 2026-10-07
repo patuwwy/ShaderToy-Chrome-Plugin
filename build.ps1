@@ -30,7 +30,7 @@ Copy-Item ./app/* ./output/firefox -Recurse -Force
 Copy-Item ./manifests/manifest-firefox.json ./output/firefox/manifest.json -Force
 $manifest = Get-Content ./output/firefox/manifest.json -Raw | ConvertFrom-Json
 if ($FIREFOX_EXTENSION_ID) {
-    $manifest.browser_specific_settings.gecko.id = "{$FIREFOX_EXTENSION_ID}"
+    $manifest.browser_specific_settings.gecko.id = $FIREFOX_EXTENSION_ID
 }
 $manifest.version = $VERSION
 $manifest | ConvertTo-Json -Depth 10 | Set-Content ./output/firefox/manifest.json -Encoding UTF8
