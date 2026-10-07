@@ -54,10 +54,24 @@ jobs:
           name: output
           path: output/
 
-  publish:
+  release:
     runs-on: self-hosted
     needs: build
-    timeout-minutes: 35
+    steps:
+      - name: Download output artifact for release
+        uses: actions/download-artifact@v4
+        with:
+          name: output
+
+      - name: Publish Release on GitHub
+        run: |
+          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
+          gh release create $VERSION ./output/ShaderToy-Chrome-Plugin-$VERSION.zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip --title "$VERSION" --notes "Release of version $VERSION"
+
+  publish-firefox:
+    runs-on: self-hosted
+    needs: build
+    timeout-minutes: 25
     steps:
       - name: Download output artifact
         uses: actions/download-artifact@v4
@@ -81,21 +95,52 @@ jobs:
           npm install --save-dev publish-browser-extension
 
       - name: Upload & Publish Extension to Firefox Add-on Store
-        continue-on-error: true
         timeout-minutes: 20
         env:
           FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXT_ID }}
           FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
           FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
-
         run: |
           VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
+          success=0
           for attempt in 1 2 3; do
             echo "Firefox publish attempt $attempt/3"
-            npx publish-extension \
-              --firefox-zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip && break
+            if npx publish-extension --firefox-zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip; then
+              success=1
+              break
+            fi
             [ $attempt -lt 3 ] && echo "Retrying in 30s..." && sleep 30
           done
+          if [ $success -ne 1 ]; then
+            echo "Firefox publish failed after 3 attempts."
+            exit 1
+          fi
+
+  publish-chrome:
+    runs-on: self-hosted
+    needs: build
+    timeout-minutes: 15
+    steps:
+      - name: Download output artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: output
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Verify Node.js runtime
+        run: |
+          which node
+          node -v
+          which npm
+          npm -v
+
+      - name: Install Dependencies for Publishing
+        run: |
+          npm install --save-dev publish-browser-extension
 
       - name: Upload & Publish Extension to Chrome Store
         continue-on-error: true
@@ -106,23 +151,8 @@ jobs:
           CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
           CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
           CHROME_PUBLISH_TARGET: default
-
         run: |
           VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
           npx publish-extension \
             --chrome-zip ./output/ShaderToy-Chrome-Plugin-$VERSION.zip
-
-  release:
-    runs-on: self-hosted
-    needs: build
-    steps:
-      - name: Download output artifact for release
-        uses: actions/download-artifact@v4
-        with:
-          name: output
-
-      - name: Publish Release on GitHub
-        run: |
-          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
-          gh release create $VERSION ./output/ShaderToy-Chrome-Plugin-$VERSION.zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip --title "$VERSION" --notes "Release of version $VERSION (Chrome)"
 
