@@ -37,6 +37,12 @@
          * @const {string}
          */
         PARAMETERS_EXTENTION_FILENAME = 'add-ons/shadertoy-plugin-parameters.js',
+        /**
+         * Monaco extension filename.
+         *
+         * @const {string}
+         */
+        MONACO_EXTENSION_FILENAME = 'add-ons/shadertoy-plugin-monaco.js',
 
         COMMON_FILENAME = 'shadertoy-plugin-common.js',
         STATE_STORAGE_KEY = 'STE-state',
@@ -238,6 +244,15 @@
 
 
     /**
+     * Loads monaco extension on editing and new shader page
+     */
+    function initializeMonaco() {
+        if (document.location.href.match(/shadertoy.com\/(new|(view\/.{6}))/)) {
+            loadScript(MONACO_EXTENSION_FILENAME);
+        }
+    }
+
+    /**
      * Initializes extension.
      */
     function init() {
@@ -246,7 +261,8 @@
         }
 
         loadScript(MAIN_EXTENSION_FILENAME);
-        setTimeout(() => {
+
+        const sendMonacoAssets = () => {
             window.postMessage({
                 type: 'MonacoAssetsData', cfg: {
                     monacoLoader: chrome.runtime.getURL('add-ons/monaco/loader.min.js'),
@@ -254,7 +270,15 @@
                     monacoEditorVSPath: chrome.runtime.getURL('add-ons/monaco/min/vs/editor/editor.main.css').replace('/editor/editor.main.css', '')
                 }
             });
-        }, 1000);
+        };
+
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'RequestMonacoAssetsData') {
+                sendMonacoAssets();
+            }
+        });
+
+        setTimeout(sendMonacoAssets, 1000);
 
         loadScript('scripts/node-sanitize-filename.js');
         loadScript('scripts/jszip-3.1.5.js');
@@ -264,6 +288,7 @@
         initializeParameters();
         initializeProfilePage();
         initializeCodemirror();
+        initializeMonaco();
         initializeBBCode();
         initializeHomePage();
 

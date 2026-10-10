@@ -1,4 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.15.0 (11-10-2026)
+
+    -   Add Monaco Editor GLSL IntelliSense support: autocomplete for GLSL built-in functions, keywords, data types, ShaderToy uniforms, and pixel shader snippets.
+
 -   0.14.294 (11-10-2026)
 
     -   Add playback time seeking support for Sound pass shaders: synchronizes generated audio buffer playback with the time slider and keyboard time controls without recompiling the shader. [Issue #180](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/180)
