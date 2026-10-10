@@ -250,7 +250,7 @@
             window.postMessage({
                 type: 'MonacoAssetsData', cfg: {
                     monacoLoader: chrome.runtime.getURL('add-ons/monaco/loader.min.js'),
-                    monacoEditor: chrome.runtime.getURL('add-ons/monaco/min/vs/editor.main.js'),
+                    monacoEditor: chrome.runtime.getURL('add-ons/monaco/min/vs/editor/editor.main.js'),
                     monacoEditorVSPath: chrome.runtime.getURL('add-ons/monaco/min/vs/editor/editor.main.css').replace('/editor/editor.main.css', '')
                 }
             });

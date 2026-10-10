@@ -1,7 +1,9 @@
 ## ShaderToy extension changelog (major changes only):
--   Unreleased
+-   0.14.294 (11-10-2026)
 
     -   Add playback time seeking support for Sound pass shaders: synchronizes generated audio buffer playback with the time slider and keyboard time controls without recompiling the shader. [Issue #180](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/180)
+    -   Fix Monaco Editor switching runtime error (`o_editor_monaco is not defined`).
+    -   Fix Monaco Editor assets path and include `codicon.ttf` in `web_accessible_resources`.
 
 -   0.14.293 (07-10-2026)
 

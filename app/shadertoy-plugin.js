@@ -987,6 +987,7 @@
                     "bracketPairColorization": true
                     // automaticLayout: true
                 });
+                this.o_editor_monaco = o_editor_monaco;
 
                 window.onresize = function() {
                     o_editor_monaco.layout();
@@ -1102,8 +1103,8 @@
                 gShaderToy.mCodeEditor.refresh();
             }
 
-            if (monaco && o_editor_monaco && o_editor_monaco.layout) {
-                o_editor_monaco.layout();
+            if (monaco && this.o_editor_monaco && this.o_editor_monaco.layout) {
+                this.o_editor_monaco.layout();
             }
 
             window.localStorage.setItem(
