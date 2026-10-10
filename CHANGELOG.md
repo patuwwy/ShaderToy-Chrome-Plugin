@@ -1,4 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
+-   Unreleased
+
+    -   Add playback time seeking support for Sound pass shaders: synchronizes generated audio buffer playback with the time slider and keyboard time controls without recompiling the shader. [Issue #180](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/180)
+
 -   0.14.293 (07-10-2026)
 
     -   Add ESLint configuration with linting steps in build script and CI workflow.

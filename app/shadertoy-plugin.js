@@ -353,7 +353,6 @@
             var destTime = Math.max(0, gShaderToy.mTf + timeShift);
 
             updateShaderToyTime(destTime);
-            updateInputsTime(destTime);
             gShaderToy.mTf = destTime;
         }
 
@@ -1389,7 +1388,6 @@
 
             if (outsideLoop) {
                 updateShaderToyTime(this.sliderInput.value);
-                updateInputsTime(this.sliderInput.value);
             }
 
             setTimeout(this.updateSlider.bind(this), 26);
@@ -1421,20 +1419,10 @@
          * Handles relase slider click.
          */
         sliderOnMouseUp() {
-            if (!this.wasPaused) {
-                gShaderToy.pauseTime();
-            }
+            var unpause = !this.wasPaused;
 
-            window.requestAnimationFrame(
-                function() {
-                    updateShaderToyTime(
-                        this.sliderInput.value,
-                        !this.wasPaused
-                    );
-                    updateInputsTime(this.sliderInput.value);
-                    this.busy = false;
-                }.bind(this)
-            );
+            this.busy = false;
+            updateShaderToyTime(this.sliderInput.value, unpause);
         }
 
         /**
@@ -1448,9 +1436,10 @@
     /**
      * Updates ShaderToy with provided time value.
      */
-    function updateShaderToyTime(time) {
+    function updateShaderToyTime(time, unpause) {
         var value = parseInt(time, 10),
-            i = 0;
+            i = 0,
+            shouldUnpause = typeof unpause === 'boolean' ? unpause : !gShaderToy.mIsPaused;
 
         gShaderToy.pauseTime();
 
@@ -1473,15 +1462,54 @@
                 gShaderToy.mEffect.mAudioContext.currentTime = value;
             } catch (ignore) {}
 
-            gShaderToy.pauseTime();
+            if (shouldUnpause) {
+                if (gShaderToy.mIsPaused) {
+                    gShaderToy.pauseTime();
+                }
+            } else if (!gShaderToy.mIsPaused) {
+                gShaderToy.pauseTime();
+            }
+
+            updateInputsTime(value);
         });
     }
 
     /**
-     * Updates ShaderToy inputs.
+     * Updates ShaderToy inputs and sound pass playback.
      */
     function updateInputsTime(value) {
+        var timeInSeconds = value / 1000;
+
         gShaderToy.mEffect.mPasses.forEach(function mPass(pass) {
+            if (pass.mType === 'sound') {
+                if (pass.mBuffer) {
+                    if (pass.mPlayNode) {
+                        try {
+                            pass.mPlayNode.stop();
+                            pass.mPlayNode.disconnect();
+                        } catch (ignore) {}
+                        pass.mPlayNode = null;
+                    }
+
+                    if (!gShaderToy.mIsPaused && timeInSeconds < pass.mPlayTime) {
+                        try {
+                            var audioCtx = pass.mEffect.mAudioContext,
+                                newSource = audioCtx.createBufferSource();
+
+                            newSource.buffer = pass.mBuffer;
+                            newSource.connect(pass.mGainNode || audioCtx.destination);
+                            newSource.start(0, timeInSeconds);
+
+                            pass.mPlayNode = newSource;
+                            pass.mPlaying = true;
+                        } catch (ignore) {}
+                    } else {
+                        pass.mPlaying = false;
+                    }
+                }
+                return;
+            }
+
             pass.mInputs.forEach(function mInput(input) {
                 var media = null;
 
@@ -1490,7 +1518,7 @@
 
                     if (media) {
                         media.controls = true;
-                        media.currentTime = value / 1000;
+                        media.currentTime = timeInSeconds;
                     }
                 }
             });
