@@ -1,4 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.15.1 (11-10-2026)
+
+    -   Add Monaco Editor GLSL hover documentation: hover signatures, mathematical formulas, and descriptions for built-in functions, ShaderToy uniforms, data types, and vector swizzles.
+
 -   0.15.0 (11-10-2026)
 
     -   Add Monaco Editor GLSL IntelliSense support: autocomplete for GLSL built-in functions, keywords, data types, ShaderToy uniforms, and pixel shader snippets.

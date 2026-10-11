@@ -706,6 +706,349 @@
                     return { suggestions: a_suggestions };
                 }
             });
+
+            var o_glsl_docs = {
+                iResolution: {
+                    signature: 'uniform vec3 iResolution;',
+                    description: '**Viewport resolution** (in pixels):\n- `iResolution.x` — viewport width in pixels\n- `iResolution.y` — viewport height in pixels\n- `iResolution.z` — pixel aspect ratio (`x / y`)'
+                },
+                iTime: {
+                    signature: 'uniform float iTime;',
+                    description: '**Playback time**: elapsed shader playback time in seconds.'
+                },
+                iTimeDelta: {
+                    signature: 'uniform float iTimeDelta;',
+                    description: '**Delta time**: render duration of the previous frame in seconds (dt).'
+                },
+                iFrame: {
+                    signature: 'uniform int iFrame;',
+                    description: '**Frame counter**: sequential frame index since playback started or reset (0, 1, 2, ...).'
+                },
+                iFrameRate: {
+                    signature: 'uniform float iFrameRate;',
+                    description: '**Frame rate**: estimated playback frame rate in frames per second (FPS).'
+                },
+                iMouse: {
+                    signature: 'uniform vec4 iMouse;',
+                    description: '**Mouse coordinates** (in pixels):\n- `iMouse.xy` — current mouse position (while button is held, or last position when released)\n- `iMouse.zw` — mouse click down coordinates\n- `iMouse.z > 0.0` — left mouse button is currently pressed\n- `iMouse.w > 0.0` — mouse button was clicked in this frame'
+                },
+                iDate: {
+                    signature: 'uniform vec4 iDate;',
+                    description: '**Current date & time**:\n- `iDate.x` — Year (e.g. 2026)\n- `iDate.y` — Month (1 - 12)\n- `iDate.z` — Day (1 - 31)\n- `iDate.w` — Time in seconds since midnight (`hours * 3600 + minutes * 60 + seconds`)'
+                },
+                iSampleRate: {
+                    signature: 'uniform float iSampleRate;',
+                    description: '**Sound sample rate**: output audio sample frequency in Hz (typically 44100.0).'
+                },
+                iChannel0: {
+                    signature: 'uniform sampler2D iChannel0;',
+                    description: '**Input channel 0**: texture, buffer, audio, keyboard, or video bound to slot 0.'
+                },
+                iChannel1: {
+                    signature: 'uniform sampler2D iChannel1;',
+                    description: '**Input channel 1**: texture, buffer, audio, keyboard, or video bound to slot 1.'
+                },
+                iChannel2: {
+                    signature: 'uniform sampler2D iChannel2;',
+                    description: '**Input channel 2**: texture, buffer, audio, keyboard, or video bound to slot 2.'
+                },
+                iChannel3: {
+                    signature: 'uniform sampler2D iChannel3;',
+                    description: '**Input channel 3**: texture, buffer, audio, keyboard, or video bound to slot 3.'
+                },
+                iChannelResolution: {
+                    signature: 'uniform vec3 iChannelResolution[4];',
+                    description: '**Channel resolutions**: array of vec3 containing width, height, and depth/aspect of each input channel.'
+                },
+                fragCoord: {
+                    signature: 'in vec2 fragCoord;',
+                    description: '**Fragment coordinates**: pixel position ranging from (0.5, 0.5) to (iResolution.x - 0.5, iResolution.y - 0.5). Origin (0, 0) is at bottom-left.'
+                },
+                fragColor: {
+                    signature: 'out vec4 fragColor;',
+                    description: '**Fragment color output**: output RGBA color of the pixel, each component typically in [0.0, 1.0].'
+                },
+                radians: {
+                    signature: 'genType radians(genType degrees)',
+                    description: 'Converts degrees to radians: `degrees * (PI / 180.0)`.'
+                },
+                degrees: {
+                    signature: 'genType degrees(genType radians)',
+                    description: 'Converts radians to degrees: `radians * (180.0 / PI)`.'
+                },
+                sin: {
+                    signature: 'genType sin(genType angle)',
+                    description: 'Computes the trigonometric sine of the angle in radians.'
+                },
+                cos: {
+                    signature: 'genType cos(genType angle)',
+                    description: 'Computes the trigonometric cosine of the angle in radians.'
+                },
+                tan: {
+                    signature: 'genType tan(genType angle)',
+                    description: 'Computes the trigonometric tangent: `sin(angle) / cos(angle)`.'
+                },
+                asin: {
+                    signature: 'genType asin(genType x)',
+                    description: 'Computes arcsine in [-PI/2, PI/2]. Undefined if `abs(x) > 1.0`.'
+                },
+                acos: {
+                    signature: 'genType acos(genType x)',
+                    description: 'Computes arccosine in [0, PI]. Undefined if `abs(x) > 1.0`.'
+                },
+                atan: {
+                    signature: 'genType atan(genType y, genType x)\ngenType atan(genType y_over_x)',
+                    description: 'Computes arc-tangent. Two-argument form returns angle in [-PI, PI] evaluating signs of both arguments (atan2).'
+                },
+                sinh: { signature: 'genType sinh(genType x)', description: 'Computes hyperbolic sine: `(e^x - e^(-x)) / 2.0`.' },
+                cosh: { signature: 'genType cosh(genType x)', description: 'Computes hyperbolic cosine: `(e^x + e^(-x)) / 2.0`.' },
+                tanh: { signature: 'genType tanh(genType x)', description: 'Computes hyperbolic tangent: `sinh(x) / cosh(x)`.' },
+                asinh: { signature: 'genType asinh(genType x)', description: 'Computes inverse hyperbolic sine.' },
+                acosh: { signature: 'genType acosh(genType x)', description: 'Computes inverse hyperbolic cosine. Undefined if `x < 1.0`.' },
+                atanh: { signature: 'genType atanh(genType x)', description: 'Computes inverse hyperbolic tangent. Undefined if `abs(x) >= 1.0`.' },
+                pow: {
+                    signature: 'genType pow(genType x, genType y)',
+                    description: 'Calculates x raised to power y (`x^y`). Undefined if `x < 0.0`, or if `x == 0.0` and `y <= 0.0`.'
+                },
+                exp: {
+                    signature: 'genType exp(genType x)',
+                    description: 'Computes natural exponential `e^x`.'
+                },
+                log: {
+                    signature: 'genType log(genType x)',
+                    description: 'Computes natural logarithm `ln(x)`. Undefined if `x <= 0.0`.'
+                },
+                exp2: {
+                    signature: 'genType exp2(genType x)',
+                    description: 'Computes base-2 exponential `2^x`.'
+                },
+                log2: {
+                    signature: 'genType log2(genType x)',
+                    description: 'Computes base-2 logarithm `log2(x)`. Undefined if `x <= 0.0`.'
+                },
+                sqrt: {
+                    signature: 'genType sqrt(genType x)',
+                    description: 'Computes square root `sqrt(x)`. Undefined if `x < 0.0`.'
+                },
+                inversesqrt: {
+                    signature: 'genType inversesqrt(genType x)',
+                    description: 'Computes reciprocal square root `1.0 / sqrt(x)`. Highly optimized on GPU hardware.'
+                },
+                abs: {
+                    signature: 'genType abs(genType x)',
+                    description: 'Returns the absolute value `abs(x)`.'
+                },
+                sign: {
+                    signature: 'genType sign(genType x)',
+                    description: 'Returns `1.0` if `x > 0.0`, `0.0` if `x == 0.0`, and `-1.0` if `x < 0.0`.'
+                },
+                floor: {
+                    signature: 'genType floor(genType x)',
+                    description: 'Returns the largest integer less than or equal to x (floor).'
+                },
+                trunc: {
+                    signature: 'genType trunc(genType x)',
+                    description: 'Truncates fractional part towards zero.'
+                },
+                round: {
+                    signature: 'genType round(genType x)',
+                    description: 'Rounds x to the nearest integer.'
+                },
+                roundEven: {
+                    signature: 'genType roundEven(genType x)',
+                    description: 'Rounds x to nearest even integer (banker\'s rounding).'
+                },
+                ceil: {
+                    signature: 'genType ceil(genType x)',
+                    description: 'Returns the smallest integer greater than or equal to x (ceil).'
+                },
+                fract: {
+                    signature: 'genType fract(genType x)',
+                    description: 'Returns fractional part: `x - floor(x)`. Always in [0.0, 1.0).'
+                },
+                mod: {
+                    signature: 'genType mod(genType x, genType y)\ngenType mod(genType x, float y)',
+                    description: 'Modulo operation: `x - y * floor(x / y)`.'
+                },
+                min: {
+                    signature: 'genType min(genType x, genType y)\ngenType min(genType x, float y)',
+                    description: 'Returns the minimum of two values.'
+                },
+                max: {
+                    signature: 'genType max(genType x, genType y)\ngenType max(genType x, float y)',
+                    description: 'Returns the maximum of two values.'
+                },
+                clamp: {
+                    signature: 'genType clamp(genType x, genType minVal, genType maxVal)\ngenType clamp(genType x, float minVal, float maxVal)',
+                    description: 'Constrains x to lie between minVal and maxVal:\n`min(max(x, minVal), maxVal)`'
+                },
+                mix: {
+                    signature: 'genType mix(genType x, genType y, genType a)\ngenType mix(genType x, genType y, float a)',
+                    description: '**Linear interpolation (lerp)** between x and y:\n`x * (1.0 - a) + y * a`\nReturns `x` when `a == 0.0`, and `y` when `a == 1.0`.'
+                },
+                step: {
+                    signature: 'genType step(genType edge, genType x)\ngenType step(float edge, genType x)',
+                    description: 'Step function: returns `0.0` if `x < edge`, otherwise `1.0`.'
+                },
+                smoothstep: {
+                    signature: 'genType smoothstep(genType edge0, genType edge1, genType x)\ngenType smoothstep(float edge0, float edge1, genType x)',
+                    description: '**Smooth Hermite interpolation** between 0.0 and 1.0:\n```glsl\nt = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);\nreturn t * t * (3.0 - 2.0 * t);\n```\nProvides smooth C1 transition with zero 1st derivatives at boundaries.'
+                },
+                isnan: { signature: 'genBType isnan(genType x)', description: 'Returns true if x is NaN (Not a Number).' },
+                isinf: { signature: 'genBType isinf(genType x)', description: 'Returns true if x is positive or negative infinity.' },
+                length: {
+                    signature: 'float length(genType x)',
+                    description: 'Calculates the Euclidean vector length (magnitude):\n`sqrt(x[0]*x[0] + x[1]*x[1] + ...)`'
+                },
+                distance: {
+                    signature: 'float distance(genType p0, genType p1)',
+                    description: 'Returns the Euclidean distance between points p0 and p1: `length(p0 - p1)`.'
+                },
+                dot: {
+                    signature: 'float dot(genType x, genType y)',
+                    description: 'Calculates scalar dot product: `x[0]*y[0] + x[1]*y[1] + ...`\nEquivalent to `length(x) * length(y) * cos(angle)`.'
+                },
+                cross: {
+                    signature: 'vec3 cross(vec3 x, vec3 y)',
+                    description: 'Calculates vector cross product. The result is perpendicular to both x and y.'
+                },
+                normalize: {
+                    signature: 'genType normalize(genType x)',
+                    description: 'Returns unit vector pointing in the same direction: `x / length(x)`.'
+                },
+                faceforward: {
+                    signature: 'genType faceforward(genType N, genType I, genType Nref)',
+                    description: 'Returns N oriented towards the viewer: returns N if `dot(Nref, I) < 0.0`, else `-N`.'
+                },
+                reflect: {
+                    signature: 'genType reflect(genType I, genType N)',
+                    description: 'Calculates reflection direction for incident vector I and surface normal N:\n`I - 2.0 * dot(N, I) * N`'
+                },
+                refract: {
+                    signature: 'genType refract(genType I, genType N, float eta)',
+                    description: 'Calculates refraction vector using Snell\'s law with index of refraction ratio eta. Returns 0.0 vector on total internal reflection.'
+                },
+                matrixCompMult: { signature: 'mat matrixCompMult(mat x, mat y)', description: 'Performs component-wise matrix multiplication.' },
+                outerProduct: { signature: 'mat outerProduct(vec c, vec r)', description: 'Calculates outer product of column vector c and row vector r.' },
+                transpose: { signature: 'mat transpose(mat m)', description: 'Transposes matrix m (flips rows and columns).' },
+                determinant: { signature: 'float determinant(mat m)', description: 'Calculates determinant of square matrix m.' },
+                inverse: { signature: 'mat inverse(mat m)', description: 'Computes inverse of matrix m such that `m * inverse(m) == identity`.' },
+                lessThan: { signature: 'bvec lessThan(vec x, vec y)', description: 'Component-wise `x < y`.' },
+                lessThanEqual: { signature: 'bvec lessThanEqual(vec x, vec y)', description: 'Component-wise `x <= y`.' },
+                greaterThan: { signature: 'bvec greaterThan(vec x, vec y)', description: 'Component-wise `x > y`.' },
+                greaterThanEqual: { signature: 'bvec greaterThanEqual(vec x, vec y)', description: 'Component-wise `x >= y`.' },
+                equal: { signature: 'bvec equal(vec x, vec y)', description: 'Component-wise `x == y`.' },
+                notEqual: { signature: 'bvec notEqual(vec x, vec y)', description: 'Component-wise `x != y`.' },
+                any: { signature: 'bool any(bvec x)', description: 'Returns true if any component of boolean vector is true.' },
+                all: { signature: 'bool all(bvec x)', description: 'Returns true if all components of boolean vector are true.' },
+                not: { signature: 'bvec not(bvec x)', description: 'Logical NOT of boolean vector components.' },
+                texture: {
+                    signature: 'vec4 texture(sampler2D sampler, vec2 P)\nvec4 texture(samplerCube sampler, vec3 P)',
+                    description: 'Samples texture at coordinates P with hardware-filtered mipmapping.'
+                },
+                textureLod: {
+                    signature: 'vec4 textureLod(sampler2D sampler, vec2 P, float lod)',
+                    description: 'Samples texture with explicit mipmap level of detail lod.'
+                },
+                textureSize: {
+                    signature: 'ivec2 textureSize(sampler2D sampler, int lod)',
+                    description: 'Retrieves dimensions of texture image at mipmap level lod.'
+                },
+                texelFetch: {
+                    signature: 'vec4 texelFetch(sampler2D sampler, ivec2 P, int lod)',
+                    description: 'Fetches single texel from texture without filtering using integer coordinates.'
+                },
+                dFdx: {
+                    signature: 'genType dFdx(genType p)',
+                    description: 'Partial derivative of p with respect to screen horizontal axis x.'
+                },
+                dFdy: {
+                    signature: 'genType dFdy(genType p)',
+                    description: 'Partial derivative of p with respect to screen vertical axis y.'
+                },
+                fwidth: {
+                    signature: 'genType fwidth(genType p)',
+                    description: 'Sum of absolute derivatives:\n`abs(dFdx(p)) + abs(dFdy(p))`\nIdeal for pixel-scale anti-aliasing.'
+                },
+                float: { signature: 'float', description: 'Single-precision 32-bit IEEE-754 floating point scalar.' },
+                int: { signature: 'int', description: 'Signed 32-bit two\'s complement integer.' },
+                uint: { signature: 'uint', description: 'Unsigned 32-bit integer.' },
+                bool: { signature: 'bool', description: 'Boolean conditional type (`true` or `false`).' },
+                vec2: { signature: 'vec2', description: '2D floating-point vector (`xy`, `rg`, `st`).' },
+                vec3: { signature: 'vec3', description: '3D floating-point vector (`xyz`, `rgb`, `stp`).' },
+                vec4: { signature: 'vec4', description: '4D floating-point vector (`xyzw`, `rgba`, `stpq`).' },
+                mat2: { signature: 'mat2', description: '2x2 floating-point column-major matrix.' },
+                mat3: { signature: 'mat3', description: '3x3 floating-point column-major matrix.' },
+                mat4: { signature: 'mat4', description: '4x4 floating-point column-major matrix.' },
+                sampler2D: { signature: 'sampler2D', description: 'Handle to a 2D texture unit.' },
+                samplerCube: { signature: 'samplerCube', description: 'Handle to a cubemap texture unit.' },
+                '#define': { signature: '#define NAME VALUE', description: 'Defines a preprocessor macro or constant value.' },
+                '#undef': { signature: '#undef NAME', description: 'Undefines a previously declared preprocessor macro.' },
+                '#ifdef': { signature: '#ifdef MACRO', description: 'Conditional compilation: executes block if `MACRO` is defined.' },
+                '#ifndef': { signature: '#ifndef MACRO', description: 'Conditional compilation: executes block if `MACRO` is not defined.' },
+                '#if': { signature: '#if CONDITION', description: 'Conditional compilation: executes block if expression is non-zero.' },
+                '#elif': { signature: '#elif CONDITION', description: 'Alternative conditional branch.' },
+                '#else': { signature: '#else', description: 'Default conditional branch.' },
+                '#endif': { signature: '#endif', description: 'Closes a conditional compilation block.' },
+                '#version': { signature: '#version 300 es', description: 'Specifies GLSL shading language version.' },
+            };
+
+
+            monaco.languages.registerHoverProvider('glsl', {
+                provideHover: function(model, position) {
+                    var o_word = model.getWordAtPosition(position);
+                    if (!o_word || !o_word.word) {
+                        return null;
+                    }
+
+                    var s_line_content = model.getLineContent(position.lineNumber);
+                    var s_word = o_word.word;
+
+                    if (s_word.charAt(0) !== '#' && o_word.startColumn > 1 && s_line_content.charAt(o_word.startColumn - 2) === '#') {
+                        s_word = '#' + s_word;
+                    }
+
+                    var o_doc = o_glsl_docs[s_word];
+                    var o_range = {
+                        startLineNumber: position.lineNumber,
+                        endLineNumber: position.lineNumber,
+                        startColumn: o_word.startColumn,
+                        endColumn: o_word.endColumn
+                    };
+
+                    if (!o_doc) {
+                        if (o_word.startColumn > 1 && s_line_content.charAt(o_word.startColumn - 2) === '.') {
+                            var b_is_pos = /^[xyzw]+$/.test(s_word);
+                            var b_is_col = /^[rgba]+$/.test(s_word);
+                            var b_is_tex = /^[stpq]+$/.test(s_word);
+                            if (b_is_pos || b_is_col || b_is_tex) {
+                                var s_type = s_word.length === 1 ? 'float' : ('vec' + s_word.length);
+                                return {
+                                    range: o_range,
+                                    contents: [
+                                        { value: '```glsl\n(property) ' + s_type + ' .' + s_word + '\n```' },
+                                        { value: '**Vector Swizzle**: selects components `.' + s_word + '` as a `' + s_type + '`.' }
+                                    ]
+                                };
+                            }
+                        }
+                        return null;
+                    }
+
+                    var a_contents = [];
+                    if (o_doc.signature) {
+                        a_contents.push({ value: '```glsl\n' + o_doc.signature + '\n```' });
+                    }
+                    if (o_doc.description) {
+                        a_contents.push({ value: o_doc.description });
+                    }
+
+                    return {
+                        range: o_range,
+                        contents: a_contents
+                    };
+                }
+            });
         },
 
         handleErrors: function(errors, isError, errorStr, fromScript, editor) {
