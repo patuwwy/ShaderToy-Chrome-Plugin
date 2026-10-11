@@ -8,6 +8,8 @@
         o_editor_monaco: null,
         b_glsl_language_registered: false,
         b_monaco_initialized: false,
+        n_live_debounce_ms: 800,
+        b_live_validation_throttled: false,
 
         init: function() {
             var self = this;
@@ -1216,18 +1218,285 @@
             });
         },
 
-        handleErrors: function(errors, isError, errorStr, fromScript, editor) {
-            var monacoErrors = errors.map(function(shError) {
-                return {
-                    startLineNumber: shError.line.parent.lines.findIndex(function(p) { return Array.isArray(p.widgets); }) + 1,
-                    startColumn: 0,
-                    endLineNumber: shError.height,
-                    endColumn: shError.line.text.length + 1,
-                    message: errorStr,
-                    severity: 8
-                };
-            });
-            window.monaco.editor.setModelMarkers(editor.getModel(), 'owner', monacoErrors);
+        handleErrors: function(errors, isError, errorStr, fromScript, editor, n_header_offset) {
+            var o_editor = editor || this.o_editor_monaco;
+            if (!o_editor || !o_editor.getModel) {
+                return;
+            }
+            var o_model = o_editor.getModel();
+            if (!o_model) {
+                return;
+            }
+
+            if (!isError) {
+                window.monaco.editor.setModelMarkers(o_model, 'owner', []);
+                window.monaco.editor.setModelMarkers(o_model, 'shadertoy', []);
+                return;
+            }
+
+            var a_monaco_markers = [];
+            var n_total_lines = o_model.getLineCount();
+
+            if (Array.isArray(errors) && errors.length > 0) {
+                for (var i = 0; i < errors.length; i++) {
+                    var shError = errors[i];
+                    if (!shError) {
+                        continue;
+                    }
+
+                    var n_line = -1;
+                    if (shError.line) {
+                        if (typeof shError.line.lineNo === 'function') {
+                            n_line = shError.line.lineNo() + 1;
+                        } else if (typeof shError.line === 'number') {
+                            n_line = shError.line + 1;
+                        } else if (window.gShaderToy && window.gShaderToy.mCodeEditor && typeof window.gShaderToy.mCodeEditor.getLineNumber === 'function') {
+                            n_line = window.gShaderToy.mCodeEditor.getLineNumber(shError.line) + 1;
+                        } else if (shError.line.parent && Array.isArray(shError.line.parent.lines)) {
+                            var n_idx = shError.line.parent.lines.indexOf(shError.line);
+                            if (n_idx !== -1) {
+                                n_line = n_idx + 1;
+                            }
+                        }
+                    }
+
+                    var s_msg = '';
+                    if (shError.node && shError.node.textContent) {
+                        s_msg = shError.node.textContent.trim();
+                    } else if (shError.text) {
+                        s_msg = shError.text.trim();
+                    }
+
+                    if (n_line > 0) {
+                        n_line = Math.max(1, Math.min(n_line, n_total_lines));
+                        var s_line_text = o_model.getLineContent(n_line);
+                        var n_start_col = 1;
+                        var n_end_col = s_line_text.length + 1;
+
+                        var o_token_match = s_msg.match(/['"]([a-zA-Z0-9_]+)['"]/);
+                        if (o_token_match && o_token_match[1]) {
+                            var s_token = o_token_match[1];
+                            var n_token_idx = s_line_text.indexOf(s_token);
+                            if (n_token_idx !== -1) {
+                                n_start_col = n_token_idx + 1;
+                                n_end_col = n_token_idx + 1 + s_token.length;
+                            } else {
+                                var n_first_non_ws = o_model.getLineFirstNonWhitespaceColumn(n_line);
+                                if (n_first_non_ws > 0) {
+                                    n_start_col = n_first_non_ws;
+                                }
+                            }
+                        } else {
+                            var n_non_ws = o_model.getLineFirstNonWhitespaceColumn(n_line);
+                            if (n_non_ws > 0) {
+                                n_start_col = n_non_ws;
+                            }
+                        }
+
+                        if (n_end_col <= n_start_col) {
+                            n_end_col = n_start_col + 1;
+                        }
+
+                        var b_is_warn = s_msg.toLowerCase().indexOf('warning') !== -1;
+                        a_monaco_markers.push({
+                            startLineNumber: n_line,
+                            startColumn: n_start_col,
+                            endLineNumber: n_line,
+                            endColumn: n_end_col,
+                            message: s_msg || errorStr,
+                            severity: b_is_warn ? 4 : 8
+                        });
+                    }
+                }
+            }
+
+            if (a_monaco_markers.length === 0 && typeof errorStr === 'string' && errorStr.length > 0) {
+                var a_err_lines = errorStr.split('\n');
+                var o_err_re = /^(ERROR|WARNING):\s*(?:\d+:)?(\d+)(?:\((\d+)\))?:\s*(.*)$/i;
+
+                for (var j = 0; j < a_err_lines.length; j++) {
+                    var s_raw_line = a_err_lines[j].trim();
+                    var o_match = s_raw_line.match(o_err_re);
+                    if (o_match) {
+                        var s_sev = o_match[1].toUpperCase();
+                        var n_parsed_line = parseInt(o_match[2], 10);
+                        var n_parsed_col = o_match[3] ? parseInt(o_match[3], 10) : null;
+                        var s_detail = o_match[4] ? o_match[4].trim() : s_raw_line;
+
+                        if (typeof n_header_offset === 'number') {
+                            n_parsed_line = n_parsed_line - n_header_offset;
+                        }
+
+                        if (n_parsed_line < 1 || n_parsed_line > n_total_lines) {
+                            continue;
+                        }
+
+                        var s_line_content = o_model.getLineContent(n_parsed_line);
+                        var n_sc = 1;
+                        var n_ec = s_line_content.length + 1;
+
+                        if (n_parsed_col !== null && n_parsed_col > 0 && n_parsed_col <= s_line_content.length + 1) {
+                            n_sc = n_parsed_col;
+                            n_ec = Math.min(s_line_content.length + 1, n_parsed_col + 1);
+                        } else {
+                            var o_t_match = s_detail.match(/['"]([a-zA-Z0-9_]+)['"]/);
+                            if (o_t_match && o_t_match[1]) {
+                                var n_pos = s_line_content.indexOf(o_t_match[1]);
+                                if (n_pos !== -1) {
+                                    n_sc = n_pos + 1;
+                                    n_ec = n_pos + 1 + o_t_match[1].length;
+                                } else {
+                                    var n_first_nw = o_model.getLineFirstNonWhitespaceColumn(n_parsed_line);
+                                    if (n_first_nw > 0) {
+                                        n_sc = n_first_nw;
+                                    }
+                                }
+                            } else {
+                                var n_nw = o_model.getLineFirstNonWhitespaceColumn(n_parsed_line);
+                                if (n_nw > 0) {
+                                    n_sc = n_nw;
+                                }
+                            }
+                        }
+
+                        if (n_ec <= n_sc) {
+                            n_ec = n_sc + 1;
+                        }
+
+                        a_monaco_markers.push({
+                            startLineNumber: n_parsed_line,
+                            startColumn: n_sc,
+                            endLineNumber: n_parsed_line,
+                            endColumn: n_ec,
+                            message: s_detail || s_raw_line,
+                            severity: (s_sev === 'WARNING' ? 4 : 8)
+                        });
+                    }
+                }
+            }
+
+            window.monaco.editor.setModelMarkers(o_model, 'owner', []);
+            window.monaco.editor.setModelMarkers(o_model, 'shadertoy', a_monaco_markers);
+        },
+
+        getGlContext: function() {
+            if (window.gShaderToy && window.gShaderToy.mEffect && window.gShaderToy.mEffect.mGLContext) {
+                return window.gShaderToy.mEffect.mGLContext;
+            }
+            if (!this.o_gl_context) {
+                var o_canvas = document.createElement('canvas');
+                this.o_gl_context = o_canvas.getContext('webgl2') || o_canvas.getContext('webgl');
+            }
+            return this.o_gl_context;
+        },
+
+        validateShaderLive: function(editor) {
+            var o_editor = editor || this.o_editor_monaco;
+            if (!o_editor || !o_editor.getModel) {
+                return;
+            }
+            var o_model = o_editor.getModel();
+            if (!o_model || o_model.isDisposed()) {
+                return;
+            }
+
+            var gl = this.getGlContext();
+            if (!gl) {
+                return;
+            }
+
+            var s_user_code = o_model.getValue();
+            if (!s_user_code || s_user_code.trim().length === 0) {
+                window.monaco.editor.setModelMarkers(o_model, 'owner', []);
+                window.monaco.editor.setModelMarkers(o_model, 'shadertoy', []);
+                return;
+            }
+
+            var s_common_code = '';
+            var o_common_img = document.querySelector("img[src='/img/common.png']");
+            if (o_common_img && o_common_img.parentNode && o_common_img.parentNode.id) {
+                var n_common_id = parseInt(o_common_img.parentNode.id.replace(/\D/g, ''), 10);
+                if (!isNaN(n_common_id) && window.gShaderToy && window.gShaderToy.mActiveDoc !== n_common_id && window.gShaderToy.mPass && window.gShaderToy.mPass[n_common_id] && window.gShaderToy.mPass[n_common_id].mDocs) {
+                    s_common_code = window.gShaderToy.mPass[n_common_id].mDocs.getValue() + '\n';
+                }
+            }
+
+            var a_header_parts = [
+                '#version 300 es',
+                'precision highp float;',
+                'precision highp int;',
+                '#define texture2D texture',
+                '#define textureCube texture',
+                '#define textureLod textureLod',
+                'uniform vec3 iResolution;',
+                'uniform float iTime;',
+                'uniform float iTimeDelta;',
+                'uniform float iFrameRate;',
+                'uniform int iFrame;',
+                'uniform float iChannelTime[4];',
+                'uniform vec3 iChannelResolution[4];',
+                'uniform vec4 iMouse;',
+                'uniform vec4 iDate;',
+                'uniform float iSampleRate;',
+                'uniform sampler2D iChannel0;',
+                'uniform sampler2D iChannel1;',
+                'uniform sampler2D iChannel2;',
+                'uniform sampler2D iChannel3;',
+                'out vec4 fragColor;',
+                '#define gl_FragColor fragColor'
+            ];
+
+            var s_base_header = a_header_parts.join('\n') + '\n';
+            var s_full_header = s_base_header + (s_common_code ? s_common_code : '');
+            var n_header_lines = s_full_header.split('\n').length - 1;
+
+            var s_footer = '';
+            if (s_user_code.indexOf('mainImage') !== -1) {
+                s_footer = '\nvoid main() { mainImage(fragColor, gl_FragCoord.xy); }\n';
+            } else if (s_user_code.indexOf('mainSound') !== -1) {
+                s_footer = '\nvoid main() { mainSound(iTime); }\n';
+            }
+
+            var s_full_shader = s_full_header + s_user_code + s_footer;
+
+            var o_shader = null;
+            try {
+                o_shader = gl.createShader(gl.FRAGMENT_SHADER);
+                gl.shaderSource(o_shader, s_full_shader);
+
+                var n_compile_start = window.performance ? window.performance.now() : Date.now();
+                gl.compileShader(o_shader);
+                var n_compile_end = window.performance ? window.performance.now() : Date.now();
+                var n_compile_duration = n_compile_end - n_compile_start;
+
+                if (n_compile_duration > 35) {
+                    this.n_live_debounce_ms = 2500;
+                    if (n_compile_duration > 75) {
+                        this.b_live_validation_throttled = true;
+                    }
+                } else if (this.n_live_debounce_ms > 800 && n_compile_duration < 20) {
+                    this.n_live_debounce_ms = 800;
+                    this.b_live_validation_throttled = false;
+                }
+
+                var b_ok = gl.getShaderParameter(o_shader, gl.COMPILE_STATUS);
+                if (b_ok) {
+                    window.monaco.editor.setModelMarkers(o_model, 'owner', []);
+                    window.monaco.editor.setModelMarkers(o_model, 'shadertoy', []);
+                } else {
+                    var s_log = gl.getShaderInfoLog(o_shader);
+                    if (s_log) {
+                        this.handleErrors(null, true, s_log, false, o_editor, n_header_lines);
+                    }
+                }
+            } catch (ignore) {
+            } finally {
+                if (o_shader && gl) {
+                    try {
+                        gl.deleteShader(o_shader);
+                    } catch (ignoreDel) {}
+                }
+            }
         },
 
         setCompilationErrorsHandler: function(editor) {
@@ -1237,10 +1506,13 @@
             window.ShaderToy.prototype.SetErrors = function(isError, errorStr, fromScript) {
                 defaultHandler.call(this, isError, errorStr, fromScript);
 
+                var o_target_editor = editor || self.o_editor_monaco;
                 if (isError) {
-                    self.handleErrors(this.mErrors, isError, errorStr, fromScript, editor);
-                } else {
-                    window.monaco.editor.setModelMarkers(editor.getModel(), 'owner', []);
+                    self.handleErrors(this.mErrors, isError, errorStr, fromScript, o_target_editor);
+                } else if (o_target_editor && o_target_editor.getModel) {
+                    self.b_live_validation_throttled = false;
+                    window.monaco.editor.setModelMarkers(o_target_editor.getModel(), 'owner', []);
+                    window.monaco.editor.setModelMarkers(o_target_editor.getModel(), 'shadertoy', []);
                 }
             };
         },
@@ -1287,8 +1559,16 @@
                     }
                 };
 
+                var n_validate_timer = null;
                 self.o_editor_monaco.getModel().onDidChangeContent(function() {
                     self.syncMonacoToActiveDoc();
+                    if (self.b_live_validation_throttled) {
+                        return;
+                    }
+                    clearTimeout(n_validate_timer);
+                    n_validate_timer = setTimeout(function() {
+                        self.validateShaderLive(self.o_editor_monaco);
+                    }, self.n_live_debounce_ms || 800);
                 });
 
                 var o_monaco_el = document.querySelector('.monaco-editor');

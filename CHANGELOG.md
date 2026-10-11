@@ -1,4 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.15.3 (11-10-2026)
+
+    -   Improve Monaco Editor compilation error diagnostics and live validation: on-the-fly background shader syntax and type checking while typing (debounced), accurate line mapping, token-level error squiggles for undeclared identifiers and types, and per-error message tooltips in Monaco markers.
+
 -   0.15.2 (11-10-2026)
 
     -   Add Monaco Editor GLSL Signature Help (parameter hints): displays active function signature, parameter positions, and overloads when typing `(` or `,` for GLSL built-in functions and vector/matrix constructors.
