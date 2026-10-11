@@ -10,10 +10,12 @@
         b_monaco_initialized: false,
         n_live_debounce_ms: 800,
         b_live_validation_throttled: false,
+        o_view_states: {},
 
         init: function() {
             var self = this;
             this.state = JSON.parse(window.localStorage.getItem(STATE_STORAGE_KEY) || '{}');
+            this.o_view_states = {};
 
             var monacoAssetsListener = function(event) {
                 if (event.source !== window) return;
@@ -30,55 +32,108 @@
             return !!(this.state && this.state.monaco === true);
         },
 
-        syncMonacoToActiveDoc: function() {
-            if (!this.isMonacoSelected() || !this.o_editor_monaco || !window.gShaderToy || !window.gShaderToy.mPass || !window.gShaderToy.mPass[window.gShaderToy.mActiveDoc]) {
+        getOrCreateModelForPass: function(n_id) {
+            if (!window.gShaderToy || !window.gShaderToy.mPass || !window.gShaderToy.mPass[n_id]) {
+                return null;
+            }
+
+            var o_pass = window.gShaderToy.mPass[n_id];
+            if (o_pass.mMonacoModel && !o_pass.mMonacoModel.isDisposed()) {
+                return o_pass.mMonacoModel;
+            }
+
+            var s_initial_code = (o_pass.mDocs && typeof o_pass.mDocs.getValue === 'function')
+                ? o_pass.mDocs.getValue()
+                : '';
+
+            var uri = window.monaco.Uri.parse('inmemory://shadertoy/pass_' + n_id + '.glsl');
+            var existingModel = window.monaco.editor.getModel(uri);
+            if (existingModel && !existingModel.isDisposed()) {
+                existingModel.dispose();
+            }
+
+            var o_model = window.monaco.editor.createModel(s_initial_code, 'glsl', uri);
+            o_pass.mMonacoModel = o_model;
+
+            var self = this;
+            o_model.onDidChangeContent(function() {
+                self.syncPassFromModel(n_id, o_model);
+            });
+
+            return o_model;
+        },
+
+        syncPassFromModel: function(n_pass_id, o_model) {
+            if (!window.gShaderToy || !window.gShaderToy.mPass || !window.gShaderToy.mPass[n_pass_id]) {
                 return;
             }
 
-            var s_code = this.o_editor_monaco.getModel().getValue();
-            var o_active_doc = window.gShaderToy.mPass[window.gShaderToy.mActiveDoc].mDocs;
+            var o_pass = window.gShaderToy.mPass[n_pass_id];
+            if (!o_pass.mDocs || typeof o_pass.mDocs.getValue !== 'function') {
+                return;
+            }
 
-            if (o_active_doc.getValue() !== s_code) {
-                o_active_doc.setValue(s_code);
+            var s_code = o_model.getValue();
+            if (o_pass.mDocs.getValue() !== s_code) {
+                o_pass.mDocs.setValue(s_code);
                 window.gShaderToy.mNeedsSave = true;
             }
 
-            if (window.gShaderToy.mCodeEditor && window.gShaderToy.mCodeEditor.getValue && window.gShaderToy.mCodeEditor.setValue) {
+            if (window.gShaderToy.mActiveDoc === n_pass_id && window.gShaderToy.mCodeEditor && window.gShaderToy.mCodeEditor.getValue && window.gShaderToy.mCodeEditor.setValue) {
                 if (window.gShaderToy.mCodeEditor.getValue() !== s_code) {
                     window.gShaderToy.mCodeEditor.setValue(s_code);
                 }
+            }
+        },
+
+        syncMonacoToActiveDoc: function() {
+            if (!this.isMonacoSelected() || !this.o_editor_monaco || !window.gShaderToy) {
+                return;
+            }
+            var n_active_id = window.gShaderToy.mActiveDoc;
+            var o_model = this.o_editor_monaco.getModel();
+            if (o_model) {
+                this.syncPassFromModel(n_active_id, o_model);
             }
         },
 
         forceSyncMonacoToActiveDoc: function() {
-            if (!this.o_editor_monaco || !window.gShaderToy || !window.gShaderToy.mPass || !window.gShaderToy.mPass[window.gShaderToy.mActiveDoc]) {
+            if (!this.o_editor_monaco || !window.gShaderToy) {
                 return;
             }
-
-            var s_code = this.o_editor_monaco.getModel().getValue();
-            var o_active_doc = window.gShaderToy.mPass[window.gShaderToy.mActiveDoc].mDocs;
-
-            if (o_active_doc.getValue() !== s_code) {
-                o_active_doc.setValue(s_code);
-                window.gShaderToy.mNeedsSave = true;
-            }
-
-            if (window.gShaderToy.mCodeEditor && window.gShaderToy.mCodeEditor.getValue && window.gShaderToy.mCodeEditor.setValue) {
-                if (window.gShaderToy.mCodeEditor.getValue() !== s_code) {
-                    window.gShaderToy.mCodeEditor.setValue(s_code);
-                }
+            var n_active_id = window.gShaderToy.mActiveDoc;
+            var o_model = this.o_editor_monaco.getModel();
+            if (o_model) {
+                this.syncPassFromModel(n_active_id, o_model);
             }
         },
 
         syncActiveDocToMonaco: function() {
-            if (!this.o_editor_monaco || !window.gShaderToy || !window.gShaderToy.mPass || !window.gShaderToy.mPass[window.gShaderToy.mActiveDoc]) {
+            if (!this.o_editor_monaco || !window.gShaderToy || !window.gShaderToy.mPass) {
                 return;
             }
 
-            var s_code = window.gShaderToy.mPass[window.gShaderToy.mActiveDoc].mDocs.getValue();
+            var n_active_id = window.gShaderToy.mActiveDoc;
+            var o_pass = window.gShaderToy.mPass[n_active_id];
+            if (!o_pass || !o_pass.mDocs) {
+                return;
+            }
 
-            if (this.o_editor_monaco.getModel().getValue() !== s_code) {
-                this.o_editor_monaco.getModel().setValue(s_code);
+            var o_target_model = this.getOrCreateModelForPass(n_active_id);
+            if (!o_target_model) {
+                return;
+            }
+
+            var s_code = o_pass.mDocs.getValue();
+            if (o_target_model.getValue() !== s_code) {
+                o_target_model.setValue(s_code);
+            }
+
+            if (this.o_editor_monaco.getModel() !== o_target_model) {
+                this.o_editor_monaco.setModel(o_target_model);
+                if (this.o_view_states && this.o_view_states[n_active_id]) {
+                    this.o_editor_monaco.restoreViewState(this.o_view_states[n_active_id]);
+                }
             }
         },
 
@@ -2046,8 +2101,15 @@
 
                 self.setupGlslLanguage(window.monaco);
 
+                // Initialize models for all passes so history and symbols are ready
+                for (var p = 0; p < window.gShaderToy.mPass.length; p++) {
+                    self.getOrCreateModelForPass(p);
+                }
+
+                var o_active_model = self.getOrCreateModelForPass(window.gShaderToy.mActiveDoc);
+
                 self.o_editor_monaco = window.monaco.editor.create(document.getElementById('editor'), {
-                    value: window.gShaderToy.mPass[window.gShaderToy.mActiveDoc].mDocs.getValue(),
+                    model: o_active_model,
                     language: 'glsl',
                     theme: 'vs-dark',
                     mouseWheelZoom: true,
@@ -2069,8 +2131,7 @@
                 };
 
                 var n_validate_timer = null;
-                self.o_editor_monaco.getModel().onDidChangeContent(function() {
-                    self.syncMonacoToActiveDoc();
+                self.o_editor_monaco.onDidChangeModelContent(function() {
                     if (self.b_live_validation_throttled) {
                         return;
                     }
@@ -2116,25 +2177,27 @@
             var f_ChangePass_old = window.ShaderToy.prototype.ChangePass;
             window.ShaderToy.prototype.ChangePass = function(n_id) {
                 var n_prev_active_doc = this.mActiveDoc;
-                var s_prev_monaco_code = null;
 
-                if (self.isMonacoSelected()) {
-                    if (self.o_editor_monaco && self.o_editor_monaco.getModel) {
-                        s_prev_monaco_code = self.o_editor_monaco.getModel().getValue();
+                if (self.o_editor_monaco && self.o_editor_monaco.getModel) {
+                    if (!self.o_view_states) {
+                        self.o_view_states = {};
                     }
+                    self.o_view_states[n_prev_active_doc] = self.o_editor_monaco.saveViewState();
                     self.forceSyncMonacoToActiveDoc();
                 }
 
                 f_ChangePass_old.call(this, n_id);
 
-                if (typeof s_prev_monaco_code === 'string' && this.mPass[n_prev_active_doc] && this.mPass[n_prev_active_doc].mDocs) {
-                    if (this.mPass[n_prev_active_doc].mDocs.getValue() !== s_prev_monaco_code) {
-                        this.mPass[n_prev_active_doc].mDocs.setValue(s_prev_monaco_code);
-                        this.mNeedsSave = true;
+                if (self.o_editor_monaco) {
+                    var o_new_model = self.getOrCreateModelForPass(n_id);
+                    if (o_new_model && self.o_editor_monaco.getModel() !== o_new_model) {
+                        self.o_editor_monaco.setModel(o_new_model);
+                        if (self.o_view_states && self.o_view_states[n_id]) {
+                            self.o_editor_monaco.restoreViewState(self.o_view_states[n_id]);
+                        }
+                        self.o_editor_monaco.focus();
                     }
                 }
-
-                self.syncActiveDocToMonaco();
             };
 
             if (!document.getElementById('editorManager')) {
