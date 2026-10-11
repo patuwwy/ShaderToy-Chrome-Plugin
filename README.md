@@ -57,7 +57,7 @@ Download the latest release zip package from the [Releases](https://github.com/p
 - **`iTime` Playback Controls:** Interactive slider for `iTime` and media channel seeking, plus loop interval ranges.
 - **`iMouse` Simulator:** Four interactive sliders to manipulate `iMouse.xyzw` coordinates for testing and parameter tuning.
 - **Fullscreen Playback & Fullscreen Edit Mode:** Smooth canvas handling with dedicated shortcut triggers.
-- **Capture HQ Screenshot & Video Recording:** Fast high-res screenshot capture (`SHIFT + CTRL + S`) and canvas video recording (`SHIFT + CTRL + R`).
+- **Capture HQ Screenshot & Video Recording:** Fast high-res screenshot capture (<kbd>SHIFT</kbd> + <kbd>CTRL</kbd> + <kbd>S</kbd>) and deterministic, frame-accurate offline video recording with selectable framerates (50, 60, 120, 144, 240 FPS) powered by WebCodecs & `webm-muxer` (<kbd>ALT</kbd> + <kbd>SHIFT</kbd> + <kbd>R</kbd>).
 
 ### 🛠️ Code Editor & Shader Tools
 - **Custom Parameters Block:** Inject external images/textures and customize canvas resolutions via a JSON comment block in the `Common` tab. [Read Custom Parameters Documentation](./docs/custom-params.md).
@@ -95,7 +95,7 @@ Download the latest release zip package from the [Releases](https://github.com/p
 | <kbd>ALT</kbd> + <kbd>&uarr;</kbd> / <kbd>&darr;</kbd> | Pause / Restart | Pauses time uniform or restarts shader from frame 0. |
 | <kbd>SHIFT</kbd> + <kbd>CTRL</kbd> + <kbd>Enter</kbd> | Fullscreen Edit | Toggles fullscreen editing mode. |
 | <kbd>SHIFT</kbd> + <kbd>CTRL</kbd> + <kbd>S</kbd> | Take HQ Screenshot | Captures current frame in high resolution. |
-| <kbd>SHIFT</kbd> + <kbd>CTRL</kbd> + <kbd>R</kbd> | Record Video | Starts/stops canvas video capture. |
+| <kbd>ALT</kbd> + <kbd>SHIFT</kbd> + <kbd>R</kbd> | Record Video | Starts/stops deterministic canvas video recording. |
 
 ### Code Editor
 
@@ -143,6 +143,7 @@ Download the latest release zip package from the [Releases](https://github.com/p
   - [Ethan Lowenthal](https://ethansawesomewebsite.tk/)
   - [Ahsen Khan](https://github.com/ahs3n)
   - GPU render timing based on [shadertoy_gpu_timing.user.js](https://github.com/andrei-drexler/shadertoy-userscripts/blob/master/shadertoy_gpu_timing.user.js) by [Andrei Drexler](https://github.com/andrei-drexler)
+  - Video muxing powered by [webm-muxer](https://github.com/vanilagy/webm-muxer) by [Vanilagy](https://github.com/vanilagy)
 
 ---
 

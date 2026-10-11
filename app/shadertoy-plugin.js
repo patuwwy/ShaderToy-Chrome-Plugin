@@ -233,6 +233,7 @@
             this.downloadShader();
             this.downloadShaderAsZip();
             this.uploadShader();
+            this.createRecordButton();
 
             this.anchorsMaker = new AnchorsMaker();
             this.performanceIndicators = new RenderMeters();
@@ -506,14 +507,21 @@
                     }
 
                     // shift + ctrl + s
-                    if (e.ctrlKey && e.shiftKey && e.which === 83) {
+                    if (e.ctrlKey && e.shiftKey && (e.which === 83 || code === 'KeyS' || key === 's')) {
                         self.takeScreenShot();
                     }
 
-                    // shift + ctrl + r
-                    if (e.ctrlKey && e.shiftKey && code === 'KeyR') {
+                    // alt + shift + r or ctrl + shift + r
+                    var isRecordShortcut = (e.altKey && e.shiftKey && (code === 'KeyR' || key === 'r' || e.which === 82)) ||
+                        (e.ctrlKey && e.shiftKey && (code === 'KeyR' || key === 'r' || e.which === 82));
+                    if (isRecordShortcut) {
+                        e.preventDefault();
                         self.switchRecording();
                     }
+                } else if (self.isRecording && ((e.altKey && e.shiftKey && (code === 'KeyR' || key === 'r' || e.which === 82)) ||
+                    (e.ctrlKey && e.shiftKey && (code === 'KeyR' || key === 'r' || e.which === 82)))) {
+                    e.preventDefault();
+                    self.switchRecording();
                 }
                 // shift + ctrl + enter
                 if (e.which === 13 && e.shiftKey && e.ctrlKey) {
@@ -567,16 +575,24 @@
                             bubbles: true,
                             cancelable: false
                         }),
+                        titleElem = document.getElementById('shaderTitle'),
+                        title = (titleElem && titleElem.value ? titleElem.value.trim() : '') ||
+                            (gShaderToy.mInfo && (gShaderToy.mInfo.name || gShaderToy.mInfo.id)) ||
+                            'shadertoy',
+                        safeTitle = title.replace(/[^a-zA-Z0-9_\-]/g, '_'),
                         filename =
-                            document.getElementById('shaderTitle').value +
+                            safeTitle +
                             '_' +
                             new Date().toJSON().slice(0, 10) +
-                            ' ' +
-                            new Date(new Date()).toString().split(' ')[4];
+                            '_' +
+                            new Date().toTimeString().split(' ')[0].replace(/:/g, '-') +
+                            '.png';
 
-                    link.setAttribute('href', imageData);
-                    link.setAttribute('download', filename);
-                    link.dispatchEvent(clickEvent);
+                    if (imageData) {
+                        link.setAttribute('href', imageData);
+                        link.setAttribute('download', filename);
+                        link.dispatchEvent(clickEvent);
+                    }
                     this.decreaseRes(currentDivider);
 
                     if (!paused) {
@@ -587,12 +603,522 @@
             );
         }
 
-        switchRecording() {
-            if (gShaderToy.mMediaRecorder.state === 'inactive') {
-                gShaderToy.mMediaRecorder.start();
-            } else {
-                gShaderToy.mMediaRecorder.stop();
+        startRecording() {
+            if (this.isRecording) {
+                return;
             }
+
+            var canvas = (window.gShaderToy && window.gShaderToy.mEffect && window.gShaderToy.mEffect.mCanvas) ||
+                (window.gShaderToy && window.gShaderToy.mEffect && window.gShaderToy.mEffect.mGLContext && window.gShaderToy.mEffect.mGLContext.canvas) ||
+                document.getElementById(this.MAIN_SHADERTOY_DEMO_ID) ||
+                this.c;
+
+            if (!canvas) {
+                console.error('[ShaderToy Plugin] Canvas element not found.');
+                window.alert('Cannot record: ShaderToy canvas element not found.');
+                return;
+            }
+
+            var targetFps = parseInt(this.fpsSelect ? this.fpsSelect.value : 60, 10) || 60;
+            var width = canvas.width - (canvas.width % 2);
+            var height = canvas.height - (canvas.height % 2);
+
+            if (this.recordButton) {
+                this.recordButton.classList.add('recording-active');
+                if (this.recordButtonLabel) {
+                    this.recordButtonLabel.textContent = 'STOP';
+                }
+            }
+            if (this.fpsSelect) {
+                this.fpsSelect.disabled = true;
+            }
+
+            this.isRecording = true;
+            this.recordedFrameCount = 0;
+            this.targetFps = targetFps;
+
+            this.showRecordingIndicator(targetFps);
+
+            // Preferred mode: WebCodecs + WebMMuxer for deterministic frame-accurate recording
+            var WebMMuxerClass = window.WebMMuxer || (typeof window !== 'undefined' ? window.WebMMuxer : null);
+            if (typeof window.VideoEncoder !== 'undefined' && WebMMuxerClass) {
+                this.startDeterministicRecording(canvas, width, height, targetFps);
+            } else if (typeof window.VideoEncoder === 'undefined') {
+                console.warn('[ShaderToy Plugin] VideoEncoder (WebCodecs) not supported, using MediaRecorder fallback.');
+                this.startMediaRecorderFallback(canvas, targetFps);
+            } else {
+                console.error('[ShaderToy Plugin] WebMMuxer not found on window. Ensure webm-muxer.js is loaded.');
+                window.alert('WebMMuxer library is still loading or not found. Please refresh the page and try again.');
+                this.stopRecording();
+            }
+        }
+
+        startDeterministicRecording(canvas, width, height, targetFps) {
+            try {
+                var WebMMuxerClass = window.WebMMuxer || (typeof window !== 'undefined' ? window.WebMMuxer : null);
+                if (!WebMMuxerClass) {
+                    throw new Error('WebMMuxer not available on window');
+                }
+
+                console.info('[ShaderToy Plugin] Initializing deterministic recording:', {
+                    width: width,
+                    height: height,
+                    targetFps: targetFps
+                });
+
+                var muxer = new WebMMuxerClass.Muxer({
+                    target: new WebMMuxerClass.ArrayBufferTarget(),
+                    video: {
+                        codec: 'V_VP9',
+                        width: width,
+                        height: height,
+                        frameRate: targetFps
+                    }
+                });
+
+                var bitrate = Math.min(60000000, Math.max(8000000, Math.round(width * height * targetFps * 0.15)));
+                var encoder = new window.VideoEncoder({
+                    output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+                    error: (e) => console.error('[ShaderToy Plugin] VideoEncoder error:', e)
+                });
+
+                try {
+                    encoder.configure({
+                        codec: 'vp09.00.10.08',
+                        width: width,
+                        height: height,
+                        bitrate: bitrate,
+                        framerate: targetFps
+                    });
+                } catch (vp9Err) {
+                    console.warn('[ShaderToy Plugin] VP9 configuration failed, trying vp8:', vp9Err);
+                    encoder.configure({
+                        codec: 'vp8',
+                        width: width,
+                        height: height,
+                        bitrate: bitrate,
+                        framerate: targetFps
+                    });
+                }
+
+                this.videoEncoder = encoder;
+                this.webmMuxer = muxer;
+                this.recordingCanvas = canvas;
+                this.isDeterministic = true;
+                this.recordedFrameCount = 0;
+
+                this.wasPaused = (window.gShaderToy && window.gShaderToy.mIsPaused);
+                if (window.gShaderToy && !window.gShaderToy.mIsPaused) {
+                    window.gShaderToy.pauseTime();
+                }
+
+                var startTimeMs = (window.gShaderToy && typeof window.gShaderToy.mTf === 'number')
+                    ? window.gShaderToy.mTf
+                    : ((window.gShaderToy && typeof window.gShaderToy.mTOffset === 'number') ? window.gShaderToy.mTOffset : 0),
+                    dtMs = 1000 / targetFps,
+                    dtSec = 1.0 / targetFps,
+                    frameIndex = 0,
+                    virtualTimeMs = startTimeMs,
+                    self = this;
+
+                // Override getRealTime so any internal Shadertoy timing uses our virtual deterministic time
+                var origGetRealTime = window.getRealTime;
+                this.origGetRealTime = origGetRealTime;
+                window.getRealTime = function() {
+                    return virtualTimeMs;
+                };
+
+                var stepFrame = () => {
+                    if (!self.isRecording) {
+                        return;
+                    }
+
+                    var frameTimeMs = startTimeMs + (frameIndex * dtMs);
+                    virtualTimeMs = frameTimeMs;
+
+                    if (window.gShaderToy) {
+                        var currentFrameNumber = Math.round(frameTimeMs / 1000 * targetFps);
+                        window.gShaderToy.mTOffset = frameTimeMs;
+                        window.gShaderToy.mTo = frameTimeMs - dtMs;
+                        window.gShaderToy.mTf = frameTimeMs;
+                        window.gShaderToy.mFpsFrame = currentFrameNumber;
+                        window.gShaderToy.mRestarted = false;
+                        window.gShaderToy.mForceFrame = true;
+
+                        if (window.gShaderToy.mEffect) {
+                            window.gShaderToy.mEffect.mFrame = currentFrameNumber;
+                            if (window.gShaderToy.mEffect.mPasses) {
+                                for (var p = 0; p < window.gShaderToy.mEffect.mPasses.length; p++) {
+                                    window.gShaderToy.mEffect.mPasses[p].mFrame = currentFrameNumber;
+                                }
+                            }
+                        }
+
+                        // Explicitly render this frame to canvas
+                        var rendered = false;
+                        if (typeof window.gShaderToy.Render === 'function') {
+                            try {
+                                window.gShaderToy.Render(true);
+                                rendered = true;
+                            } catch (e) {
+                                console.warn('[ShaderToy Plugin] gShaderToy.Render error:', e);
+                            }
+                        }
+
+                        if (!rendered && window.gShaderToy.mEffect && typeof window.gShaderToy.mEffect.Paint === 'function') {
+                            try {
+                                window.gShaderToy.mEffect.Paint(frameTimeMs / 1000, dtSec, targetFps, 0, 0, 0, 0, false);
+                                rendered = true;
+                            } catch (e2) {
+                                console.warn('[ShaderToy Plugin] mEffect.Paint error:', e2);
+                            }
+                        }
+                    }
+
+                    // Flush GPU draw queue so the WebGL canvas has finished all pixels
+                    var gl = (window.gShaderToy && window.gShaderToy.mEffect && window.gShaderToy.mEffect.mGLContext) ||
+                        (canvas && (canvas.getContext('webgl2') || canvas.getContext('webgl')));
+                    if (gl && typeof gl.finish === 'function') {
+                        gl.finish();
+                    }
+
+                    try {
+                        var timestampUs = Math.round(frameIndex * (1000000 / targetFps)),
+                            isKey = (frameIndex % (targetFps * 2) === 0),
+                            recCanvas = self.recordingCanvas || (window.gShaderToy && window.gShaderToy.mCanvas) || canvas,
+                            frameOpts = { timestamp: timestampUs };
+
+                        if (recCanvas.width !== width || recCanvas.height !== height) {
+                            frameOpts.visibleRect = { x: 0, y: 0, width: width, height: height };
+                        }
+
+                        var videoFrame = new window.VideoFrame(recCanvas, frameOpts);
+
+                        encoder.encode(videoFrame, { keyFrame: isKey });
+                        videoFrame.close();
+
+                        frameIndex++;
+                        self.recordedFrameCount = frameIndex;
+
+                        var virtualSec = (frameIndex / targetFps).toFixed(2);
+                        self.updateRecordingHUD(frameIndex, targetFps, virtualSec);
+
+                        if (frameIndex % 30 === 0 || frameIndex === 1) {
+                            console.log('[ShaderToy Plugin] Recorded frame ' + frameIndex + ' (' + virtualSec + 's)');
+                        }
+
+                        var scheduleNext = () => {
+                            if (!self.isRecording) {
+                                return;
+                            }
+                            if (encoder.encodeQueueSize > 8) {
+                                window.setTimeout(scheduleNext, 10);
+                            } else {
+                                // Yield via requestAnimationFrame so browser paints frame on screen
+                                window.requestAnimationFrame(stepFrame);
+                            }
+                        };
+
+                        scheduleNext();
+                    } catch (encodeErr) {
+                        console.error('[ShaderToy Plugin] Frame encode error:', encodeErr);
+                        self.stopRecording();
+                    }
+                };
+
+                // Kick off the deterministic frame-by-frame loop
+                stepFrame();
+            } catch (err) {
+                console.error('[ShaderToy Plugin] Deterministic recording failed to init:', err);
+                window.alert('Deterministic recording initialization failed: ' + err.message);
+                this.stopRecording();
+            }
+        }
+
+        startMediaRecorderFallback(canvas, targetFps) {
+            var captureStream = canvas.captureStream || canvas.mozCaptureStream;
+            if (typeof captureStream !== 'function' || typeof window.MediaRecorder === 'undefined') {
+                console.error('[ShaderToy Plugin] MediaRecorder not supported.');
+                window.alert('Video recording is not supported in this browser.');
+                this.isRecording = false;
+                return;
+            }
+
+            var stream = null;
+            try {
+                stream = captureStream.call(canvas, targetFps);
+            } catch (e) {
+                stream = captureStream.call(canvas);
+            }
+
+            if (!stream) {
+                this.isRecording = false;
+                return;
+            }
+
+            if (window.gShaderToy && window.gShaderToy.mIsPaused) {
+                window.gShaderToy.pauseTime();
+            }
+
+            var mimeType = '',
+                candidateTypes = [
+                    'video/webm;codecs=vp9',
+                    'video/webm;codecs=vp8',
+                    'video/webm',
+                    'video/mp4;codecs=avc1',
+                    'video/mp4'
+                ];
+
+            if (typeof window.MediaRecorder.isTypeSupported === 'function') {
+                for (var i = 0; i < candidateTypes.length; i++) {
+                    if (window.MediaRecorder.isTypeSupported(candidateTypes[i])) {
+                        mimeType = candidateTypes[i];
+                        break;
+                    }
+                }
+            }
+
+            var recorderOptions = mimeType ? { mimeType: mimeType } : {},
+                mediaRecorder = null;
+
+            try {
+                mediaRecorder = new window.MediaRecorder(stream, recorderOptions);
+            } catch (recErr) {
+                mediaRecorder = new window.MediaRecorder(stream);
+            }
+
+            this.mediaRecorder = mediaRecorder;
+            this.recordedChunks = [];
+            this.isDeterministic = false;
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data && event.data.size > 0) {
+                    this.recordedChunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                if (!this.recordedChunks || this.recordedChunks.length === 0) {
+                    return;
+                }
+                var actualMime = mediaRecorder.mimeType || mimeType || 'video/webm',
+                    ext = actualMime.indexOf('mp4') !== -1 ? '.mp4' : '.webm',
+                    blob = new window.Blob(this.recordedChunks, { type: actualMime });
+                this.recordedChunks = [];
+                this.downloadRecordingBlob(blob, ext, targetFps);
+            };
+
+            mediaRecorder.start(250);
+        }
+
+        stopRecording() {
+            if (!this.isRecording) {
+                return;
+            }
+
+            this.isRecording = false;
+
+            if (this.origGetRealTime) {
+                window.getRealTime = this.origGetRealTime;
+                this.origGetRealTime = null;
+            }
+
+            if (this.wasPaused === false && window.gShaderToy && window.gShaderToy.mIsPaused) {
+                window.gShaderToy.pauseTime();
+            }
+
+            if (this.recordButton) {
+                this.recordButton.classList.remove('recording-active');
+                if (this.recordButtonLabel) {
+                    this.recordButtonLabel.textContent = 'REC';
+                }
+            }
+            if (this.fpsSelect) {
+                this.fpsSelect.disabled = false;
+            }
+            this.removeRecordingIndicator();
+
+            if (this.isDeterministic && this.videoEncoder && this.webmMuxer) {
+                var encoder = this.videoEncoder,
+                    muxer = this.webmMuxer,
+                    targetFps = this.targetFps || 60;
+
+                this.videoEncoder = null;
+                this.webmMuxer = null;
+
+                (async () => {
+                    try {
+                        await encoder.flush();
+                        encoder.close();
+                        muxer.finalize();
+
+                        var buffer = muxer.target.buffer,
+                            blob = new window.Blob([buffer], { type: 'video/webm' });
+
+                        this.downloadRecordingBlob(blob, '.webm', targetFps);
+                    } catch (finalizeErr) {
+                        console.error('[ShaderToy Plugin] Error finalizing video:', finalizeErr);
+                    }
+                })();
+            } else if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+                try {
+                    if (typeof this.mediaRecorder.requestData === 'function') {
+                        this.mediaRecorder.requestData();
+                    }
+                } catch (ignore) {}
+                try {
+                    this.mediaRecorder.stop();
+                } catch (e) {
+                    console.error('[ShaderToy Plugin] MediaRecorder.stop failed:', e);
+                }
+            }
+        }
+
+        downloadRecordingBlob(blob, ext, fps) {
+            var titleElem = document.getElementById('shaderTitle'),
+                title = (titleElem && titleElem.value ? titleElem.value.trim() : '') ||
+                    (window.gShaderToy && window.gShaderToy.mInfo && (window.gShaderToy.mInfo.name || window.gShaderToy.mInfo.id)) ||
+                    'shadertoy',
+                safeTitle = title.replace(/[^a-zA-Z0-9_\-]/g, '_'),
+                now = new Date(),
+                timestamp = now.getFullYear() + '-' +
+                    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(now.getDate()).padStart(2, '0') + '_' +
+                    String(now.getHours()).padStart(2, '0') + '-' +
+                    String(now.getMinutes()).padStart(2, '0') + '-' +
+                    String(now.getSeconds()).padStart(2, '0'),
+                filename = safeTitle + '_' + timestamp + '_' + fps + 'fps' + ext;
+
+            var link = document.createElement('a'),
+                url = window.URL.createObjectURL(blob);
+
+            link.href = url;
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+
+            window.setTimeout(() => {
+                if (link.parentNode) {
+                    link.parentNode.removeChild(link);
+                }
+                window.URL.revokeObjectURL(url);
+            }, 30000);
+        }
+
+        switchRecording() {
+            if (this.isRecording) {
+                this.stopRecording();
+            } else {
+                this.startRecording();
+            }
+        }
+
+        createRecordButton() {
+            var group = document.createElement('div'),
+                recordBtn = document.createElement('div'),
+                dot = document.createElement('span'),
+                label = document.createElement('span'),
+                fpsSelect = document.createElement('select');
+
+            group.className = 'ste-record-control-group';
+
+            recordBtn.className = 'formButton formButton-extension ste-record-btn';
+            recordBtn.title = 'Record shader video (ALT + SHIFT + R)';
+
+            dot.className = 'ste-record-btn-dot';
+            label.className = 'ste-record-btn-label';
+            label.textContent = 'REC';
+
+            recordBtn.appendChild(dot);
+            recordBtn.appendChild(label);
+
+            fpsSelect.className = 'formButton ste-record-fps-select';
+            fpsSelect.title = 'Target video recording FPS';
+
+            [50, 60, 120, 144, 240].forEach((fps) => {
+                var opt = document.createElement('option');
+                opt.value = fps;
+                opt.textContent = fps + ' fps';
+                if (fps === 60) {
+                    opt.selected = true;
+                }
+                fpsSelect.appendChild(opt);
+            });
+
+            group.appendChild(recordBtn);
+            group.appendChild(fpsSelect);
+
+            if (extensionElements.controlsContainerFooter) {
+                extensionElements.controlsContainerFooter.appendChild(group);
+            }
+
+            recordBtn.addEventListener('click', () => {
+                this.switchRecording();
+            });
+
+            this.recordButton = recordBtn;
+            this.recordButtonLabel = label;
+            this.fpsSelect = fpsSelect;
+        }
+
+        showRecordingIndicator(fps) {
+            this.removeRecordingIndicator();
+
+            var container = document.getElementById('player') || document.body,
+                badge = document.createElement('div'),
+                dot = document.createElement('span'),
+                label = document.createElement('span'),
+                fpsBadge = document.createElement('span'),
+                timer = document.createElement('span'),
+                stopBtn = document.createElement('button');
+
+            badge.className = 'ste-recording-badge';
+            badge.title = 'Recording in progress. Click to stop (or press Alt + Shift + R)';
+
+            dot.className = 'ste-recording-dot';
+            label.className = 'ste-recording-label';
+            label.textContent = 'REC';
+
+            fpsBadge.className = 'ste-recording-fps-badge';
+            fpsBadge.textContent = '[' + fps + ' FPS]';
+
+            timer.className = 'ste-recording-timer';
+            timer.textContent = 'Frames: 0 (0.00s)';
+
+            stopBtn.className = 'ste-recording-stop-btn';
+            stopBtn.type = 'button';
+            stopBtn.textContent = 'Stop';
+
+            badge.appendChild(dot);
+            badge.appendChild(label);
+            badge.appendChild(fpsBadge);
+            badge.appendChild(timer);
+            badge.appendChild(stopBtn);
+
+            badge.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.stopRecording();
+            });
+
+            container.appendChild(badge);
+            this.recordingBadge = badge;
+            this.recordingHUDTimer = timer;
+        }
+
+        updateRecordingHUD(frameCount, fps, virtualSec) {
+            if (this.recordingHUDTimer) {
+                this.recordingHUDTimer.textContent = 'Frames: ' + frameCount + ' (' + virtualSec + 's)';
+            }
+        }
+
+        removeRecordingIndicator() {
+            if (this.recordingBadge && this.recordingBadge.parentNode) {
+                this.recordingBadge.parentNode.removeChild(this.recordingBadge);
+                this.recordingBadge = null;
+            }
+            this.recordingHUDTimer = null;
         }
 
         duplicateShader() {

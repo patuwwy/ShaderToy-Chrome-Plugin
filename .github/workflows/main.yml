@@ -38,12 +38,12 @@ jobs:
           mkdir -p output
           mkdir -p output/chrome
           mkdir -p output/firefox
-          VERSION=$(head -n 1 ./manifests/version.txt | tr -d '\r\n')
+          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
           echo $VERSION
 
       - name: Zip the Chrome extension
         run: |
-          VERSION=$(head -n 1 ./manifests/version.txt | tr -d '\r\n')
+          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
           cp ./app/* ./output/chrome -r
           cp ./manifests/manifest-chrome.json ./output/chrome/manifest.json
           jq --arg version "$VERSION" '.version = $version' ./output/chrome/manifest.json > ./output/chrome/manifest.json.tmp && mv ./output/chrome/manifest.json.tmp ./output/chrome/manifest.json
@@ -55,7 +55,7 @@ jobs:
         env:
           FIREFOX_EXTENSION_ID: ${{ secrets.FIREFOX_EXT_ID }}
         run: |
-          VERSION=$(head -n 1 ./manifests/version.txt | tr -d '\r\n')
+          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
           cp ./app/* ./output/firefox -r
           cp ./manifests/manifest-firefox.json ./output/firefox/manifest.json
           jq --arg id "$FIREFOX_EXTENSION_ID" '.browser_specific_settings.gecko.id = $id' ./output/firefox/manifest.json > ./output/firefox/manifest.json.tmp && mv ./output/firefox/manifest.json.tmp ./output/firefox/manifest.json
@@ -81,7 +81,7 @@ jobs:
 
       - name: Publish Release on GitHub
         run: |
-          VERSION=$(head -n 1 ./manifests/version.txt | tr -d '\r\n')
+          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
           gh release create $VERSION ./output/ShaderToy-Chrome-Plugin-$VERSION.zip ./output/ShaderToy-Firefox-Plugin-$VERSION.zip --title "$VERSION" --notes "Release of version $VERSION"
 
   publish-firefox:
@@ -117,7 +117,7 @@ jobs:
           FIREFOX_JWT_ISSUER: ${{ secrets.FIREFOX_JWT_ISSUER }}
           FIREFOX_JWT_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
         run: |
-          VERSION=$(head -n 1 ./manifests/version.txt | tr -d '\r\n')
+          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
           success=0
           for attempt in 1 2 3; do
             echo "Firefox publish attempt $attempt/3"
@@ -169,7 +169,7 @@ jobs:
           CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
           CHROME_PUBLISH_TARGET: default
         run: |
-          VERSION=$(head -n 1 ./manifests/version.txt | tr -d '\r\n')
+          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
           npx publish-extension \
             --chrome-zip ./output/ShaderToy-Chrome-Plugin-$VERSION.zip
 
@@ -206,6 +206,6 @@ jobs:
           EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
           EDGE_API_KEY: ${{ secrets.EDGE_API_KEY }}
         run: |
-          VERSION=$(head -n 1 ./manifests/version.txt | tr -d '\r\n')
+          VERSION=$(awk '{printf "%s", $0}' ./manifests/version.txt)
           npx publish-extension \
             --edge-zip ./output/ShaderToy-Chrome-Plugin-$VERSION.zip

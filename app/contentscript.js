@@ -63,7 +63,7 @@
         var script = document.createElement('script');
 
         script.src = chrome.runtime.getURL(filename);
-        //script.async = true;
+        script.async = false;
 
         if (id) {
             script.id = id;
@@ -260,8 +260,6 @@
             return;
         }
 
-        loadScript(MAIN_EXTENSION_FILENAME);
-
         const sendMonacoAssets = () => {
             window.postMessage({
                 type: 'MonacoAssetsData', cfg: {
@@ -282,6 +280,9 @@
 
         loadScript('scripts/node-sanitize-filename.js');
         loadScript('scripts/jszip-3.1.5.js');
+        loadScript('scripts/webm-muxer.js');
+
+        loadScript(MAIN_EXTENSION_FILENAME);
 
         loadScript(COMMON_FILENAME);
 

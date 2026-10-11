@@ -581,3 +581,153 @@ body div#header {
     right: 2em;
     opacity: 0.7;
 }
+
+.ste-recording-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 14px;
+    background: rgba(10, 10, 10, 0.85);
+    border: 1px solid rgba(255, 59, 48, 0.7);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    color: #ffffff;
+    font-family: monospace;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.ste-recording-badge:hover {
+    background: rgba(28, 10, 10, 0.95);
+    transform: scale(1.03);
+}
+
+.ste-recording-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ff3b30;
+    box-shadow: 0 0 6px #ff3b30;
+    animation: ste-pulse-recording 1s ease-in-out infinite alternate;
+}
+
+@keyframes ste-pulse-recording {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0.3;
+        transform: scale(0.7);
+    }
+}
+
+.ste-recording-label {
+    color: #ff453a;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+}
+
+.ste-recording-timer {
+    color: #ffffff;
+    min-width: 38px;
+}
+
+.ste-recording-stop-btn {
+    padding: 1px 6px;
+    border-radius: 3px;
+    border: none;
+    background: #ff3b30;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    line-height: 14px;
+}
+
+.ste-recording-stop-btn:hover {
+    background: #ff554a;
+}
+
+.formButton.formButton-record.recording-active,
+.ste-record-btn.recording-active {
+    background: #d32f2f !important;
+    color: #ffffff !important;
+    border-color: #f44336 !important;
+    animation: ste-pulse-rec-btn 1s infinite alternate;
+}
+
+.ste-record-control-group {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    gap: 3px;
+    margin-right: 4px;
+}
+
+.ste-record-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ste-record-btn-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ff3b30;
+    box-shadow: 0 0 5px #ff3b30;
+    display: inline-block;
+}
+
+.ste-record-btn.recording-active .ste-record-btn-dot {
+    background: #ffffff;
+    box-shadow: 0 0 6px #ffffff;
+    animation: ste-pulse-recording 0.8s ease-in-out infinite alternate;
+}
+
+.ste-record-fps-select {
+    font-size: 11px;
+    height: 22px;
+    padding: 0 4px;
+    background: #222222;
+    color: #bbbbbb;
+    border: 1px solid #444444;
+    border-radius: 3px;
+    cursor: pointer;
+    outline: none;
+    vertical-align: middle;
+}
+
+.ste-record-fps-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ste-recording-fps-badge {
+    color: #64b5f6;
+    font-weight: normal;
+    font-size: 11px;
+}
+
+@keyframes ste-pulse-rec-btn {
+    0% {
+        box-shadow: 0 0 4px rgba(244, 67, 54, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 10px rgba(244, 67, 54, 0.9);
+    }
+}
+
+
+

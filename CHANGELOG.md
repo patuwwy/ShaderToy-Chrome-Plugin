@@ -1,4 +1,10 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.15.5 (11-10-2026)
+
+    -   Fix broken video recording and uninitialized MediaRecorder runtime errors. [Issue #153](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/153)
+    -   Add deterministic frame-accurate offline video recording with selectable framerates (50, 60, 120, 144, 240 fps) powered by WebCodecs `VideoEncoder` and `WebMMuxer`: video frames wait synchronously for GPU render passes, guaranteeing perfectly smooth animation output even on heavy shaders.
+    -   Update recording controls in toolbar: red REC circle button with toggle state, adjacent FPS dropdown selector, player HUD counter, and `Alt + Shift + R` shortcut.
+
 -   0.15.4 (11-10-2026)
 
     -   Add Monaco Editor GLSL Go to Definition and Symbol Outline: `F12` and `Ctrl+Click` jump to definition for user-defined functions, structs, `#define` macros, and variables, plus Quick Open symbol navigation (`Ctrl+Shift+O`).

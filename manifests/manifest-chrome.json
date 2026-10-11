@@ -43,7 +43,8 @@
                 "shadertoy-plugin-profile.js",
                 "shadertoy-plugin-home.js",
                 "scripts/jszip-3.1.5.js",
-                "scripts/node-sanitize-filename.js"
+                "scripts/node-sanitize-filename.js",
+                "scripts/webm-muxer.js"
             ],
             "matches": ["https://www.shadertoy.com/*"]
         }
