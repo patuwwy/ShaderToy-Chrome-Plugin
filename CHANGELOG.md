@@ -1,4 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.15.4 (11-10-2026)
+
+    -   Add Monaco Editor GLSL Go to Definition and Symbol Outline: `F12` and `Ctrl+Click` jump to definition for user-defined functions, structs, `#define` macros, and variables, plus Quick Open symbol navigation (`Ctrl+Shift+O`).
+
 -   0.15.3 (11-10-2026)
 
     -   Improve Monaco Editor compilation error diagnostics and live validation: on-the-fly background shader syntax and type checking while typing (debounced), accurate line mapping, token-level error squiggles for undeclared identifiers and types, and per-error message tooltips in Monaco markers.

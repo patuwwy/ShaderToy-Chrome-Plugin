@@ -1216,6 +1216,257 @@
                     };
                 }
             });
+
+            var f_find_matching_brace_line = function(model, n_start_line, n_total_lines) {
+                var n_depth = 0;
+                var b_found_first = false;
+
+                for (var lineIdx = n_start_line; lineIdx <= n_total_lines; lineIdx++) {
+                    var s_line_str = model.getLineContent(lineIdx);
+                    for (var charIdx = 0; charIdx < s_line_str.length; charIdx++) {
+                        var ch = s_line_str.charAt(charIdx);
+                        if (ch === '{') {
+                            n_depth++;
+                            b_found_first = true;
+                        } else if (ch === '}') {
+                            n_depth--;
+                            if (b_found_first && n_depth === 0) {
+                                return lineIdx;
+                            }
+                        }
+                    }
+                }
+                return n_start_line;
+            };
+
+            var f_parse_glsl_symbols = function(model) {
+                var n_line_count = model.getLineCount();
+                var a_symbols = [];
+                var o_def_map = {};
+
+                var o_non_types = {
+                    'return': 1, 'else': 1, 'case': 1, 'break': 1, 'continue': 1,
+                    'discard': 1, 'if': 1, 'for': 1, 'while': 1, 'do': 1,
+                    'switch': 1, 'default': 1
+                };
+
+                var o_symbol_kind = (window.monaco && window.monaco.languages && window.monaco.languages.SymbolKind) ? window.monaco.languages.SymbolKind : {
+                    Function: 11,
+                    Struct: 22,
+                    Constant: 13,
+                    Variable: 12
+                };
+
+                var o_fn_re = /^(\s*)([a-zA-Z_]\w*)\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*(\{)?/;
+                var o_struct_re = /^(\s*)struct\s+([a-zA-Z_]\w*)\s*(\{)?/;
+                var o_define_re = /^(\s*)#define\s+([a-zA-Z_]\w*)(?:\(([^)]*)\))?/;
+                var o_const_re = /^(\s*)const\s+(?:[a-zA-Z_]\w*)\s+([a-zA-Z_]\w*)/;
+
+                for (var i = 1; i <= n_line_count; i++) {
+                    var s_line = model.getLineContent(i);
+                    var s_trimmed = s_line.trim();
+
+                    if (s_trimmed.indexOf('//') === 0 || s_trimmed.indexOf('/*') === 0) {
+                        continue;
+                    }
+
+                    // Struct definitions
+                    var o_match = s_line.match(o_struct_re);
+                    if (o_match) {
+                        var s_struct_name = o_match[2];
+                        var n_start_col = s_line.indexOf(s_struct_name) + 1;
+                        var n_end_col = n_start_col + s_struct_name.length;
+                        var n_struct_end_line = f_find_matching_brace_line(model, i, n_line_count);
+
+                        o_def_map[s_struct_name] = { line: i, startCol: n_start_col, endCol: n_end_col };
+                        a_symbols.push({
+                            name: s_struct_name,
+                            detail: 'struct',
+                            kind: o_symbol_kind.Struct,
+                            range: {
+                                startLineNumber: i,
+                                startColumn: 1,
+                                endLineNumber: n_struct_end_line,
+                                endColumn: model.getLineMaxColumn(n_struct_end_line)
+                            },
+                            selectionRange: {
+                                startLineNumber: i,
+                                startColumn: n_start_col,
+                                endLineNumber: i,
+                                endColumn: n_end_col
+                            }
+                        });
+                        continue;
+                    }
+
+                    // #define macros
+                    o_match = s_line.match(o_define_re);
+                    if (o_match) {
+                        var s_macro_name = o_match[2];
+                        var n_macro_start_col = s_line.indexOf(s_macro_name) + 1;
+                        var n_macro_end_col = n_macro_start_col + s_macro_name.length;
+
+                        o_def_map[s_macro_name] = { line: i, startCol: n_macro_start_col, endCol: n_macro_end_col };
+                        a_symbols.push({
+                            name: s_macro_name,
+                            detail: o_match[3] ? '(' + o_match[3] + ')' : 'macro',
+                            kind: o_symbol_kind.Constant,
+                            range: {
+                                startLineNumber: i,
+                                startColumn: 1,
+                                endLineNumber: i,
+                                endColumn: model.getLineMaxColumn(i)
+                            },
+                            selectionRange: {
+                                startLineNumber: i,
+                                startColumn: n_macro_start_col,
+                                endLineNumber: i,
+                                endColumn: n_macro_end_col
+                            }
+                        });
+                        continue;
+                    }
+
+                    // const definitions
+                    o_match = s_line.match(o_const_re);
+                    if (o_match) {
+                        var s_const_name = o_match[2];
+                        var n_const_start = s_line.indexOf(s_const_name) + 1;
+                        var n_const_end = n_const_start + s_const_name.length;
+
+                        o_def_map[s_const_name] = { line: i, startCol: n_const_start, endCol: n_const_end };
+                        a_symbols.push({
+                            name: s_const_name,
+                            detail: 'const',
+                            kind: o_symbol_kind.Constant,
+                            range: {
+                                startLineNumber: i,
+                                startColumn: 1,
+                                endLineNumber: i,
+                                endColumn: model.getLineMaxColumn(i)
+                            },
+                            selectionRange: {
+                                startLineNumber: i,
+                                startColumn: n_const_start,
+                                endLineNumber: i,
+                                endColumn: n_const_end
+                            }
+                        });
+                        continue;
+                    }
+
+                    // Function definitions
+                    o_match = s_line.match(o_fn_re);
+                    if (o_match) {
+                        var s_ret_type = o_match[2];
+                        var s_fn_name = o_match[3];
+                        var b_has_brace = !!o_match[5];
+
+                        if (o_non_types[s_ret_type] || o_non_types[s_fn_name]) {
+                            continue;
+                        }
+
+                        if (s_trimmed.charAt(s_trimmed.length - 1) === ';') {
+                            continue;
+                        }
+
+                        if (!b_has_brace) {
+                            var b_next_has_brace = false;
+                            for (var k = i + 1; k <= Math.min(n_line_count, i + 5); k++) {
+                                var s_next_trimmed = model.getLineContent(k).trim();
+                                if (!s_next_trimmed) continue;
+                                if (s_next_trimmed.indexOf('{') === 0) {
+                                    b_next_has_brace = true;
+                                }
+                                break;
+                            }
+                            if (!b_next_has_brace) {
+                                continue;
+                            }
+                        }
+
+                        var n_fn_start = s_line.indexOf(s_fn_name) + 1;
+                        var n_fn_end = n_fn_start + s_fn_name.length;
+                        var n_fn_end_line = f_find_matching_brace_line(model, i, n_line_count);
+
+                        o_def_map[s_fn_name] = { line: i, startCol: n_fn_start, endCol: n_fn_end };
+                        a_symbols.push({
+                            name: s_fn_name,
+                            detail: s_ret_type + ' (' + o_match[4].trim() + ')',
+                            kind: o_symbol_kind.Function,
+                            range: {
+                                startLineNumber: i,
+                                startColumn: 1,
+                                endLineNumber: n_fn_end_line,
+                                endColumn: model.getLineMaxColumn(n_fn_end_line)
+                            },
+                            selectionRange: {
+                                startLineNumber: i,
+                                startColumn: n_fn_start,
+                                endLineNumber: i,
+                                endColumn: n_fn_end
+                            }
+                        });
+                    }
+                }
+
+                return { symbols: a_symbols, defMap: o_def_map };
+            };
+
+            monaco.languages.registerDocumentSymbolProvider('glsl', {
+                provideDocumentSymbols: function(model) {
+                    var o_parsed = f_parse_glsl_symbols(model);
+                    return o_parsed.symbols;
+                }
+            });
+
+            monaco.languages.registerDefinitionProvider('glsl', {
+                provideDefinition: function(model, position) {
+                    var o_word = model.getWordAtPosition(position);
+                    if (!o_word || !o_word.word) {
+                        return null;
+                    }
+                    var s_target = o_word.word;
+                    var o_parsed = f_parse_glsl_symbols(model);
+
+                    if (o_parsed.defMap[s_target]) {
+                        var o_def = o_parsed.defMap[s_target];
+                        return {
+                            uri: model.uri,
+                            range: {
+                                startLineNumber: o_def.line,
+                                startColumn: o_def.startCol,
+                                endLineNumber: o_def.line,
+                                endColumn: o_def.endCol
+                            }
+                        };
+                    }
+
+                    var o_local_re = new RegExp('\\b([a-zA-Z_]\\w*)\\s+([a-zA-Z_]\\w*\\s*,\\s*)*\\b' + s_target + '\\b');
+                    for (var i = position.lineNumber; i >= 1; i--) {
+                        var s_current_line = model.getLineContent(i);
+                        if (o_local_re.test(s_current_line)) {
+                            var n_col = s_current_line.indexOf(s_target) + 1;
+                            if (n_col > 0) {
+                                return {
+                                    uri: model.uri,
+                                    range: {
+                                        startLineNumber: i,
+                                        startColumn: n_col,
+                                        endLineNumber: i,
+                                        endColumn: n_col + s_target.length
+                                    }
+                                };
+                            }
+                        }
+                        if (/^\s*(?:void|bool|int|uint|float|vec[234]|mat[234])\s+[a-zA-Z_]\w*\s*\(/.test(s_current_line)) {
+                            break;
+                        }
+                    }
+
+                    return null;
+                }
+            });
         },
 
         handleErrors: function(errors, isError, errorStr, fromScript, editor, n_header_offset) {
