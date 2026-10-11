@@ -996,6 +996,419 @@
             };
 
 
+            var f_get_line_count = function(source) {
+                if (!source) return 0;
+                if (typeof source.getLineCount === 'function') return source.getLineCount();
+                if (typeof source.lineCount === 'function') return source.lineCount();
+                if (typeof source.getValue === 'function') return source.getValue().split('\n').length;
+                if (typeof source === 'string') return source.split('\n').length;
+                return 0;
+            };
+
+            var f_get_line_content = function(source, lineNum) {
+                if (!source || lineNum < 1) return '';
+                if (typeof source.getLineContent === 'function') return source.getLineContent(lineNum);
+                if (typeof source.getLine === 'function') return source.getLine(lineNum - 1) || '';
+                if (typeof source.getValue === 'function') {
+                    var lines = source.getValue().split('\n');
+                    return lines[lineNum - 1] || '';
+                }
+                if (typeof source === 'string') {
+                    var lines = source.split('\n');
+                    return lines[lineNum - 1] || '';
+                }
+                return '';
+            };
+
+            var f_find_matching_brace_line = function(source, n_start_line, n_total_lines) {
+                var n_depth = 0;
+                var b_found_first = false;
+
+                for (var lineIdx = n_start_line; lineIdx <= n_total_lines; lineIdx++) {
+                    var s_line_str = f_get_line_content(source, lineIdx);
+                    for (var charIdx = 0; charIdx < s_line_str.length; charIdx++) {
+                        var ch = s_line_str.charAt(charIdx);
+                        if (ch === '{') {
+                            n_depth++;
+                            b_found_first = true;
+                        } else if (ch === '}') {
+                            n_depth--;
+                            if (b_found_first && n_depth === 0) {
+                                return lineIdx;
+                            }
+                        }
+                    }
+                }
+                return n_start_line;
+            };
+
+            var f_extract_preceding_doc = function(source, n_line_idx) {
+                var a_doc_lines = [];
+                for (var c = n_line_idx - 1; c >= 1; c--) {
+                    var s_prev = f_get_line_content(source, c).trim();
+                    if (!s_prev) {
+                        break;
+                    }
+                    if (s_prev.indexOf('//') === 0) {
+                        a_doc_lines.unshift(s_prev.replace(/^\/\/\s?/, ''));
+                    } else if (s_prev.indexOf('*/') !== -1 || s_prev.indexOf('/*') !== -1 || s_prev.indexOf('*') === 0) {
+                        a_doc_lines.unshift(s_prev.replace(/^(\/\*+|\*+|\*\/)\s?/, ''));
+                    } else {
+                        break;
+                    }
+                }
+                return a_doc_lines.join('\n').trim();
+            };
+
+            var f_parse_glsl_symbols = function(source) {
+                var n_line_count = f_get_line_count(source);
+                var a_symbols = [];
+                var o_def_map = {};
+
+                var o_non_types = {
+                    'return': 1, 'else': 1, 'case': 1, 'break': 1, 'continue': 1,
+                    'discard': 1, 'if': 1, 'for': 1, 'while': 1, 'do': 1,
+                    'switch': 1, 'default': 1
+                };
+
+                var o_symbol_kind = (window.monaco && window.monaco.languages && window.monaco.languages.SymbolKind) ? window.monaco.languages.SymbolKind : {
+                    Function: 11,
+                    Struct: 22,
+                    Constant: 13,
+                    Variable: 12
+                };
+
+                var o_fn_start_re = /^(\s*)([a-zA-Z_]\w*)\s+([a-zA-Z_]\w*)\s*\(/;
+                var o_struct_re = /^(\s*)struct\s+([a-zA-Z_]\w*)\s*(\{)?/;
+                var o_define_re = /^(\s*)#define\s+([a-zA-Z_]\w*)(?:\(([^)]*)\))?/;
+                var o_const_re = /^(\s*)const\s+(?:[a-zA-Z_]\w*)\s+([a-zA-Z_]\w*)/;
+                var o_global_var_re = /^(\s*)([a-zA-Z_]\w*)\s+([a-zA-Z_]\w*)\s*(?:=\s*[^;]+)?\s*;/;
+
+                for (var i = 1; i <= n_line_count; i++) {
+                    var s_line = f_get_line_content(source, i);
+                    var s_trimmed = s_line.trim();
+
+                    if (s_trimmed.indexOf('//') === 0 || s_trimmed.indexOf('/*') === 0) {
+                        continue;
+                    }
+
+                    // Struct definitions
+                    var o_match = s_line.match(o_struct_re);
+                    if (o_match) {
+                        var s_struct_name = o_match[2];
+                        var n_start_col = s_line.indexOf(s_struct_name) + 1;
+                        var n_end_col = n_start_col + s_struct_name.length;
+                        var n_struct_end_line = f_find_matching_brace_line(source, i, n_line_count);
+                        var s_struct_doc = f_extract_preceding_doc(source, i);
+
+                        o_def_map[s_struct_name] = {
+                            line: i,
+                            startCol: n_start_col,
+                            endCol: n_end_col,
+                            kind: 'struct',
+                            name: s_struct_name,
+                            signature: 'struct ' + s_struct_name,
+                            documentation: s_struct_doc
+                        };
+
+                        a_symbols.push({
+                            name: s_struct_name,
+                            detail: 'struct',
+                            kind: o_symbol_kind.Struct,
+                            range: {
+                                startLineNumber: i,
+                                startColumn: 1,
+                                endLineNumber: n_struct_end_line,
+                                endColumn: (source.getLineMaxColumn ? source.getLineMaxColumn(n_struct_end_line) : (f_get_line_content(source, n_struct_end_line).length + 1))
+                            },
+                            selectionRange: {
+                                startLineNumber: i,
+                                startColumn: n_start_col,
+                                endLineNumber: i,
+                                endColumn: n_end_col
+                            }
+                        });
+                        continue;
+                    }
+
+                    // #define macros
+                    o_match = s_line.match(o_define_re);
+                    if (o_match) {
+                        var s_macro_name = o_match[2];
+                        var n_macro_start_col = s_line.indexOf(s_macro_name) + 1;
+                        var n_macro_end_col = n_macro_start_col + s_macro_name.length;
+                        var s_macro_doc = f_extract_preceding_doc(source, i);
+
+                        o_def_map[s_macro_name] = {
+                            line: i,
+                            startCol: n_macro_start_col,
+                            endCol: n_macro_end_col,
+                            kind: 'macro',
+                            name: s_macro_name,
+                            signature: s_trimmed,
+                            documentation: s_macro_doc
+                        };
+
+                        a_symbols.push({
+                            name: s_macro_name,
+                            detail: o_match[3] ? '(' + o_match[3] + ')' : 'macro',
+                            kind: o_symbol_kind.Constant,
+                            range: {
+                                startLineNumber: i,
+                                startColumn: 1,
+                                endLineNumber: i,
+                                endColumn: (source.getLineMaxColumn ? source.getLineMaxColumn(i) : (s_line.length + 1))
+                            },
+                            selectionRange: {
+                                startLineNumber: i,
+                                startColumn: n_macro_start_col,
+                                endLineNumber: i,
+                                endColumn: n_macro_end_col
+                            }
+                        });
+                        continue;
+                    }
+
+                    // const definitions
+                    o_match = s_line.match(o_const_re);
+                    if (o_match) {
+                        var s_const_name = o_match[2];
+                        var n_const_start = s_line.indexOf(s_const_name) + 1;
+                        var n_const_end = n_const_start + s_const_name.length;
+                        var s_const_doc = f_extract_preceding_doc(source, i);
+
+                        o_def_map[s_const_name] = {
+                            line: i,
+                            startCol: n_const_start,
+                            endCol: n_const_end,
+                            kind: 'const',
+                            name: s_const_name,
+                            signature: s_trimmed.replace(/;.*$/, ''),
+                            documentation: s_const_doc
+                        };
+
+                        a_symbols.push({
+                            name: s_const_name,
+                            detail: 'const',
+                            kind: o_symbol_kind.Constant,
+                            range: {
+                                startLineNumber: i,
+                                startColumn: 1,
+                                endLineNumber: i,
+                                endColumn: (source.getLineMaxColumn ? source.getLineMaxColumn(i) : (s_line.length + 1))
+                            },
+                            selectionRange: {
+                                startLineNumber: i,
+                                startColumn: n_const_start,
+                                endLineNumber: i,
+                                endColumn: n_const_end
+                            }
+                        });
+                        continue;
+                    }
+
+                    // Function definitions
+                    var o_fn_match = s_line.match(o_fn_start_re);
+                    if (o_fn_match) {
+                        var s_ret_type = o_fn_match[2];
+                        var s_fn_name = o_fn_match[3];
+
+                        if (!o_non_types[s_ret_type] && !o_non_types[s_fn_name]) {
+                            var s_params = '';
+                            var b_fn_valid = false;
+                            var n_closing_line = i;
+
+                            if (s_line.indexOf(')') !== -1) {
+                                var n_paren_open = s_line.indexOf('(');
+                                var n_paren_close = s_line.indexOf(')', n_paren_open);
+                                s_params = s_line.substring(n_paren_open + 1, n_paren_close).trim();
+                                b_fn_valid = true;
+                            } else {
+                                var a_param_chunks = [s_line.substring(s_line.indexOf('(') + 1)];
+                                for (var m = i + 1; m <= Math.min(n_line_count, i + 8); m++) {
+                                    var s_m_line = f_get_line_content(source, m);
+                                    var n_close_idx = s_m_line.indexOf(')');
+                                    if (n_close_idx !== -1) {
+                                        a_param_chunks.push(s_m_line.substring(0, n_close_idx));
+                                        n_closing_line = m;
+                                        b_fn_valid = true;
+                                        break;
+                                    } else {
+                                        a_param_chunks.push(s_m_line);
+                                    }
+                                }
+                                if (b_fn_valid) {
+                                    s_params = a_param_chunks.join(' ').replace(/\s+/g, ' ').trim();
+                                }
+                            }
+
+                            if (b_fn_valid) {
+                                var s_end_line = f_get_line_content(source, n_closing_line).trim();
+                                if (s_end_line.charAt(s_end_line.length - 1) !== ';') {
+                                    var b_has_brace = (s_end_line.indexOf('{') !== -1);
+                                    if (!b_has_brace) {
+                                        for (var k = n_closing_line + 1; k <= Math.min(n_line_count, n_closing_line + 5); k++) {
+                                            var s_next_trimmed = f_get_line_content(source, k).trim();
+                                            if (!s_next_trimmed) continue;
+                                            if (s_next_trimmed.indexOf('{') === 0) {
+                                                b_has_brace = true;
+                                            }
+                                            break;
+                                        }
+                                    }
+
+                                    if (b_has_brace) {
+                                        var n_fn_start = s_line.indexOf(s_fn_name) + 1;
+                                        var n_fn_end = n_fn_start + s_fn_name.length;
+                                        var n_fn_end_line = f_find_matching_brace_line(source, n_closing_line, n_line_count);
+                                        var s_fn_doc = f_extract_preceding_doc(source, i);
+                                        var s_fn_sig = s_ret_type + ' ' + s_fn_name + '(' + s_params + ')';
+
+                                        o_def_map[s_fn_name] = {
+                                            line: i,
+                                            startCol: n_fn_start,
+                                            endCol: n_fn_end,
+                                            kind: 'function',
+                                            retType: s_ret_type,
+                                            name: s_fn_name,
+                                            params: s_params,
+                                            signature: s_fn_sig,
+                                            documentation: s_fn_doc
+                                        };
+
+                                        a_symbols.push({
+                                            name: s_fn_name,
+                                            detail: s_ret_type + ' (' + s_params + ')',
+                                            kind: o_symbol_kind.Function,
+                                            range: {
+                                                startLineNumber: i,
+                                                startColumn: 1,
+                                                endLineNumber: n_fn_end_line,
+                                                endColumn: (source.getLineMaxColumn ? source.getLineMaxColumn(n_fn_end_line) : (f_get_line_content(source, n_fn_end_line).length + 1))
+                                            },
+                                            selectionRange: {
+                                                startLineNumber: i,
+                                                startColumn: n_fn_start,
+                                                endLineNumber: i,
+                                                endColumn: n_fn_end
+                                            }
+                                        });
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Global variable definitions
+                    var o_var_match = s_line.match(o_global_var_re);
+                    if (o_var_match) {
+                        var s_var_type = o_var_match[2];
+                        var s_var_name = o_var_match[3];
+                        if (!o_non_types[s_var_type] && !o_non_types[s_var_name] && !o_def_map[s_var_name]) {
+                            var n_var_start = s_line.indexOf(s_var_name) + 1;
+                            var n_var_end = n_var_start + s_var_name.length;
+                            var s_var_doc = f_extract_preceding_doc(source, i);
+
+                            o_def_map[s_var_name] = {
+                                line: i,
+                                startCol: n_var_start,
+                                endCol: n_var_end,
+                                kind: 'variable',
+                                name: s_var_name,
+                                signature: s_trimmed.replace(/;.*$/, ''),
+                                documentation: s_var_doc
+                            };
+
+                            a_symbols.push({
+                                name: s_var_name,
+                                detail: s_var_type,
+                                kind: o_symbol_kind.Variable,
+                                range: {
+                                    startLineNumber: i,
+                                    startColumn: 1,
+                                    endLineNumber: i,
+                                    endColumn: (source.getLineMaxColumn ? source.getLineMaxColumn(i) : (s_line.length + 1))
+                                },
+                                selectionRange: {
+                                    startLineNumber: i,
+                                    startColumn: n_var_start,
+                                    endLineNumber: i,
+                                    endColumn: n_var_end
+                                }
+                            });
+                        }
+                    }
+                }
+
+                return { symbols: a_symbols, defMap: o_def_map };
+            };
+
+            var o_symbols_cache = {};
+            var f_get_parsed_symbols = function(source) {
+                if (!source) return { symbols: [], defMap: {} };
+                var s_key = (source.id) || (source.uri ? source.uri.toString() : '');
+                var n_version = typeof source.getVersionId === 'function' ? source.getVersionId() : 0;
+                if (!s_key) {
+                    s_key = (typeof source.getValue === 'function') ? ('doc_' + source.getValue().length) : 'default';
+                    n_version = (typeof source.getValue === 'function') ? source.getValue().length : 0;
+                }
+                if (o_symbols_cache[s_key] && o_symbols_cache[s_key].version === n_version) {
+                    return o_symbols_cache[s_key].data;
+                }
+                var o_data = f_parse_glsl_symbols(source);
+                o_symbols_cache[s_key] = { version: n_version, data: o_data };
+                return o_data;
+            };
+
+            var f_find_symbol_definition = function(model, s_target) {
+                var o_parsed = f_get_parsed_symbols(model);
+                if (o_parsed.defMap[s_target]) {
+                    return { def: o_parsed.defMap[s_target], model: model, isCurrentModel: true };
+                }
+
+                if (window.gShaderToy && Array.isArray(window.gShaderToy.mPass)) {
+                    for (var p = 0; p < window.gShaderToy.mPass.length; p++) {
+                        var o_pass = window.gShaderToy.mPass[p];
+                        if (o_pass && o_pass.mDocs && o_pass.mDocs !== model) {
+                            var o_other_parsed = f_get_parsed_symbols(o_pass.mDocs);
+                            if (o_other_parsed.defMap[s_target]) {
+                                return { def: o_other_parsed.defMap[s_target], model: o_pass.mDocs, isCurrentModel: false, passIndex: p };
+                            }
+                        }
+                    }
+                }
+
+                return null;
+            };
+
+            var f_find_local_definition = function(model, position, s_target) {
+                if (!model || !position || !s_target) return null;
+                var o_local_re = new RegExp('\\b([a-zA-Z_]\\w*)\\s+([a-zA-Z_]\\w*\\s*,\\s*)*\\b' + s_target + '\\b');
+                for (var i = position.lineNumber; i >= 1; i--) {
+                    var s_current_line = f_get_line_content(model, i);
+                    var o_match = s_current_line.match(o_local_re);
+                    if (o_match) {
+                        var n_col = s_current_line.indexOf(s_target) + 1;
+                        if (n_col > 0) {
+                            var s_type = o_match[1];
+                            var b_is_fn = /^\s*(?:void|bool|int|uint|float|vec[234]|mat[234])\s+[a-zA-Z_]\w*\s*\(/.test(s_current_line);
+                            var s_sig = (b_is_fn ? '(parameter) ' : '(local variable) ') + s_type + ' ' + s_target;
+                            return {
+                                line: i,
+                                startCol: n_col,
+                                endCol: n_col + s_target.length,
+                                signature: s_sig
+                            };
+                        }
+                    }
+                    if (/^\s*(?:void|bool|int|uint|float|vec[234]|mat[234])\s+[a-zA-Z_]\w*\s*\(/.test(s_current_line)) {
+                        break;
+                    }
+                }
+                return null;
+            };
+
             monaco.languages.registerHoverProvider('glsl', {
                 provideHover: function(model, position) {
                     var o_word = model.getWordAtPosition(position);
@@ -1034,6 +1447,34 @@
                                 };
                             }
                         }
+
+                        // Check user-defined functions, structs, macros, consts
+                        var o_user_sym = f_find_symbol_definition(model, s_word);
+                        if (o_user_sym) {
+                            var o_user_def = o_user_sym.def;
+                            var a_user_contents = [
+                                { value: '```glsl\n' + o_user_def.signature + '\n```' }
+                            ];
+                            if (o_user_def.documentation) {
+                                a_user_contents.push({ value: o_user_def.documentation });
+                            }
+                            return {
+                                range: o_range,
+                                contents: a_user_contents
+                            };
+                        }
+
+                        // Check local variable or parameter in current scope
+                        var o_local = f_find_local_definition(model, position, s_word);
+                        if (o_local) {
+                            return {
+                                range: o_range,
+                                contents: [
+                                    { value: '```glsl\n' + o_local.signature + '\n```' }
+                                ]
+                            };
+                        }
+
                         return null;
                     }
 
@@ -1195,6 +1636,28 @@
 
                     var a_sigs = o_signatures[o_call.functionName];
                     if (!a_sigs || a_sigs.length === 0) {
+                        var o_user_fn = f_find_symbol_definition(model, o_call.functionName);
+                        if (o_user_fn && o_user_fn.def.kind === 'function') {
+                            var s_raw_params = o_user_fn.def.params;
+                            var a_params = [];
+                            if (s_raw_params) {
+                                var a_split = s_raw_params.split(',');
+                                for (var sp = 0; sp < a_split.length; sp++) {
+                                    var s_p = a_split[sp].trim();
+                                    if (s_p) {
+                                        a_params.push({ label: s_p });
+                                    }
+                                }
+                            }
+                            a_sigs = [{
+                                label: o_user_fn.def.signature,
+                                documentation: o_user_fn.def.documentation || '',
+                                parameters: a_params
+                            }];
+                        }
+                    }
+
+                    if (!a_sigs || a_sigs.length === 0) {
                         return null;
                     }
 
@@ -1217,205 +1680,9 @@
                 }
             });
 
-            var f_find_matching_brace_line = function(model, n_start_line, n_total_lines) {
-                var n_depth = 0;
-                var b_found_first = false;
-
-                for (var lineIdx = n_start_line; lineIdx <= n_total_lines; lineIdx++) {
-                    var s_line_str = model.getLineContent(lineIdx);
-                    for (var charIdx = 0; charIdx < s_line_str.length; charIdx++) {
-                        var ch = s_line_str.charAt(charIdx);
-                        if (ch === '{') {
-                            n_depth++;
-                            b_found_first = true;
-                        } else if (ch === '}') {
-                            n_depth--;
-                            if (b_found_first && n_depth === 0) {
-                                return lineIdx;
-                            }
-                        }
-                    }
-                }
-                return n_start_line;
-            };
-
-            var f_parse_glsl_symbols = function(model) {
-                var n_line_count = model.getLineCount();
-                var a_symbols = [];
-                var o_def_map = {};
-
-                var o_non_types = {
-                    'return': 1, 'else': 1, 'case': 1, 'break': 1, 'continue': 1,
-                    'discard': 1, 'if': 1, 'for': 1, 'while': 1, 'do': 1,
-                    'switch': 1, 'default': 1
-                };
-
-                var o_symbol_kind = (window.monaco && window.monaco.languages && window.monaco.languages.SymbolKind) ? window.monaco.languages.SymbolKind : {
-                    Function: 11,
-                    Struct: 22,
-                    Constant: 13,
-                    Variable: 12
-                };
-
-                var o_fn_re = /^(\s*)([a-zA-Z_]\w*)\s+([a-zA-Z_]\w*)\s*\(([^)]*)\)\s*(\{)?/;
-                var o_struct_re = /^(\s*)struct\s+([a-zA-Z_]\w*)\s*(\{)?/;
-                var o_define_re = /^(\s*)#define\s+([a-zA-Z_]\w*)(?:\(([^)]*)\))?/;
-                var o_const_re = /^(\s*)const\s+(?:[a-zA-Z_]\w*)\s+([a-zA-Z_]\w*)/;
-
-                for (var i = 1; i <= n_line_count; i++) {
-                    var s_line = model.getLineContent(i);
-                    var s_trimmed = s_line.trim();
-
-                    if (s_trimmed.indexOf('//') === 0 || s_trimmed.indexOf('/*') === 0) {
-                        continue;
-                    }
-
-                    // Struct definitions
-                    var o_match = s_line.match(o_struct_re);
-                    if (o_match) {
-                        var s_struct_name = o_match[2];
-                        var n_start_col = s_line.indexOf(s_struct_name) + 1;
-                        var n_end_col = n_start_col + s_struct_name.length;
-                        var n_struct_end_line = f_find_matching_brace_line(model, i, n_line_count);
-
-                        o_def_map[s_struct_name] = { line: i, startCol: n_start_col, endCol: n_end_col };
-                        a_symbols.push({
-                            name: s_struct_name,
-                            detail: 'struct',
-                            kind: o_symbol_kind.Struct,
-                            range: {
-                                startLineNumber: i,
-                                startColumn: 1,
-                                endLineNumber: n_struct_end_line,
-                                endColumn: model.getLineMaxColumn(n_struct_end_line)
-                            },
-                            selectionRange: {
-                                startLineNumber: i,
-                                startColumn: n_start_col,
-                                endLineNumber: i,
-                                endColumn: n_end_col
-                            }
-                        });
-                        continue;
-                    }
-
-                    // #define macros
-                    o_match = s_line.match(o_define_re);
-                    if (o_match) {
-                        var s_macro_name = o_match[2];
-                        var n_macro_start_col = s_line.indexOf(s_macro_name) + 1;
-                        var n_macro_end_col = n_macro_start_col + s_macro_name.length;
-
-                        o_def_map[s_macro_name] = { line: i, startCol: n_macro_start_col, endCol: n_macro_end_col };
-                        a_symbols.push({
-                            name: s_macro_name,
-                            detail: o_match[3] ? '(' + o_match[3] + ')' : 'macro',
-                            kind: o_symbol_kind.Constant,
-                            range: {
-                                startLineNumber: i,
-                                startColumn: 1,
-                                endLineNumber: i,
-                                endColumn: model.getLineMaxColumn(i)
-                            },
-                            selectionRange: {
-                                startLineNumber: i,
-                                startColumn: n_macro_start_col,
-                                endLineNumber: i,
-                                endColumn: n_macro_end_col
-                            }
-                        });
-                        continue;
-                    }
-
-                    // const definitions
-                    o_match = s_line.match(o_const_re);
-                    if (o_match) {
-                        var s_const_name = o_match[2];
-                        var n_const_start = s_line.indexOf(s_const_name) + 1;
-                        var n_const_end = n_const_start + s_const_name.length;
-
-                        o_def_map[s_const_name] = { line: i, startCol: n_const_start, endCol: n_const_end };
-                        a_symbols.push({
-                            name: s_const_name,
-                            detail: 'const',
-                            kind: o_symbol_kind.Constant,
-                            range: {
-                                startLineNumber: i,
-                                startColumn: 1,
-                                endLineNumber: i,
-                                endColumn: model.getLineMaxColumn(i)
-                            },
-                            selectionRange: {
-                                startLineNumber: i,
-                                startColumn: n_const_start,
-                                endLineNumber: i,
-                                endColumn: n_const_end
-                            }
-                        });
-                        continue;
-                    }
-
-                    // Function definitions
-                    o_match = s_line.match(o_fn_re);
-                    if (o_match) {
-                        var s_ret_type = o_match[2];
-                        var s_fn_name = o_match[3];
-                        var b_has_brace = !!o_match[5];
-
-                        if (o_non_types[s_ret_type] || o_non_types[s_fn_name]) {
-                            continue;
-                        }
-
-                        if (s_trimmed.charAt(s_trimmed.length - 1) === ';') {
-                            continue;
-                        }
-
-                        if (!b_has_brace) {
-                            var b_next_has_brace = false;
-                            for (var k = i + 1; k <= Math.min(n_line_count, i + 5); k++) {
-                                var s_next_trimmed = model.getLineContent(k).trim();
-                                if (!s_next_trimmed) continue;
-                                if (s_next_trimmed.indexOf('{') === 0) {
-                                    b_next_has_brace = true;
-                                }
-                                break;
-                            }
-                            if (!b_next_has_brace) {
-                                continue;
-                            }
-                        }
-
-                        var n_fn_start = s_line.indexOf(s_fn_name) + 1;
-                        var n_fn_end = n_fn_start + s_fn_name.length;
-                        var n_fn_end_line = f_find_matching_brace_line(model, i, n_line_count);
-
-                        o_def_map[s_fn_name] = { line: i, startCol: n_fn_start, endCol: n_fn_end };
-                        a_symbols.push({
-                            name: s_fn_name,
-                            detail: s_ret_type + ' (' + o_match[4].trim() + ')',
-                            kind: o_symbol_kind.Function,
-                            range: {
-                                startLineNumber: i,
-                                startColumn: 1,
-                                endLineNumber: n_fn_end_line,
-                                endColumn: model.getLineMaxColumn(n_fn_end_line)
-                            },
-                            selectionRange: {
-                                startLineNumber: i,
-                                startColumn: n_fn_start,
-                                endLineNumber: i,
-                                endColumn: n_fn_end
-                            }
-                        });
-                    }
-                }
-
-                return { symbols: a_symbols, defMap: o_def_map };
-            };
-
             monaco.languages.registerDocumentSymbolProvider('glsl', {
                 provideDocumentSymbols: function(model) {
-                    var o_parsed = f_parse_glsl_symbols(model);
+                    var o_parsed = f_get_parsed_symbols(model);
                     return o_parsed.symbols;
                 }
             });
@@ -1427,10 +1694,10 @@
                         return null;
                     }
                     var s_target = o_word.word;
-                    var o_parsed = f_parse_glsl_symbols(model);
+                    var o_user_sym = f_find_symbol_definition(model, s_target);
 
-                    if (o_parsed.defMap[s_target]) {
-                        var o_def = o_parsed.defMap[s_target];
+                    if (o_user_sym && o_user_sym.isCurrentModel && model.uri) {
+                        var o_def = o_user_sym.def;
                         return {
                             uri: model.uri,
                             range: {
@@ -1442,26 +1709,17 @@
                         };
                     }
 
-                    var o_local_re = new RegExp('\\b([a-zA-Z_]\\w*)\\s+([a-zA-Z_]\\w*\\s*,\\s*)*\\b' + s_target + '\\b');
-                    for (var i = position.lineNumber; i >= 1; i--) {
-                        var s_current_line = model.getLineContent(i);
-                        if (o_local_re.test(s_current_line)) {
-                            var n_col = s_current_line.indexOf(s_target) + 1;
-                            if (n_col > 0) {
-                                return {
-                                    uri: model.uri,
-                                    range: {
-                                        startLineNumber: i,
-                                        startColumn: n_col,
-                                        endLineNumber: i,
-                                        endColumn: n_col + s_target.length
-                                    }
-                                };
+                    var o_local = f_find_local_definition(model, position, s_target);
+                    if (o_local && model.uri) {
+                        return {
+                            uri: model.uri,
+                            range: {
+                                startLineNumber: o_local.line,
+                                startColumn: o_local.startCol,
+                                endLineNumber: o_local.line,
+                                endColumn: o_local.endCol
                             }
-                        }
-                        if (/^\s*(?:void|bool|int|uint|float|vec[234]|mat[234])\s+[a-zA-Z_]\w*\s*\(/.test(s_current_line)) {
-                            break;
-                        }
+                        };
                     }
 
                     return null;
