@@ -67,12 +67,16 @@ Download the latest release zip package from the [Releases](https://github.com/p
 
 ### 🛠️ Code Editor & Shader Tools
 
-- **Monaco Editor GLSL IntelliSense & Autocomplete:** Full autocompletion for GLSL built-in functions, keywords, vector swizzles, ShaderToy uniforms, and snippets (`CTRL + M` or `.`, `#` triggers).
-- **Go to Definition & Symbol Navigation:** Jump directly to definitions (<kbd>F12</kbd> or <kbd>CTRL</kbd> + Click) for user-defined functions, structs, `#define` macros, and variables; quick outline symbol search via <kbd>CTRL</kbd> + <kbd>SHIFT</kbd> + <kbd>O</kbd>.
-- **Rich Hover Tooltips & Signatures:** Hover over any built-in GLSL function or user-defined function, struct, macro, or variable to inspect full GLSL signatures, descriptions, and parameter types across passes (including the `Common` tab).
+- **Monaco Editor GLSL IntelliSense & Autocomplete:** Full autocompletion for GLSL built-in functions, keywords, vector swizzles, ShaderToy uniforms, and
+  snippets (`CTRL + M` or `.`, `#` triggers).
+- **Go to Definition & Symbol Navigation:** Jump directly to definitions (<kbd>F12</kbd> or <kbd>CTRL</kbd> + Click) for user-defined functions, structs,
+  `#define` macros, and variables; quick outline symbol search via <kbd>CTRL</kbd> + <kbd>SHIFT</kbd> + <kbd>O</kbd>.
+- **Rich Hover Tooltips & Signatures:** Hover over any built-in GLSL function or user-defined function, struct, macro, or variable to inspect full GLSL
+  signatures, descriptions, and parameter types across passes (including the `Common` tab).
 - **Signature Help & Parameter Hints:** Interactive parameter hints showing the active argument while typing function calls (`(` and `,`).
 - **Live Diagnostics & Compilation Error Squiggles:** On-the-fly background syntax and type checking with inline squiggles and tooltips before compiling.
-- **Custom Parameters Block:** Inject external images/textures and customize canvas resolutions via a JSON comment block in the `Common` tab. [Read Custom Parameters Documentation](./docs/custom-params.md).
+- **Custom Parameters Block:** Inject external images/textures and customize canvas resolutions via a JSON comment block in the `Common` tab.
+  [Read Custom Parameters Documentation](./docs/custom-params.md).
 - **Interactive Color Picker:** Direct color picking for `vec3` declarations containing RGB float values.
 - **BBCode Helper Buttons:** Quick formatting toolbar for shader descriptions and comments.
 - **Fork Any Shader:** Fork any public shader directly with one click.
@@ -111,14 +115,14 @@ Download the latest release zip package from the [Releases](https://github.com/p
 
 ### Code Editor
 
-| Shortcut / Trigger                                               | Action              | Description                                                                               |
-| :--------------------------------------------------------------- | :------------------ | :---------------------------------------------------------------------------------------- |
-| <kbd>CTRL</kbd> + <kbd>M</kbd>                                   | Code Completion     | Triggers GLSL autocomplete suggestions.                                                   |
-| <kbd>F12</kbd> or <kbd>CTRL</kbd> + Click                        | Go to Definition    | Jumps to definition of function, struct, macro, or variable.                              |
-| <kbd>CTRL</kbd> + <kbd>SHIFT</kbd> + <kbd>O</kbd>                | Symbol Outline      | Opens Quick Open symbol outline search in current file.                                   |
-| Hover over symbol                                                | Hover Tooltips      | Displays GLSL signature, documentation, and parameter types.                             |
-| Type `(` or `,`                                                  | Parameter Hints     | Displays active function signature and highlights current parameter.                      |
-| Cursor on `vec3(r, g, b)`                                        | Color Picker        | Pops up an inline visual color picker.                                                    |
+| Shortcut / Trigger                                | Action           | Description                                                          |
+| :------------------------------------------------ | :--------------- | :------------------------------------------------------------------- |
+| <kbd>CTRL</kbd> + <kbd>M</kbd>                    | Code Completion  | Triggers GLSL autocomplete suggestions.                              |
+| <kbd>F12</kbd> or <kbd>CTRL</kbd> + Click         | Go to Definition | Jumps to definition of function, struct, macro, or variable.         |
+| <kbd>CTRL</kbd> + <kbd>SHIFT</kbd> + <kbd>O</kbd> | Symbol Outline   | Opens Quick Open symbol outline search in current file.              |
+| Hover over symbol                                 | Hover Tooltips   | Displays GLSL signature, documentation, and parameter types.         |
+| Type `(` or `,`                                   | Parameter Hints  | Displays active function signature and highlights current parameter. |
+| Cursor on `vec3(r, g, b)`                         | Color Picker     | Pops up an inline visual color picker.                               |
 
 ---
 
@@ -140,9 +144,9 @@ Download the latest release zip package from the [Releases](https://github.com/p
 | :-------------------------------------------------: | :-------------------------------------------: |
 | ![BBCode Buttons](./screenshots/bbcode-buttons.png) | ![Custom Textures](./screenshots/params2.png) |
 
-|     Monaco Editor features Comment Buttons      |
-| :---------------------------------------------: |
-| ![Monaco Editor](./screenshots/monaco-comp.png) |
+| Monaco Editor additional, shadertoy specific features |
+| :---------------------------------------------------: |
+|    ![Monaco Editor](./screenshots/monaco-comp.png)    |
 
 ---
 
