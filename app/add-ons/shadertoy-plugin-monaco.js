@@ -1049,6 +1049,171 @@
                     };
                 }
             });
+
+            var o_signatures = {
+                vec2: [
+                    { label: 'vec2(float x, float y)', documentation: 'Constructs a 2D vector from x and y components.', parameters: [{ label: 'float x' }, { label: 'float y' }] },
+                    { label: 'vec2(float s)', documentation: 'Constructs a 2D vector with both components initialized to scalar s.', parameters: [{ label: 'float s' }] }
+                ],
+                vec3: [
+                    { label: 'vec3(float x, float y, float z)', documentation: 'Constructs a 3D vector from x, y, and z components.', parameters: [{ label: 'float x' }, { label: 'float y' }, { label: 'float z' }] },
+                    { label: 'vec3(vec2 xy, float z)', documentation: 'Constructs a 3D vector from 2D vector xy and float z.', parameters: [{ label: 'vec2 xy' }, { label: 'float z' }] },
+                    { label: 'vec3(float s)', documentation: 'Constructs a 3D vector with all components initialized to scalar s.', parameters: [{ label: 'float s' }] }
+                ],
+                vec4: [
+                    { label: 'vec4(float x, float y, float z, float w)', documentation: 'Constructs a 4D vector from x, y, z, and w components.', parameters: [{ label: 'float x' }, { label: 'float y' }, { label: 'float z' }, { label: 'float w' }] },
+                    { label: 'vec4(vec3 xyz, float w)', documentation: 'Constructs a 4D vector from 3D vector xyz and float w.', parameters: [{ label: 'vec3 xyz' }, { label: 'float w' }] },
+                    { label: 'vec4(vec2 xy, vec2 zw)', documentation: 'Constructs a 4D vector from two 2D vectors xy and zw.', parameters: [{ label: 'vec2 xy' }, { label: 'vec2 zw' }] },
+                    { label: 'vec4(vec2 xy, float z, float w)', documentation: 'Constructs a 4D vector from 2D vector xy and floats z, w.', parameters: [{ label: 'vec2 xy' }, { label: 'float z' }, { label: 'float w' }] },
+                    { label: 'vec4(float s)', documentation: 'Constructs a 4D vector with all components initialized to scalar s.', parameters: [{ label: 'float s' }] }
+                ],
+                mat2: [
+                    { label: 'mat2(float m00, float m01, float m10, float m11)', documentation: 'Constructs a 2x2 column-major matrix from 4 floats.', parameters: [{ label: 'float m00' }, { label: 'float m01' }, { label: 'float m10' }, { label: 'float m11' }] },
+                    { label: 'mat2(vec2 col0, vec2 col1)', documentation: 'Constructs a 2x2 matrix from two column vectors.', parameters: [{ label: 'vec2 col0' }, { label: 'vec2 col1' }] },
+                    { label: 'mat2(float diag)', documentation: 'Constructs a 2x2 diagonal matrix.', parameters: [{ label: 'float diag' }] }
+                ],
+                mat3: [
+                    { label: 'mat3(vec3 col0, vec3 col1, vec3 col2)', documentation: 'Constructs a 3x3 matrix from three column vectors.', parameters: [{ label: 'vec3 col0' }, { label: 'vec3 col1' }, { label: 'vec3 col2' }] },
+                    { label: 'mat3(float diag)', documentation: 'Constructs a 3x3 diagonal matrix.', parameters: [{ label: 'float diag' }] }
+                ],
+                mat4: [
+                    { label: 'mat4(vec4 col0, vec4 col1, vec4 col2, vec4 col3)', documentation: 'Constructs a 4x4 matrix from four column vectors.', parameters: [{ label: 'vec4 col0' }, { label: 'vec4 col1' }, { label: 'vec4 col2' }, { label: 'vec4 col3' }] },
+                    { label: 'mat4(float diag)', documentation: 'Constructs a 4x4 diagonal matrix.', parameters: [{ label: 'float diag' }] }
+                ]
+            };
+
+            for (var s_fn_key in o_glsl_docs) {
+                if (Object.prototype.hasOwnProperty.call(o_glsl_docs, s_fn_key)) {
+                    var o_fn_doc = o_glsl_docs[s_fn_key];
+                    if (o_fn_doc.signature && o_fn_doc.signature.indexOf('(') !== -1) {
+                        var a_fn_lines = o_fn_doc.signature.split('\n');
+                        var a_fn_sigs = [];
+                        for (var n_line_idx = 0; n_line_idx < a_fn_lines.length; n_line_idx++) {
+                            var s_sig_line = a_fn_lines[n_line_idx].trim();
+                            var o_sig_match = s_sig_line.match(/^(.+?\b([a-zA-Z0-9_]+))\s*\((.*)\)$/);
+                            if (o_sig_match) {
+                                var s_params_str = o_sig_match[3].trim();
+                                var a_parsed_params = [];
+                                if (s_params_str.length > 0) {
+                                    var a_raw_params = s_params_str.split(',');
+                                    for (var p = 0; p < a_raw_params.length; p++) {
+                                        a_parsed_params.push({
+                                            label: a_raw_params[p].trim()
+                                        });
+                                    }
+                                }
+                                a_fn_sigs.push({
+                                    label: s_sig_line,
+                                    documentation: o_fn_doc.description,
+                                    parameters: a_parsed_params
+                                });
+                            }
+                        }
+                        if (a_fn_sigs.length > 0) {
+                            o_signatures[s_fn_key] = a_fn_sigs;
+                        }
+                    }
+                }
+            }
+
+            function f_find_function_call(s_text) {
+                var n_depth = 0;
+                var n_bracket_depth = 0;
+                var n_param_index = 0;
+                var i = s_text.length - 1;
+
+                for (; i >= 0; i--) {
+                    var c = s_text.charAt(i);
+                    if (c === ';' || c === '{' || c === '}') {
+                        return null;
+                    }
+                    if (c === ')') {
+                        n_depth++;
+                    } else if (c === '(') {
+                        if (n_depth > 0) {
+                            n_depth--;
+                        } else {
+                            break;
+                        }
+                    } else if (c === ']') {
+                        n_bracket_depth++;
+                    } else if (c === '[') {
+                        if (n_bracket_depth > 0) {
+                            n_bracket_depth--;
+                        }
+                    } else if (c === ',' && n_depth === 0 && n_bracket_depth === 0) {
+                        n_param_index++;
+                    }
+                }
+
+                if (i < 0) {
+                    return null;
+                }
+
+                var j = i - 1;
+                while (j >= 0 && /\s/.test(s_text.charAt(j))) {
+                    j--;
+                }
+                var n_end = j + 1;
+                while (j >= 0 && /[a-zA-Z0-9_]/.test(s_text.charAt(j))) {
+                    j--;
+                }
+                var s_fn_name = s_text.substring(j + 1, n_end);
+                if (!s_fn_name) {
+                    return null;
+                }
+
+                return {
+                    functionName: s_fn_name,
+                    activeParameter: n_param_index
+                };
+            }
+
+            monaco.languages.registerSignatureHelpProvider('glsl', {
+                signatureHelpTriggerCharacters: ['(', ','],
+                signatureHelpRetriggerCharacters: [','],
+                provideSignatureHelp: function(model, position) {
+                    var s_line_before_cursor = model.getLineContent(position.lineNumber).substring(0, position.column - 1);
+                    if (s_line_before_cursor.indexOf('//') !== -1) {
+                        return null;
+                    }
+
+                    var n_start_line = Math.max(1, position.lineNumber - 4);
+                    var s_text = model.getValueInRange({
+                        startLineNumber: n_start_line,
+                        startColumn: 1,
+                        endLineNumber: position.lineNumber,
+                        endColumn: position.column
+                    });
+
+                    var o_call = f_find_function_call(s_text);
+                    if (!o_call) {
+                        return null;
+                    }
+
+                    var a_sigs = o_signatures[o_call.functionName];
+                    if (!a_sigs || a_sigs.length === 0) {
+                        return null;
+                    }
+
+                    var n_active_sig = 0;
+                    for (var s = 0; s < a_sigs.length; s++) {
+                        if (a_sigs[s].parameters.length > o_call.activeParameter) {
+                            n_active_sig = s;
+                            break;
+                        }
+                    }
+
+                    return {
+                        value: {
+                            signatures: a_sigs,
+                            activeSignature: n_active_sig,
+                            activeParameter: o_call.activeParameter
+                        },
+                        dispose: function() {}
+                    };
+                }
+            });
         },
 
         handleErrors: function(errors, isError, errorStr, fromScript, editor) {

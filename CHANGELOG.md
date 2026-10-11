@@ -1,4 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.15.2 (11-10-2026)
+
+    -   Add Monaco Editor GLSL Signature Help (parameter hints): displays active function signature, parameter positions, and overloads when typing `(` or `,` for GLSL built-in functions and vector/matrix constructors.
+
 -   0.15.1 (11-10-2026)
 
     -   Add Monaco Editor GLSL hover documentation: hover signatures, mathematical formulas, and descriptions for built-in functions, ShaderToy uniforms, data types, and vector swizzles.
