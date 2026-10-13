@@ -10,6 +10,7 @@
     -   Update native `#myTime` and timeline slider synchronously during deterministic frame-by-frame video recording.
     -   Fix alignment, centering, and sizing of editor switch tabs and controls expand trigger.
     -   Sort render meters passes alphabetically for stable, flicker-free performance tracking.
+    -   Fix recent shaders dropdown z-index layering and add custom dark glassmorphic scrollbar.
 
 -   0.15.5 (11-10-2026)
 

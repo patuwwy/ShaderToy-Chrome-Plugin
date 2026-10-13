@@ -727,14 +727,19 @@ body div#header {
     border: 1px solid #333d4e;
     border-radius: 6px;
     color: #cbd5e1;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     margin-right: 14px;
-    z-index: 3;
-    padding: 5px 12px;
+    z-index: 99999;
+    padding: 0 12px;
+    height: 25px;
+    line-height: normal;
     font-size: 11px;
     font-weight: 500;
     cursor: pointer;
+    user-select: none;
     transition: all 0.2s ease;
 }
 
@@ -753,27 +758,57 @@ body div#header {
     width: 100%;
     opacity: 0;
     cursor: pointer;
+    margin: 0;
 }
 
 .recent-list ul {
     display: none;
     background: rgba(18, 22, 32, 0.96);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-top: 1px solid rgba(56, 189, 248, 0.35);
     color: #cbd5e1;
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
-    width: 300px;
-    max-height: 80vh;
+    width: 320px;
+    max-height: 70vh;
     margin: 0;
-    z-index: 9999;
+    z-index: 100000;
     border-radius: 8px;
-    padding: 4px 0;
-    overflow: hidden auto;
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75);
+    padding: 6px 4px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 12px rgba(56, 189, 248, 0.15);
+    scrollbar-width: thin;
+    scrollbar-color: #333d4e rgba(18, 22, 32, 0.6);
+}
+
+/* Custom scrollbar matching extension controls style */
+.recent-list ul::-webkit-scrollbar {
+    width: 6px;
+}
+
+.recent-list ul::-webkit-scrollbar-track {
+    background: rgba(18, 22, 32, 0.6);
+    border-radius: 4px;
+    margin: 4px 0;
+}
+
+.recent-list ul::-webkit-scrollbar-thumb {
+    background: #333d4e;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.15s ease;
+}
+
+.recent-list ul::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+.recent-list ul::-webkit-scrollbar-thumb:active {
+    background: #38bdf8;
 }
 
 .recent-list input:checked + ul {
@@ -783,6 +818,7 @@ body div#header {
 .recent-list li {
     margin: 0;
     padding: 0;
+    list-style: none;
 }
 
 .recent-list li a {
@@ -791,20 +827,13 @@ body div#header {
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
-    padding: 6px 10px;
+    padding: 6px 8px;
     text-align: left;
     font-weight: normal;
     text-decoration: none;
     color: #cbd5e1;
+    border-radius: 6px;
     transition: background 0.15s ease, color 0.15s ease;
-}
-
-.recent-list li:first-child a {
-    padding-top: 8px;
-}
-
-.recent-list li:last-child a {
-    padding-bottom: 8px;
 }
 
 .recent-list li a:hover {
@@ -814,12 +843,20 @@ body div#header {
 
 .recent-list img {
     width: 64px;
-    margin-right: 8px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
 }
 
 .recent-list li.no-shaders-info {
-    padding: 10px;
+    padding: 12px;
     white-space: pre-line;
+    color: #94a3b8;
+    font-size: 11px;
+    text-align: center;
 }
 
 .toyplug-preview {
