@@ -775,6 +775,15 @@
                         }
                     }
 
+                    // Update Shadertoy native time display and plugin slider while paused for recording
+                    var myTimeEl = document.getElementById('myTime');
+                    if (myTimeEl) {
+                        myTimeEl.textContent = (frameTimeMs / 1000).toFixed(2);
+                    }
+                    if (self.timebar && self.timebar.sliderInput) {
+                        self.timebar.sliderInput.value = frameTimeMs;
+                    }
+
                     // Flush GPU draw queue so the WebGL canvas has finished all pixels
                     var gl = (window.gShaderToy && window.gShaderToy.mEffect && window.gShaderToy.mEffect.mGLContext) ||
                         (canvas && (canvas.getContext('webgl2') || canvas.getContext('webgl')));
@@ -1033,7 +1042,8 @@
             recordBtn.appendChild(dot);
             recordBtn.appendChild(label);
 
-            fpsSelect.className = 'formButton ste-record-fps-select';
+            fpsSelect.className =
+                'formButton formButton-extension ste-record-fps-select';
             fpsSelect.title = 'Target video recording FPS';
 
             [50, 60, 120, 144, 240].forEach((fps) => {
@@ -1436,6 +1446,24 @@
                 'change',
                 this.onChangeMaxInput.bind(this)
             );
+
+            var addWheelStep = function(input, callback) {
+                input.addEventListener('wheel', function(e) {
+                    e.preventDefault();
+                    var step = e.shiftKey ? 10 : 1;
+                    var delta = e.deltaY < 0 ? step : -step;
+                    var cur = parseFloat(input.value) || 0;
+                    var min = parseFloat(input.min) || 0;
+                    var next = Math.max(min, cur + delta);
+                    if (input.max) {
+                        next = Math.min(parseFloat(input.max), next);
+                    }
+                    input.value = next;
+                    callback();
+                }, { passive: false });
+            };
+            addWheelStep(this.minValueInput, this.onChangeMinInput.bind(this));
+            addWheelStep(this.maxValueInput, this.onChangeMaxInput.bind(this));
             this.updateSlider();
             this.controlsExpandTrigger.addEventListener(
                 'click',
@@ -1630,6 +1658,11 @@
 
             if (gShaderToy && !this.busy) {
                 this.sliderInput.value = gShaderToy.mTf;
+            }
+
+            if (this.ToyPlug && this.ToyPlug.isRecording) {
+                setTimeout(this.updateSlider.bind(this), 26);
+                return;
             }
 
             if (this.loop && gShaderToy.mTf > this.maxValueInput.value * 1000) {
@@ -2309,34 +2342,31 @@
                     };
                 }
 
-                let sorted = [];
                 let fastest;
                 let slowest;
 
                 if (numPasses > 1) {
-                    sorted = passData.sort((p1, p2) => p1.avgRenderTime - p2.avgRenderTime);
+                    let sortedByTime = [...passData].sort((p1, p2) => parseFloat(p1.avgRenderTime) - parseFloat(p2.avgRenderTime));
+                    fastest = sortedByTime[0].avgRenderTime;
+                    slowest = sortedByTime[sortedByTime.length - 1].avgRenderTime;
 
-                    fastest = sorted[0].avgRenderTime;
-                    slowest = sorted[sorted.length - 1].avgRenderTime;
+                    passData.sort((p1, p2) => (p1.name || '').localeCompare(p2.name || ''));
                 }
 
                 while (extensionElements.renderMetersContainer.lastChild) {
                     extensionElements.renderMetersContainer.lastChild.remove();
                 }
 
-                extensionElements.renderMetersContainer.removeChild;
                 let frag = document.createDocumentFragment();
 
                 passData.forEach(pass => {
                     let l = document.createElement('p');
                     l.textContent = `${pass.name}: ${pass.avgRenderTime}ms`;
 
-                    if (numPasses > 1) {
+                    if (numPasses > 1 && fastest !== slowest) {
                         if (pass.avgRenderTime === slowest) {
                             l.classList.add('slowest');
-                        }
-
-                        if (pass.avgRenderTime === fastest) {
+                        } else if (pass.avgRenderTime === fastest) {
                             l.classList.add('fastest');
                         }
                     }

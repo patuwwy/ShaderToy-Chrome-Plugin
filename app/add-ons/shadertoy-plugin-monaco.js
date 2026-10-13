@@ -2318,7 +2318,12 @@
                         o_btn.className = 'monaco-help-btn';
                         o_btn.title = 'Monaco Shortcuts & Features';
                         o_btn.innerHTML = '?';
-                        o_em.appendChild(o_btn);
+                        var o_monaco_tab = o_em.querySelector('.tab.monaco') || o_em.querySelectorAll('.tab')[1];
+                        if (o_monaco_tab) {
+                            o_monaco_tab.appendChild(o_btn);
+                        } else {
+                            o_em.appendChild(o_btn);
+                        }
                     }
                 }
             }

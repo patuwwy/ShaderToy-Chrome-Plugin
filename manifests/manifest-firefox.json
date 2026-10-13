@@ -16,11 +16,11 @@
     },
     "host_permissions": ["https://www.shadertoy.com/*"],
     "icons": {
-        "128": "assets/icon_active_128.png"
+        "128": "assets/icon_128.fw-10th.png"
     },
     "action": {
         "default_title": "ShaderToy plugin",
-        "default_icon": "assets/icon_active_128.png",
+        "default_icon": "assets/icon_128.fw-10th-off.png",
         "default_popup": "popup.html"
     },
     "content_scripts": [

@@ -5,6 +5,11 @@
     -   Improve Monaco Editor compilation error range highlighting for assignment mismatches and operator errors.
     -   Replace broken remote iframe in extension popup with a high-performance animated CSS plasma shader effect and modern glassmorphic UI.
     -   Rename Monaco editor tab label from `VScode (Monaco) Editor` to `Monaco` and add a dedicated `?` modal button displaying comprehensive keyboard shortcuts and newly added editor features.
+    -   Add 10th anniversary extension icons (active and inactive states).
+    -   Redesign extension controls bar with modern glassmorphic theme, custom styled dropdowns, and mouse wheel stepping on time range inputs.
+    -   Update native `#myTime` and timeline slider synchronously during deterministic frame-by-frame video recording.
+    -   Fix alignment, centering, and sizing of editor switch tabs and controls expand trigger.
+    -   Sort render meters passes alphabetically for stable, flicker-free performance tracking.
 
 -   0.15.5 (11-10-2026)
 

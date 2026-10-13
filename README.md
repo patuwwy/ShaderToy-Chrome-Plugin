@@ -10,6 +10,8 @@ A browser extension designed to supercharge the shader development and playback 
 
 ---
 
+## :birthday: 10th Annivesary!
+
 ## Installation
 
 ### Web Stores
@@ -144,9 +146,9 @@ Download the latest release zip package from the [Releases](https://github.com/p
 | :-------------------------------------------------: | :-------------------------------------------: |
 | ![BBCode Buttons](./screenshots/bbcode-buttons.png) | ![Custom Textures](./screenshots/params2.png) |
 
-| Monaco Editor additional, shadertoy specific features |
-| :---------------------------------------------------: |
-|    ![Monaco Editor](./screenshots/monaco-comp.png)    |
+| Monaco Editor additional, shadertoy specific features |                   Fullscreen edit                   |
+| :---------------------------------------------------: | :-------------------------------------------------: |
+|    ![Monaco Editor](./screenshots/monaco-comp.png)    | ![Monaco Editor](./screenshots/fullscreen-edit.png) |
 
 ---
 
