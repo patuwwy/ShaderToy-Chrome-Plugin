@@ -4,6 +4,7 @@
     -   Fix Monaco Editor live validation channel sampler types (support CubeMap `samplerCube` and 3D textures) preventing false-positive dimension mismatch errors on CubeMap sampling.
     -   Improve Monaco Editor compilation error range highlighting for assignment mismatches and operator errors.
     -   Replace broken remote iframe in extension popup with a high-performance animated CSS plasma shader effect and modern glassmorphic UI.
+    -   Rename Monaco editor tab label from `VScode (Monaco) Editor` to `Monaco` and add a dedicated `?` modal button displaying comprehensive keyboard shortcuts and newly added editor features.
 
 -   0.15.5 (11-10-2026)
 

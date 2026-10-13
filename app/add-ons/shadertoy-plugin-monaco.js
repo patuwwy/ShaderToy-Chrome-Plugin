@@ -2292,7 +2292,8 @@
                 var s_html_editor_choice = [
                     '<div id="editorManager" style="margin-bottom: 5px">',
                     '    <div onclick="ToyPlug.editPage.f_display_editor(\'#editor .CodeMirror\', false)" class="tab"><label>Orginal Shadertoy Editor</label></div>',
-                    '    <div onclick="ToyPlug.editPage.f_display_editor(\'#editor .monaco-editor\', true)" class="tab"><label>VScode (Monaco) Editor</label></div>',
+                    '    <div onclick="ToyPlug.editPage.f_display_editor(\'#editor .monaco-editor\', true)" class="tab monaco"><label>Monaco</label><button id="monaco-keys-btn" type="button" class="monaco-help-btn" title="Monaco Shortcuts & Features">?</button></div>',
+                    '    ',
                     '</div>'
                 ].join('\n');
 
@@ -2303,7 +2304,124 @@
                 if (o_block1) {
                     o_block1.insertBefore(o_div_html_editor_choice, o_block1.firstChild);
                 }
+            } else {
+                var o_em = document.getElementById('editorManager');
+                if (o_em) {
+                    var o_tabs = o_em.querySelectorAll('.tab label');
+                    if (o_tabs && o_tabs[1] && o_tabs[1].textContent.indexOf('VScode') !== -1) {
+                        o_tabs[1].textContent = 'Monaco';
+                    }
+                    if (!document.getElementById('monaco-keys-btn')) {
+                        var o_btn = document.createElement('button');
+                        o_btn.id = 'monaco-keys-btn';
+                        o_btn.type = 'button';
+                        o_btn.className = 'monaco-help-btn';
+                        o_btn.title = 'Monaco Shortcuts & Features';
+                        o_btn.innerHTML = '?';
+                        o_em.appendChild(o_btn);
+                    }
+                }
             }
+
+            var o_keys_btn = document.getElementById('monaco-keys-btn');
+            if (o_keys_btn && !o_keys_btn.hasAttribute('data-bound')) {
+                o_keys_btn.setAttribute('data-bound', 'true');
+                o_keys_btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    self.showShortcutsModal();
+                });
+            }
+        },
+
+        showShortcutsModal: function() {
+            var o_modal = document.getElementById('monaco-shortcuts-modal');
+            if (o_modal) {
+                o_modal.style.display = 'flex';
+                return;
+            }
+
+            var isMac = /Mac/i.test(navigator.platform);
+            var cmdKey = isMac ? 'Cmd' : 'Ctrl';
+            var altKey = isMac ? 'Cmd' : 'Alt';
+
+            var s_modal_html = [
+                '<div id="monaco-shortcuts-modal">',
+                '    <div class="msm-container" onclick="event.stopPropagation()">',
+                '        <div class="msm-header">',
+                '            <div class="msm-title">⌨️ Monaco Editor — Shortcuts & Features</div>',
+                '            <button class="msm-close" type="button" title="Close (Esc)">✕</button>',
+                '        </div>',
+                '        <div class="msm-body">',
+                '            <h3>Shortcuts</h3>',
+                '            <div class="msm-grid">',
+                '                <div class="msm-item"><span>Compile & Run</span><kbd>' + altKey + ' + Enter</kbd></div>',
+                '                <div class="msm-item"><span>Save shader</span><kbd>' + cmdKey + ' + S</kbd></div>',
+                '                <div class="msm-item"><span>Go to Definition</span><kbd>F12 / ' + cmdKey + ' + Click</kbd></div>',
+                '                <div class="msm-item"><span>Symbol Outline</span><kbd>' + cmdKey + ' + Shift + O</kbd></div>',
+                '                <div class="msm-item"><span>Autocomplete</span><kbd>' + cmdKey + ' + Space</kbd></div>',
+                '                <div class="msm-item"><span>Signature Help</span><kbd>( , / ' + cmdKey + ' + Shift + Space</kbd></div>',
+                '                <div class="msm-item"><span>Command Palette</span><kbd>F1</kbd></div>',
+                '                <div class="msm-item"><span>Find / Replace</span><kbd>' + cmdKey + ' + F / ' + cmdKey + ' + H</kbd></div>',
+                '                <div class="msm-item"><span>Undo / Redo</span><kbd>' + cmdKey + ' + Z / ' + cmdKey + ' + Y</kbd></div>',
+                '                <div class="msm-item"><span>Zoom Font</span><kbd>' + cmdKey + ' + Scroll</kbd></div>',
+                '            </div>',
+                '            <h3>Features</h3>',
+                '            <div class="msm-features">',
+                '                <div class="msm-feat-card">',
+                '                    <strong>⚡ Live Error Diagnostics</strong>',
+                '                    <p>Background GLSL syntax & type validation while typing (debounced) with accurate squiggles and error tooltips.</p>',
+                '                </div>',
+                '                <div class="msm-feat-card">',
+                '                    <strong>🔍 Go to Definition & Outline</strong>',
+                '                    <p>Instant navigation to user-defined functions, structs, #define macros, and variables, plus Quick Open outline.</p>',
+                '                </div>',
+                '                <div class="msm-feat-card">',
+                '                    <strong>💡 Hover Documentation</strong>',
+                '                    <p>Hover over any GLSL function, swizzle, uniform (iResolution, iTime, etc.), or input channel to see docs & formulas.</p>',
+                '                </div>',
+                '                <div class="msm-feat-card">',
+                '                    <strong>📑 Independent Pass Tabs</strong>',
+                '                    <p>Switching tabs (Image, Buffers, Common, Sound) preserves independent cursor, scroll position, and Undo/Redo history.</p>',
+                '                </div>',
+                '                <div class="msm-feat-card">',
+                '                    <strong>🧊 Dynamic Sampler Types</strong>',
+                '                    <p>Auto-detects CubeMap (samplerCube), 3D textures, and 2D textures for iChannel0..3 based on active pass inputs.</p>',
+                '                </div>',
+                '                <div class="msm-feat-card">',
+                '                    <strong>📝 IntelliSense & Signature Help</strong>',
+                '                    <p>Auto-completion for GLSL built-ins, types, snippets, and live parameter hints with function overloads.</p>',
+                '                </div>',
+                '            </div>',
+                '        </div>',
+                '        <div class="msm-footer">',
+                '            <span>Tip: Press Esc or click outside to close</span>',
+                '            <button class="msm-close-btn" type="button">Close</button>',
+                '        </div>',
+                '    </div>',
+                '</div>'
+            ].join('\n');
+
+            var o_wrapper = document.createElement('div');
+            o_wrapper.innerHTML = s_modal_html;
+            var o_modal_el = o_wrapper.firstElementChild;
+            document.body.appendChild(o_modal_el);
+
+            var f_close = function() {
+                o_modal_el.style.display = 'none';
+            };
+
+            o_modal_el.addEventListener('click', f_close);
+            var o_close_icon = o_modal_el.querySelector('.msm-close');
+            if (o_close_icon) o_close_icon.addEventListener('click', f_close);
+            var o_close_btn = o_modal_el.querySelector('.msm-close-btn');
+            if (o_close_btn) o_close_btn.addEventListener('click', f_close);
+
+            window.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && o_modal_el.style.display !== 'none') {
+                    f_close();
+                }
+            });
         }
     };
 

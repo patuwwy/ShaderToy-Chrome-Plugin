@@ -1366,7 +1366,10 @@
             Array.prototype.slice.apply(document.querySelectorAll('#editorManager .tab'))
                 .forEach(o => o.classList.remove('selected'));
 
-            var a_editor_tabs = document.querySelectorAll('#editorManager > div');
+            var a_editor_tabs = document.querySelectorAll('#editorManager > .tab');
+            if (!a_editor_tabs.length) {
+                a_editor_tabs = document.querySelectorAll('#editorManager > div');
+            }
             if (a_editor_tabs[Number(monaco)]) {
                 a_editor_tabs[Number(monaco)].classList.add('selected');
             }
