@@ -1,4 +1,10 @@
 ## ShaderToy extension changelog (major changes only):
+-   0.15.6 (13-10-2026)
+
+    -   Fix Monaco Editor live validation channel sampler types (support CubeMap `samplerCube` and 3D textures) preventing false-positive dimension mismatch errors on CubeMap sampling.
+    -   Improve Monaco Editor compilation error range highlighting for assignment mismatches and operator errors.
+    -   Replace broken remote iframe in extension popup with a high-performance animated CSS plasma shader effect and modern glassmorphic UI.
+
 -   0.15.5 (11-10-2026)
 
     -   Fix broken video recording and uninitialized MediaRecorder runtime errors. [Issue #153](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/153)

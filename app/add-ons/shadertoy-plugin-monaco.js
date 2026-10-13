@@ -142,6 +142,7 @@
                 return;
             }
             this.b_glsl_language_registered = true;
+            var self = this;
 
             monaco.languages.register({ id: 'glsl' });
 
@@ -1534,8 +1535,16 @@
                     }
 
                     var a_contents = [];
-                    if (o_doc.signature) {
-                        a_contents.push({ value: '```glsl\n' + o_doc.signature + '\n```' });
+                    var s_sig = o_doc.signature;
+                    if (/^iChannel[0-3]$/.test(s_word) && self && self.getChannelSamplerType) {
+                        var n_ch_num = parseInt(s_word.replace('iChannel', ''), 10);
+                        var s_dyn_type = self.getChannelSamplerType(n_ch_num, model.getValue());
+                        if (s_dyn_type) {
+                            s_sig = 'uniform ' + s_dyn_type + ' ' + s_word + ';';
+                        }
+                    }
+                    if (s_sig) {
+                        a_contents.push({ value: '```glsl\n' + s_sig + '\n```' });
                     }
                     if (o_doc.description) {
                         a_contents.push({ value: o_doc.description });
@@ -1837,13 +1846,24 @@
                         var n_start_col = 1;
                         var n_end_col = s_line_text.length + 1;
 
-                        var o_token_match = s_msg.match(/['"]([a-zA-Z0-9_]+)['"]/);
+                        var o_token_match = s_msg.match(/['"]([^'"]+)['"]/);
                         if (o_token_match && o_token_match[1]) {
                             var s_token = o_token_match[1];
                             var n_token_idx = s_line_text.indexOf(s_token);
                             if (n_token_idx !== -1) {
                                 n_start_col = n_token_idx + 1;
                                 n_end_col = n_token_idx + 1 + s_token.length;
+                            } else if (s_token === 'assign' || /cannot convert/i.test(s_msg) || /dimension mismatch/i.test(s_msg)) {
+                                var n_eq_pos = s_line_text.indexOf('=');
+                                if (n_eq_pos !== -1) {
+                                    n_start_col = n_eq_pos + 1;
+                                    n_end_col = n_eq_pos + 2;
+                                } else {
+                                    var n_first_non_ws = o_model.getLineFirstNonWhitespaceColumn(n_line);
+                                    if (n_first_non_ws > 0) {
+                                        n_start_col = n_first_non_ws;
+                                    }
+                                }
                             } else {
                                 var n_first_non_ws = o_model.getLineFirstNonWhitespaceColumn(n_line);
                                 if (n_first_non_ws > 0) {
@@ -1903,12 +1923,24 @@
                             n_sc = n_parsed_col;
                             n_ec = Math.min(s_line_content.length + 1, n_parsed_col + 1);
                         } else {
-                            var o_t_match = s_detail.match(/['"]([a-zA-Z0-9_]+)['"]/);
+                            var o_t_match = s_detail.match(/['"]([^'"]+)['"]/);
                             if (o_t_match && o_t_match[1]) {
-                                var n_pos = s_line_content.indexOf(o_t_match[1]);
+                                var s_raw_token = o_t_match[1];
+                                var n_pos = s_line_content.indexOf(s_raw_token);
                                 if (n_pos !== -1) {
                                     n_sc = n_pos + 1;
-                                    n_ec = n_pos + 1 + o_t_match[1].length;
+                                    n_ec = n_pos + 1 + s_raw_token.length;
+                                } else if (s_raw_token === 'assign' || /cannot convert/i.test(s_detail) || /dimension mismatch/i.test(s_detail)) {
+                                    var n_eq_idx = s_line_content.indexOf('=');
+                                    if (n_eq_idx !== -1) {
+                                        n_sc = n_eq_idx + 1;
+                                        n_ec = n_eq_idx + 2;
+                                    } else {
+                                        var n_first_nw = o_model.getLineFirstNonWhitespaceColumn(n_parsed_line);
+                                        if (n_first_nw > 0) {
+                                            n_sc = n_first_nw;
+                                        }
+                                    }
                                 } else {
                                     var n_first_nw = o_model.getLineFirstNonWhitespaceColumn(n_parsed_line);
                                     if (n_first_nw > 0) {
@@ -1941,6 +1973,55 @@
 
             window.monaco.editor.setModelMarkers(o_model, 'owner', []);
             window.monaco.editor.setModelMarkers(o_model, 'shadertoy', a_monaco_markers);
+        },
+
+        getChannelSamplerType: function(n_ch, s_user_code) {
+            var n_active_id = (window.gShaderToy && typeof window.gShaderToy.mActiveDoc === 'number')
+                ? window.gShaderToy.mActiveDoc
+                : 0;
+
+            var a_passes = (window.gShaderToy && window.gShaderToy.mEffect && window.gShaderToy.mEffect.mPasses) || [];
+            var o_effect_pass = a_passes[n_active_id];
+            var o_doc_pass = window.gShaderToy && window.gShaderToy.mPass && window.gShaderToy.mPass[n_active_id];
+            var o_pass = o_effect_pass || o_doc_pass;
+
+            if (o_pass) {
+                if (typeof o_pass.mHeader === 'string') {
+                    var o_hdr_match = o_pass.mHeader.match(new RegExp('uniform\\s+(samplerCube|sampler3D|sampler2D)\\s+iChannel' + n_ch + ';'));
+                    if (o_hdr_match && o_hdr_match[1]) {
+                        return o_hdr_match[1];
+                    }
+                }
+
+                var a_inputs = o_pass.mInputs || (o_doc_pass && o_doc_pass.mInputs) || (o_effect_pass && o_effect_pass.mInputs);
+                if (Array.isArray(a_inputs) && a_inputs[n_ch]) {
+                    var o_input = a_inputs[n_ch];
+                    var s_type = (o_input.mType || (o_input.mInfo && o_input.mInfo.mType) || o_input.type || '').toLowerCase();
+                    if (s_type === 'cubemap' || s_type === 'cube') {
+                        return 'samplerCube';
+                    }
+                    if (s_type === 'volume' || s_type === '3d') {
+                        return 'sampler3D';
+                    }
+                    if (typeof o_input.mSrc === 'string') {
+                        if (/cube/i.test(o_input.mSrc)) {
+                            return 'samplerCube';
+                        }
+                        if (/volume/i.test(o_input.mSrc)) {
+                            return 'sampler3D';
+                        }
+                    }
+                }
+            }
+
+            if (typeof s_user_code === 'string') {
+                var o_cube_usage = new RegExp('\\b(?:textureCube\\s*\\(\\s*iChannel' + n_ch + '\\b|texture(?:Lod)?\\s*\\(\\s*iChannel' + n_ch + '\\s*,\\s*(?:reflect|refract|normalize|vec3|[a-zA-Z0-9_]+\\.(?:xyz|rgb)))');
+                if (o_cube_usage.test(s_user_code)) {
+                    return 'samplerCube';
+                }
+            }
+
+            return 'sampler2D';
         },
 
         getGlContext: function() {
@@ -1985,6 +2066,11 @@
                 }
             }
 
+            var s_ch0 = this.getChannelSamplerType(0, s_user_code);
+            var s_ch1 = this.getChannelSamplerType(1, s_user_code);
+            var s_ch2 = this.getChannelSamplerType(2, s_user_code);
+            var s_ch3 = this.getChannelSamplerType(3, s_user_code);
+
             var a_header_parts = [
                 '#version 300 es',
                 'precision highp float;',
@@ -2002,10 +2088,10 @@
                 'uniform vec4 iMouse;',
                 'uniform vec4 iDate;',
                 'uniform float iSampleRate;',
-                'uniform sampler2D iChannel0;',
-                'uniform sampler2D iChannel1;',
-                'uniform sampler2D iChannel2;',
-                'uniform sampler2D iChannel3;',
+                'uniform ' + s_ch0 + ' iChannel0;',
+                'uniform ' + s_ch1 + ' iChannel1;',
+                'uniform ' + s_ch2 + ' iChannel2;',
+                'uniform ' + s_ch3 + ' iChannel3;',
                 'out vec4 fragColor;',
                 '#define gl_FragColor fragColor'
             ];
@@ -2019,6 +2105,8 @@
                 s_footer = '\nvoid main() { mainImage(fragColor, gl_FragCoord.xy); }\n';
             } else if (s_user_code.indexOf('mainSound') !== -1) {
                 s_footer = '\nvoid main() { mainSound(iTime); }\n';
+            } else {
+                s_footer = '\nvoid main() { fragColor = vec4(0.0); }\n';
             }
 
             var s_full_shader = s_full_header + s_user_code + s_footer;

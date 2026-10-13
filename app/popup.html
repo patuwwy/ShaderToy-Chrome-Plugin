@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link href="https://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet">
+    <meta charset="utf-8">
+    <link href="https://fonts.googleapis.com/css?family=Quicksand:400,600,700" rel="stylesheet">
     <style>
-
         * {
             box-sizing: border-box;
         }
@@ -13,267 +13,318 @@
         }
 
         body {
-            font-family: 'Quicksand', sans-serif;
-            font-size: 14px;
-            min-width: 320px;
-            background: #34495e;
-            color: #222;
+            font-family: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 13px;
+            min-width: 330px;
+            background: #080b12;
+            color: #e2e8f0;
             border: 0;
             outline: 0;
-            padding: 0;
+            padding: 8px;
             margin: 0;
             position: relative;
             overflow: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        a {
-            color: rgb(255, 153, 34);
+        /* Animated Shader Canvas Background */
+        .shader-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            background: #07090e;
+            pointer-events: none;
+        }
+
+        .shader-canvas .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(48px);
+            opacity: 0.52;
+            mix-blend-mode: screen;
+            will-change: transform;
+        }
+
+        .shader-canvas .blob-1 {
+            width: 240px;
+            height: 240px;
+            top: -40px;
+            left: -40px;
+            background: radial-gradient(circle, #00f2fe 0%, #4facfe 65%, transparent 100%);
+            animation: shader-drift-1 16s ease-in-out infinite alternate;
+        }
+
+        .shader-canvas .blob-2 {
+            width: 260px;
+            height: 260px;
+            bottom: -50px;
+            right: -40px;
+            background: radial-gradient(circle, #ff0844 0%, #ff6b81 65%, transparent 100%);
+            animation: shader-drift-2 20s ease-in-out infinite alternate;
+        }
+
+        .shader-canvas .blob-3 {
+            width: 210px;
+            height: 210px;
+            top: 40%;
+            left: 20%;
+            background: radial-gradient(circle, #ff8c00 0%, #ff0055 65%, transparent 100%);
+            animation: shader-drift-3 13s ease-in-out infinite alternate;
+        }
+
+        .shader-canvas .blob-4 {
+            width: 220px;
+            height: 220px;
+            top: 15%;
+            right: -30px;
+            background: radial-gradient(circle, #b224ef 0%, #7579ff 65%, transparent 100%);
+            animation: shader-drift-4 18s ease-in-out infinite alternate;
+        }
+
+        .shader-canvas .grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                radial-gradient(circle at 50% 50%, transparent 20%, rgba(7, 9, 14, 0.75) 100%);
+            background-size: 22px 22px, 22px 22px, 100% 100%;
+        }
+
+        @keyframes shader-drift-1 {
+            0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate3d(50px, 70px, 0) scale(1.15) rotate(45deg); }
+            100% { transform: translate3d(20px, 120px, 0) scale(0.9) rotate(90deg); }
+        }
+
+        @keyframes shader-drift-2 {
+            0% { transform: translate3d(0, 0, 0) scale(1); }
+            50% { transform: translate3d(-60px, -50px, 0) scale(1.2); }
+            100% { transform: translate3d(-20px, -100px, 0) scale(0.95); }
+        }
+
+        @keyframes shader-drift-3 {
+            0% { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate3d(35px, -40px, 0) scale(1.2) rotate(60deg); }
+            100% { transform: translate3d(-40px, 30px, 0) scale(0.85) rotate(-40deg); }
+        }
+
+        @keyframes shader-drift-4 {
+            0% { transform: translate3d(0, 0, 0) scale(0.9); }
+            50% { transform: translate3d(-40px, 80px, 0) scale(1.18); }
+            100% { transform: translate3d(-70px, 30px, 0) scale(1.05); }
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            padding: 12px 14px;
+            background: rgba(12, 16, 26, 0.76);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h2 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.9px;
+            color: #38bdf8;
+            font-weight: 700;
+            margin: 12px 0 6px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .settings {
+            margin: 0;
+            padding: 0;
+        }
+
+        .settings ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 6px;
+        }
+
+        .settings li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .settings input[type="checkbox"] {
             cursor: pointer;
+            width: 16px;
+            height: 16px;
+            accent-color: #38bdf8;
         }
 
-        ul {
+        .settings select {
+            background: rgba(30, 41, 59, 0.85);
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-family: inherit;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+
+        .settings select:focus {
+            border-color: #38bdf8;
+        }
+
+        .keys {
             list-style: none;
             padding: 0;
             margin: 0;
         }
 
-        ul:after, .settings li:after {
-            clear: both;
-            display: block;
-            content: "";
-        }
-
-        h1 {
-            margin: 0;
-            position: relative;
-            z-index: 1;
-            display: inline-block;
-        }
-
-        h1 b {
-            color: #fff;
-            font-size: 24px;
-            line-height: 48px;
-            text-shadow: 2px 2px 0 #000;
-            display: inline-block;
-        }
-
-        h2 {
-            font-size: 16px;
-            line-height: 32px;
-            font-weight: normal;
-            clear: both;
-            position: relative;
-            z-index: 1;
-            margin-top: 8px;
-        }
-
-        h3 {
-            font-size: 14px;
-            line-height: 28px;
-            font-weight: normal;
-        }
-
-        .settings ul {
-            border-bottom: 1px dashed #333;
-            padding-top: 8px;
-        }
-
-        li {
-            font-size: 14px;
-            line-height: 18px;
-        }
-
-        footer {
-            margin-top: 15px;
-        }
-
-        .changelog > li {
-            margin-bottom: 5px;
-        }
-
-        .keys b {
-            display: block;
-            font-weight: normal;
-            color: #000;
-            float: right;
-        }
-
-        .keys span {
-            display: block;
-            float: left;
-            clear: left;
-        }
-
         .keys li {
-            margin-bottom: 5px;
-            clear: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 3px 0;
+            font-size: 12px;
+            line-height: 1.4;
+            color: #cbd5e1;
         }
 
-        .wrapper {
-            position: relative;
-            padding: 0 15px;
-            transition: all .2s ease;
+        .keys li span {
+            color: #cbd5e1;
         }
 
-        .author {
-            text-align: left;
+        .keys li b {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 11px;
+            font-weight: 600;
+            color: #e0f2fe;
+            background: rgba(56, 189, 248, 0.12);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            padding: 1px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.2px;
+            white-space: nowrap;
         }
 
-        header {
-            position: relative;
-            text-align: center;
-            margin-top: 15px;
+        .keys .li-combo-breaker {
+            height: 4px;
+            padding: 0;
         }
 
-        a:focus { outline: none;}
+        .osx-note {
+            font-size: 11px;
+            color: #94a3b8;
+            margin: 8px 0 0;
+            text-align: right;
+            font-style: italic;
+        }
+
+        .support-section {
+            margin: 14px 0 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .support-section a {
+            display: inline-block;
+            line-height: 0;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .support-section a:hover {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.6);
+        }
+
+        .support-section img {
+            height: 24px;
+            width: auto;
+            display: block;
+        }
 
         footer {
-            margin: 32px 0 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 12px;
+            color: #64748b;
         }
 
         footer p {
-            float: left;
-            line-height: 48px;
             margin: 0;
-        }
-
-        footer:after {
-            clear: both;
-            float: none;
-            display: block;
-            content: ""
+            color: #64748b;
+            font-family: ui-monospace, monospace;
+            font-size: 11px;
         }
 
         .gitlink {
-            float: right;
-            line-height: 48px;
-            font-size: 14px;
+            color: #94a3b8;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            transition: color 0.15s ease;
+        }
+
+        .gitlink:hover {
+            color: #f8fafc;
         }
 
         .gitlink img {
-            width: 48px;
-            height: 48px;
+            width: 20px;
+            height: 20px;
+            opacity: 0.75;
             vertical-align: middle;
+            transition: opacity 0.15s ease, transform 0.15s ease;
         }
 
-        .settings {
-            margin-top: 8px;
-            padding-top: 0;
-        }
-
-        .settings li {
-            clear: both;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-
-        .settings label {
-            float: left;
-            clear: left;
-        }
-
-        .settings input, .settings select {
-            float: right;
-        }
-
-        body {
-            color: #000;
-            text-shadow: 1px 1px 3px #000;
-        }
-
-        body .wrapper {
-            color: #eee;
-        }
-
-        body .wrapper:before {
-            background-color: #0a0a0a;
-            background-image: linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000),
-                linear-gradient(45deg, #000 25%, transparent 25%, transparent 75%, #000 75%, #000);
-        }
-
-        body .keys b {
-            color: #fff;
-        }
-
-        body:before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            z-index: -2;
-            background:
-                radial-gradient(circle at 20% 20%, rgba(74, 199, 255, 0.35), transparent 45%),
-                radial-gradient(circle at 80% 75%, rgba(255, 88, 88, 0.25), transparent 40%),
-                linear-gradient(125deg, #0f1f2f 0%, #1e3a4b 45%, #3e2f3f 100%);
-            animation: popup-bg-shift 12s ease-in-out infinite alternate;
-        }
-
-        @keyframes popup-bg-shift {
-            0% {
-                transform: scale(1) translate3d(0, 0, 0);
-                filter: hue-rotate(0deg);
-            }
-            100% {
-                transform: scale(1.08) translate3d(-2%, -1%, 0);
-                filter: hue-rotate(18deg);
-            }
-        }
-
-        .title-subtext {
-            clear: both;
-            font-size: 12px;
-        }
-
-        iframe {
-            position: fixed;
-            width: 100%;
-            height: 105%;
-            z-index: -1;
-            left: 0;
-            top: -2.5%;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.35s ease;
-        }
-
-        body.shader-bg-ready iframe {
-            opacity: 0.9;
-        }
-
-        body.shader-bg-failed iframe {
-            display: none;
-        }
-
-        .beer {
-            margin-top: 40px;
-            text-align: center;
-        }
-
-        .beer a {
-            background: greenyellow;
-            color: #000;
-            padding: 3px 6px;
-            border-radius: 5px;
-            text-decoration: none;
-            text-shadow: none;
-            font-weight: bold;
-            font-size: 13px;
+        .gitlink:hover img {
+            opacity: 1;
+            transform: rotate(8deg);
         }
     </style>
 </head>
 <body>
+    <div class="shader-canvas">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+        <div class="blob blob-4"></div>
+        <div class="grid-overlay"></div>
+    </div>
     <div class="wrapper">
-        <iframe id="popup-background" frameborder="0" src="https://www.shadertoy.com/embed/3djSRd?gui=false&t=10&paused=false&muted=true"></iframe>
         <section class="settings">
             <ul>
                 <li title="Shows shaders on Your page in a grid, with big previews">
-                    <label>Alternative profile page</label>
+                    <label for="input-alternate-profile">Alternative profile page</label>
                     <input type="checkbox" id="input-alternate-profile"/>
                 </li>
             </ul>
             <ul>
                 <li title="When resolution decrased">
-                    <label>Rendering mode</label>
+                    <label for="input-rendering-mode">Rendering mode</label>
                     <select id="input-rendering-mode">
                         <option value="default">Default</option>
                         <option value="pixelated">Pixelated</option>
@@ -284,56 +335,55 @@
         <section>
             <h2>Click on Shader, then...</h2>
             <ul class="keys">
-
-                        <li>
-                            <span>Resolution / X</span><b>ALT + 1..9 (* X with Shift)</b>
-                        </li>
-                        <li class="li-combo-breaker"></li>
-                        <li>
-                            <span>Forward</span><b>ALT + Arrow Right</b>
-                        </li>
-                        <li>
-                            <span>Rewind</span><b>ALT + Arrow Left</b>
-                        </li>
-                        <li>
-                            <span>Pause time</span><b>ALT + Arrow Up</b>
-                        </li>
-                        <li>
-                            <span>Restart time</span><b>ALT + Arrow Down</b>
-                        </li>
-                        <li class="li-combo-breaker"></li>
-                        <li>
-                            <span>Fullscreen edit</b></span><b>SHIFT + CTRL + Enter</b>
-                        </li>
-                        <li>
-                            <span>Take HQ screenshot</span><b>SHIFT + CTRL + S</b>
-                        </li>
-                        <li>
-                            <span>Record</span><b>ALT + SHIFT + R</b>
-                        </li>
-
-
-                    </ul>
-                    <h2>In the Code Editor...</h2>
-                    <ul class="keys">
-
-                        <li>
-                            <span>Code Completion</span><b>CTRL + M</b>
-                        </li>
-                        <li>
-                            <span>Color Picker</span><b>Cursor on vec3 with r,g,b</b>
-                        </li>
-                    </ul>
-                            <p>On OSX use CMD instead of ALT.</p>
+                <li>
+                    <span>Resolution / X</span><b>ALT + 1..9 (* X with Shift)</b>
+                </li>
+                <li class="li-combo-breaker"></li>
+                <li>
+                    <span>Forward</span><b>ALT + Arrow Right</b>
+                </li>
+                <li>
+                    <span>Rewind</span><b>ALT + Arrow Left</b>
+                </li>
+                <li>
+                    <span>Pause time</span><b>ALT + Arrow Up</b>
+                </li>
+                <li>
+                    <span>Restart time</span><b>ALT + Arrow Down</b>
+                </li>
+                <li class="li-combo-breaker"></li>
+                <li>
+                    <span>Fullscreen edit</span><b>SHIFT + CTRL + Enter</b>
+                </li>
+                <li>
+                    <span>Take HQ screenshot</span><b>SHIFT + CTRL + S</b>
+                </li>
+                <li>
+                    <span>Record</span><b>ALT + SHIFT + R</b>
+                </li>
+            </ul>
+            <h2>In the Code Editor...</h2>
+            <ul class="keys">
+                <li>
+                    <span>Code Completion</span><b>CTRL + M</b>
+                </li>
+                <li>
+                    <span>Color Picker</span><b>Cursor on vec3 with r,g,b</b>
+                </li>
+            </ul>
+            <p class="osx-note">On OSX use CMD instead of ALT.</p>
         </section>
-        <div class="beer">
-            <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VDFNBT9N3ANHW&source=url">
-                Beer? Sure.
+        <div class="support-section">
+            <a href="https://ko-fi.com/patu-pl" target="_blank" title="Support on Ko-fi">
+                <img src="assets/badge-kofi.svg" alt="Support on Ko-fi" />
+            </a>
+            <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VDFNBT9N3ANHW&source=url" target="_blank" title="Donate via PayPal">
+                <img src="assets/badge-paypal.svg" alt="Donate via PayPal" />
             </a>
         </div>
         <footer>
             <p id="version" class="version">version</p>
-            <a class="gitlink" target="_blank" href="https://github.com/patuwwy/ShaderToy-Chrome-Plugin">Read more, report bugs: <img src="assets/github-10-xxl.png"/></a>
+            <a class="gitlink" target="_blank" href="https://github.com/patuwwy/ShaderToy-Chrome-Plugin">Read more, report bugs: <img src="assets/github-10-xxl.png" alt="GitHub"/></a>
         </footer>
     </div>
     <script src="popup.js"></script>
