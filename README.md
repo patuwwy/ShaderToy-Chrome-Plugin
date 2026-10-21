@@ -1,9 +1,8 @@
 # Shadertoy Unofficial Plugin
 
 [![GitHub Release](https://img.shields.io/github/v/release/patuwwy/ShaderToy-Chrome-Plugin?style=flat-square&color=blue)](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/releases)
-[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-4285F4?style=flat-square&logo=googlechrome&logoColor=white)](https://chrome.google.com/webstore/detail/ohicbclhdmkhoabobgppffepcopomhgl)
-[![Firefox Add-on](https://img.shields.io/badge/Firefox_Add--on-Available-FF7139?style=flat-square&logo=firefoxbrowser&logoColor=white)](https://addons.mozilla.org/firefox/addon/shadertoy-unofficial-plugin/)
-[![Microsoft Edge Add-on](https://img.shields.io/badge/Edge_Add--on-Available-0078D7?style=flat-square&logo=microsoftedge&logoColor=white)](https://microsoftedge.microsoft.com/addons/detail/mjcddpebilehgjibahdplabcocgpfmdb)
+![Chrome Web Store Size](https://img.shields.io/chrome-web-store/size/ohicbclhdmkhoabobgppffepcopomhgl?style=flat-square&labelColor=blue&color=orange)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE.md)
 
 A browser extension designed to supercharge the shader development and playback experience on [Shadertoy.com](https://www.shadertoy.com).
@@ -16,11 +15,13 @@ A browser extension designed to supercharge the shader development and playback 
 
 ### Web Stores
 
-| Browser             | Store Link                                                                                         |
-| :------------------ | :------------------------------------------------------------------------------------------------- |
-| **Google Chrome**   | [Chrome Web Store](https://chrome.google.com/webstore/detail/ohicbclhdmkhoabobgppffepcopomhgl)     |
-| **Mozilla Firefox** | [Firefox Add-ons (AMO)](https://addons.mozilla.org/firefox/addon/shadertoy-unofficial-plugin/)     |
-| **Microsoft Edge**  | [Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/mjcddpebilehgjibahdplabcocgpfmdb) |
+[![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-4285F4?style=flat-square&logo=googlechrome&logoColor=white)](https://chrome.google.com/webstore/detail/ohicbclhdmkhoabobgppffepcopomhgl)
+![Chrome Web Store Users](https://img.shields.io/chrome-web-store/users/ohicbclhdmkhoabobgppffepcopomhgl?style=flat-square&labelColor=blue&color=orange)
+
+[![Firefox Add-on](https://img.shields.io/badge/Firefox_Add--on-Available-FF7139?style=flat-square&logo=firefoxbrowser&logoColor=white&color=blue)](https://addons.mozilla.org/firefox/addon/shadertoy-unofficial-plugin/)
+![Mozilla Add-on Users](https://img.shields.io/amo/users/%7Bcab6fe0d-6896-4cb6-a40c-1613dd3ed8f9%7D?style=flat-square&labelColor=blue&color=orange&link=https%3A%2F%2Faddons.mozilla.org%2Fpl%2Ffirefox%2Faddon%2Fshadertoy-unofficial-plugin%2F)
+
+[![Microsoft Edge Add-on](https://img.shields.io/badge/Edge_Add--on-Available-0078D7?style=flat-square&logo=microsoftedge&logoColor=white)](https://microsoftedge.microsoft.com/addons/detail/mjcddpebilehgjibahdplabcocgpfmdb)
 
 ### Manual Installation (Unpacked / ZIP)
 
