@@ -137,6 +137,26 @@
             }
         },
 
+        compileShader: function() {
+            this.forceSyncMonacoToActiveDoc();
+            if (window.gShaderToy && typeof window.gShaderToy.SetShaderFromEditor === 'function') {
+                window.gShaderToy.SetShaderFromEditor(false, true);
+            } else {
+                var o_compile_btn = document.querySelector('#compileButton');
+                if (o_compile_btn) {
+                    o_compile_btn.click();
+                }
+            }
+        },
+
+        saveShader: function() {
+            this.forceSyncMonacoToActiveDoc();
+            var o_save_btn = document.querySelector('#saveButton');
+            if (o_save_btn) {
+                o_save_btn.click();
+            }
+        },
+
         setupGlslLanguage: function(monaco) {
             if (this.b_glsl_language_registered) {
                 return;
@@ -2210,6 +2230,7 @@
                     window.ToyPlug.editPage.o_editor_monaco = self.o_editor_monaco;
                     window.ToyPlug.editPage.syncActiveDocToMonaco = function() { self.syncActiveDocToMonaco(); };
                     window.ToyPlug.editPage.forceSyncMonacoToActiveDoc = function() { self.forceSyncMonacoToActiveDoc(); };
+                    window.ToyPlug.editPage.compileShader = function() { self.compileShader(); };
                 }
 
                 window.onresize = function() {
@@ -2229,19 +2250,43 @@
                     }, self.n_live_debounce_ms || 800);
                 });
 
-                var o_monaco_el = document.querySelector('.monaco-editor');
+                var a_compile_keys = [
+                    window.monaco.KeyMod.Alt | window.monaco.KeyCode.Enter
+                ];
+                if (navigator.platform.match('Mac')) {
+                    a_compile_keys.push(window.monaco.KeyMod.CtrlCmd | window.monaco.KeyCode.Enter);
+                }
+
+                self.o_editor_monaco.addAction({
+                    id: 'shadertoy-compile',
+                    label: 'Compile Shader',
+                    keybindings: a_compile_keys,
+                    run: function() {
+                        self.compileShader();
+                    }
+                });
+
+                self.o_editor_monaco.addAction({
+                    id: 'shadertoy-save',
+                    label: 'Save Shader',
+                    keybindings: [
+                        window.monaco.KeyMod.CtrlCmd | window.monaco.KeyCode.KeyS
+                    ],
+                    run: function() {
+                        self.saveShader();
+                    }
+                });
+
+                var o_monaco_el = document.querySelector('.monaco-editor') || document.getElementById('editor');
                 if (o_monaco_el) {
                     o_monaco_el.addEventListener('keydown', function(e) {
                         if (e.key === 's' && (navigator.platform.match('Mac') ? e.metaKey : e.ctrlKey)) {
                             e.preventDefault();
-                            var o_save_btn = document.querySelector('#saveButton');
-                            if (o_save_btn) o_save_btn.click();
+                            self.saveShader();
                         }
-                        if (e.key === 'Enter' && (navigator.platform.match('Mac') ? e.metaKey : e.altKey)) {
+                        if (e.key === 'Enter' && (navigator.platform.match('Mac') ? (e.metaKey || e.altKey) : e.altKey)) {
                             e.preventDefault();
-                            self.syncMonacoToActiveDoc();
-                            var o_compile_btn = document.querySelector('#compileButton');
-                            if (o_compile_btn) o_compile_btn.click();
+                            self.compileShader();
                         }
                     }, false);
                 }
