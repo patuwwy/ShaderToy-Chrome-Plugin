@@ -31,7 +31,8 @@ export default [
                 require: 'readonly',
                 o_editor_monaco: 'writable',
                 WebGL2RenderingContext: 'readonly',
-                EffectPass: 'readonly'
+                EffectPass: 'readonly',
+                EyeDropper: 'readonly'
             }
         },
         rules: {

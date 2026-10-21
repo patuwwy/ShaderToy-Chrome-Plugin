@@ -1,401 +1,344 @@
 ## ShaderToy extension changelog (major changes only):
--   0.15.6 (13-10-2026)
 
-    -   Trigger shader compilation on Alt+Enter in Monaco Editor via Shadertoy's native `gShaderToy.SetShaderFromEditor`.
-    -   Fix Monaco Editor live validation channel sampler types (support CubeMap `samplerCube` and 3D textures) preventing false-positive dimension mismatch errors on CubeMap sampling.
-    -   Improve Monaco Editor compilation error range highlighting for assignment mismatches and operator errors.
-    -   Replace broken remote iframe in extension popup with a high-performance animated CSS plasma shader effect and modern glassmorphic UI.
-    -   Rename Monaco editor tab label from `VScode (Monaco) Editor` to `Monaco` and add a dedicated `?` modal button displaying comprehensive keyboard shortcuts and newly added editor features.
-    -   Add 10th anniversary extension icons (active and inactive states).
-    -   Redesign extension controls bar with modern glassmorphic theme, custom styled dropdowns, and mouse wheel stepping on time range inputs.
-    -   Update native `#myTime` and timeline slider synchronously during deterministic frame-by-frame video recording.
-    -   Fix alignment, centering, and sizing of editor switch tabs and controls expand trigger.
-    -   Sort render meters passes alphabetically for stable, flicker-free performance tracking.
-    -   Fix recent shaders dropdown z-index layering and add custom dark glassmorphic scrollbar.
+- 0.15.7 (21-10-2026)
+    - Add canvas pixel color picker button (EyeDropper API) next to render meters toggle (Chrome/Edge only).
+      [Issue #4](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/4)
+    - Trigger shader compilation on Alt+Enter in Monaco Editor, save with Ctrl+s.
+
+- 0.15.6 (13-10-2026)
+    - Fix Monaco Editor live validation channel sampler types (support CubeMap `samplerCube` and 3D textures) preventing false-positive dimension mismatch
+      errors on CubeMap sampling.
+    - Improve Monaco Editor compilation error range highlighting for assignment mismatches and operator errors.
+    - Replace broken remote iframe in extension popup with a high-performance animated CSS plasma shader effect and modern glassmorphic UI.
+    - Rename Monaco editor tab label from `VScode (Monaco) Editor` to `Monaco` and add a dedicated `?` modal button displaying comprehensive keyboard shortcuts
+      and newly added editor features.
+    - Add 10th anniversary extension icons (active and inactive states).
+    - Redesign extension controls bar with modern glassmorphic theme, custom styled dropdowns, and mouse wheel stepping on time range inputs.
+    - Update native `#myTime` and timeline slider synchronously during deterministic frame-by-frame video recording.
+    - Fix alignment, centering, and sizing of editor switch tabs and controls expand trigger.
+    - Sort render meters passes alphabetically for stable, flicker-free performance tracking.
+    - Fix recent shaders dropdown z-index layering and add custom dark glassmorphic scrollbar.
+
+- 0.15.5 (11-10-2026)
+    - Fix broken video recording and uninitialized MediaRecorder runtime errors. [Issue #153](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/153)
+    - Add deterministic frame-accurate offline video recording with selectable framerates (50, 60, 120, 144, 240 fps) powered by WebCodecs `VideoEncoder` and
+      `WebMMuxer`: video frames wait synchronously for GPU render passes, guaranteeing perfectly smooth animation output even on heavy shaders.
+    - Update recording controls in toolbar: red REC circle button with toggle state, adjacent FPS dropdown selector, player HUD counter, and `Alt + Shift + R`
+      shortcut.
+
+- 0.15.4 (11-10-2026)
+    - Add Monaco Editor GLSL Go to Definition and Symbol Outline: `F12` and `Ctrl+Click` jump to definition for user-defined functions, structs, `#define`
+      macros, and variables, plus Quick Open symbol navigation (`Ctrl+Shift+O`).
+
+- 0.15.3 (11-10-2026)
+    - Improve Monaco Editor compilation error diagnostics and live validation: on-the-fly background shader syntax and type checking while typing (debounced),
+      accurate line mapping, token-level error squiggles for undeclared identifiers and types, and per-error message tooltips in Monaco markers.
+
+- 0.15.2 (11-10-2026)
+    - Add Monaco Editor GLSL Signature Help (parameter hints): displays active function signature, parameter positions, and overloads when typing `(` or `,` for
+      GLSL built-in functions and vector/matrix constructors.
+
+- 0.15.1 (11-10-2026)
+    - Add Monaco Editor GLSL hover documentation: hover signatures, mathematical formulas, and descriptions for built-in functions, ShaderToy uniforms, data
+      types, and vector swizzles.
+
+- 0.15.0 (11-10-2026)
+    - Add Monaco Editor GLSL IntelliSense support: autocomplete for GLSL built-in functions, keywords, data types, ShaderToy uniforms, and pixel shader
+      snippets.
+
+- 0.14.294 (11-10-2026)
+    - Add playback time seeking support for Sound pass shaders: synchronizes generated audio buffer playback with the time slider and keyboard time controls
+      without recompiling the shader. [Issue #180](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/180)
+    - Fix Monaco Editor switching runtime error (`o_editor_monaco is not defined`).
+    - Fix Monaco Editor assets path and include `codicon.ttf` in `web_accessible_resources`.
+
+- 0.14.293 (07-10-2026)
+    - Add ESLint configuration with linting steps in build script and CI workflow.
+    - Fix Monaco assets CSS path and improve initialization reliability in content script.
+    - Split and isolate store publish workflows (Firefox, Chrome, Microsoft Edge) and decouple GitHub release from store publishing.
+    - Fix Firefox extension ID validation during add-on submission.
+
+- 0.14.291 (20-05-2026)
+    - Fix editor synchronization regressions: prevent tab-switch resets in original editor mode and keep Monaco/Original editor changes synchronized (including
+      Monaco tab switching without losing unsaved edits). [Issue #229](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/229)
+
+- 0.14.290 (28-04-2026)
+    - Fix remaining redo shortcut regression in the shader editor by improving Ctrl/Cmd detection and CodeMirror focus checks across keyboard layouts.
+      [Issue #168](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/168)
+
+- 0.14.289 (28-04-2026)
+    - Add a confirmation prompt before Fork when the current shader has unsaved changes, with guidance to save first or use "Save as new draft".
+      [Issue #59](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/59)
+
+- 0.14.288 (28-04-2026)
+    - Fix time range input values being floored to integers when validating decimal values (e.g. 3.1, 3.2). Changed `parseInt` to `parseFloat` in time range
+      handlers to preserve decimal places. [Issue #161](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/161)
+
+- 0.14.287 (28-04-2026)
+    - Fix profile page console error from unsafe state parsing (`JSON.parse` on non-string fallback) that could break profile enhancements.
+      [Issue #152](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/152)
+
+- 0.14.285 (28-04-2026)
+    - Add dedicated undo/redo history for comment textarea to prevent Ctrl/Cmd+Z from crossing into Monaco/CodeMirror history after mixed typing.
+      [Issue #168](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/168)
+
+- 0.14.284 (28-04-2026)
+    - Fix code editor undo/redo shortcuts being mixed with browser history (e.g. chat input), by forcing Ctrl/Cmd+Z and redo shortcuts to stay in the shader
+      editor. [Issue #168](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/168)
+
+- 0.14.283 (28-04-2026)
+    - Improve Cloudflare challenge detection (localized title, challenge platform and Turnstile markers) so plugin scripts are not injected during verification
+      on shader URLs. [Issue #215](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/215)
+
+- 0.14.281 (28-04-2026)
+    - Fix Monaco editor buffer tabs losing unsaved text after switching tabs. [Issue #218](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/218)
+
+- 0.14.280 (27-04-2026)
+    - Fix popup background not loading on some browsers (fallback background + safer embed handling).
+      [Issue #217](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/217)
+
+- 0.14.272 (11-01-2025)
+    - Canvas size can be set with custom parameters object in common tab. [See documentation](./docs/custom-params.md)
 
--   0.15.5 (11-10-2026)
+- 0.14.266 (02-10-2024)
+    - Resoulution can be multiplied (alt + shift + 1...9)
 
-    -   Fix broken video recording and uninitialized MediaRecorder runtime errors. [Issue #153](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/153)
-    -   Add deterministic frame-accurate offline video recording with selectable framerates (50, 60, 120, 144, 240 fps) powered by WebCodecs `VideoEncoder` and `WebMMuxer`: video frames wait synchronously for GPU render passes, guaranteeing perfectly smooth animation output even on heavy shaders.
-    -   Update recording controls in toolbar: red REC circle button with toggle state, adjacent FPS dropdown selector, player HUD counter, and `Alt + Shift + R` shortcut.
+- 0.14.260 (18-05-2024)
+    - Custom params (by [Dakotys](https://github.com/Dakotys)) [see docs](./docs/custom-params.md)
 
--   0.15.4 (11-10-2026)
+- 0.14.254 (28-08-2023)
+    - Compilation errors in Monaco Editor
+    - Zoomable Monaco Editor
 
-    -   Add Monaco Editor GLSL Go to Definition and Symbol Outline: `F12` and `Ctrl+Click` jump to definition for user-defined functions, structs, `#define` macros, and variables, plus Quick Open symbol navigation (`Ctrl+Shift+O`).
+- 0.14.250 (28-06-2023)
+    - Monaco code editor added (see [Issue #](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/164))
 
--   0.15.3 (11-10-2026)
+- 0.14.257
+    - Temporary remove monaco editor
 
-    -   Improve Monaco Editor compilation error diagnostics and live validation: on-the-fly background shader syntax and type checking while typing (debounced), accurate line mapping, token-level error squiggles for undeclared identifiers and types, and per-error message tooltips in Monaco markers.
+- 0.14.254 (28-08-2023)
+    - Compilation errors in Monaco Editor
+    - Zoomable Monaco Editor
 
--   0.15.2 (11-10-2026)
+- 0.14.250 (28-06-2023)
+    - Monaco code editor added (see [Issue #](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/164))
 
-    -   Add Monaco Editor GLSL Signature Help (parameter hints): displays active function signature, parameter positions, and overloads when typing `(` or `,` for GLSL built-in functions and vector/matrix constructors.
+- 0.13.247 (22-02-2022)
+    - Fix marking shader as owned.
 
--   0.15.1 (11-10-2026)
+- 0.13.215 (30-11-2020)
+    - Add code completion and color picker extentions to code editor
 
-    -   Add Monaco Editor GLSL hover documentation: hover signatures, mathematical formulas, and descriptions for built-in functions, ShaderToy uniforms, data types, and vector swizzles.
+- 0.13.201 (28-11-2020)
+    - Temporary fix for resoultion decrease. (doesn't change resolution when entering fullscreen)
 
--   0.15.0 (11-10-2026)
+- 0.13.200
+    - Fix for render timers
 
-    -   Add Monaco Editor GLSL IntelliSense support: autocomplete for GLSL built-in functions, keywords, data types, ShaderToy uniforms, and pixel shader snippets.
+- 0.13.190 (10-10-2019)
+    - Firefox compatibility fix - **alternative profile page and render mode now works in Firefox**.
 
--   0.14.294 (11-10-2026)
+- 0.13.184 (08-10-2019)
+    - **GPU render timers** based on
+      [shadertoy_gpu_timing.user.js](https://github.com/andrei-drexler/shadertoy-userscripts/blob/master/shadertoy_gpu_timing.user.js).
+    - Layout fixes + icons.
 
-    -   Add playback time seeking support for Sound pass shaders: synchronizes generated audio buffer playback with the time slider and keyboard time controls without recompiling the shader. [Issue #180](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/180)
-    -   Fix Monaco Editor switching runtime error (`o_editor_monaco is not defined`).
-    -   Fix Monaco Editor assets path and include `codicon.ttf` in `web_accessible_resources`.
+- 0.12.174 (04-10-2019)
+    - Fix iMouse sliders appearance on firefox.
 
--   0.14.293 (07-10-2026)
+- 0.12.172 (01-10-2019)
+    - Hot fixes for ShaderToy layout update.
 
-    -   Add ESLint configuration with linting steps in build script and CI workflow.
-    -   Fix Monaco assets CSS path and improve initialization reliability in content script.
-    -   Split and isolate store publish workflows (Firefox, Chrome, Microsoft Edge) and decouple GitHub release from store publishing.
-    -   Fix Firefox extension ID validation during add-on submission.
+- 0.12.170 (08-09-2019)
+    - Show shader screenshot.
 
--   0.14.291 (20-05-2026)
+- 0.12.157 (06-09-2019)
+    - Reorganize buttons in shader controls.
 
-    -   Fix editor synchronization regressions: prevent tab-switch resets in original editor mode and keep Monaco/Original editor changes synchronized (including Monaco tab switching without losing unsaved edits). [Issue #229](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/229)
+- 0.12.154 (01-08-2019)
+    - Change versioning strategy (Last number is commit number now).
+    - Remove resolution info (it has been added to ShaderToy!).
+    - Update README.
 
--   0.14.290 (28-04-2026)
+- 0.12.0 (01-08-2019)
+    - Continuous Delivery (Auto publish to Chrome Store, Auto release on GitHub).
 
-    -   Fix remaining redo shortcut regression in the shader editor by improving Ctrl/Cmd detection and CodeMirror focus checks across keyboard layouts. [Issue #168](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/168)
+- 0.12.0 (12-04-2019)
+    - Recent shaders.
+    - Fix displayed shaders count when exporting all.
 
--   0.14.289 (28-04-2026)
+- 0.11.0 (08-04-2019)
+    - Updated controls section appearance.
+    - Show resolution in control section.
+    - Fixed render multiplier.
+    - Moved loop switch from popup to control section.
 
-    -   Add a confirmation prompt before Fork when the current shader has unsaved changes, with guidance to save first or use "Save as new draft". [Issue #59](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/59)
+- 0.10.0 (13-03-2019)
+    - Render multiplier (calls draw multiple times).
 
--   0.14.288 (28-04-2026)
+- 0.9.17 (26-05-2018)
+    - Display current canvas resolution on FPS hover.
+    - Fix auto-links.
 
-    -   Fix time range input values being floored to integers when validating decimal values (e.g. 3.1, 3.2). Changed `parseInt` to `parseFloat` in time range handlers to preserve decimal places. [Issue #161](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/161)
+- 0.9.13 (18-Feb-2018)
+    - Popup background changed.
 
--   0.14.287 (28-04-2026)
+- 0.9.12 (11-Feb-2018)
+    - **First release for Firefox.**
+    - Multi-language alterative profile page support.
+    - Fix for confirmation dialog (on profile page) Now it appear on window's center when alternative profile page is active.
 
-    -   Fix profile page console error from unsafe state parsing (`JSON.parse` on non-string fallback) that could break profile enhancements. [Issue #152](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/152)
+- 0.9.11
+    - **Export to ZIP** by [Chris White cxw42](https://github.com/cxw42)
 
--   0.14.285 (28-04-2026)
+- 0.9.10 (10-Jan-2018)
+    - Alternative Profile page hot fix.
 
-    -   Add dedicated undo/redo history for comment textarea to prevent Ctrl/Cmd+Z from crossing into Monaco/CodeMirror history after mixed typing. [Issue #168](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/168)
+- 0.9.8 (27-Nov-2017)
+    - [issue#40](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/40)
+    - [issue#41](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/41)
 
--   0.14.284 (28-04-2026)
+- 0.9.7 (24-Nov-2017)
+    - Forked shader's banner. [issue#40](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/40)
 
-    -   Fix code editor undo/redo shortcuts being mixed with browser history (e.g. chat input), by forcing Ctrl/Cmd+Z and redo shortcuts to stay in the shader editor. [Issue #168](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/168)
+- 0.9.6 (10-Nov-2017)
+    - Fix for 'draft' -> 'unlisted' change.
+    - Key bindings change.
 
--   0.14.283 (28-04-2026)
+- 0.9.5 (20-Oct-2017)
+    - Fixed font color for auto-links.
+    - Fixed shader titles on tiles.
 
-    -   Improve Cloudflare challenge detection (localized title, challenge platform and Turnstile markers) so plugin scripts are not injected during verification on shader URLs. [Issue #215](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/215)
+- 0.9.4 (7-Oct-2017)
+    - Make links for URLs if not inserted with BBCode in description and comments.
 
--   0.14.281 (28-04-2026)
+- 0.9.3 (6-Oct-2017)
+    - Foldable controls.
+    - Extension's buttons colorized.
 
-    -   Fix Monaco editor buffer tabs losing unsaved text after switching tabs. [Issue #218](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/218)
+- 0.9.2 (2-Sep-2017 at Riverwash party)
+    - **Clone any shader**.
 
--   0.14.280 (27-04-2026)
+- 0.9.1 (13-Aug-2017)
+    - Removed shader preview in shaders list on profile page. (Provided natively in ShaderToy now).
+    - Removed "tabs" permission (browser history).
 
-    -   Fix popup background not loading on some browsers (fallback background + safer embed handling). [Issue #217](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/217)
+- 0.9.0 (06-Aug-2017)
+    - **Export/Import shader** (JSON) by [movAX13h](http://blog.thrill-project.com/)
+    - Backup all user's shaders (JSON) by [movAX13h](http://blog.thrill-project.com/)
+    - Bigger shaders list on Profile page.
+    - Redirect to login page when user visit own profile but is not logged anymore.
+    - Code style clean up.
 
--   0.14.272 (11-01-2025)
+- 0.8.4 (04-Aug-2017)
+    - Rewind/Forward with arrow keys when shader is active.
+    - Removed shaders sorting on Profile page (Sorting is provided natively in ShaderToy now).
+    - Minor fixes.
 
-    -   Canvas size can be set with custom parameters object in common tab. [See documentation](./docs/custom-params.md)
+- 0.8.3
+    - On/Off record with CTRL + SHIFT + R (for fullscreen).
+    - Fixed taking screenshot.
 
--   0.14.266 (02-10-2024)
+- 0.8.2
+    - Clean up.
 
-    -   Resoulution can be multiplied (alt + shift + 1...9)
+- 0.8.1
+    - Dark theme removed. Dark theme has been implemented in ShaderToy.
 
--   0.14.260 (18-05-2024)
+- 0.8.0
+    - **Alternative profile page - new shaders list**.
+    - New shaders list option added to extension's popup.
+    - Code structure changed. Dedicated JS module for profile page.
 
-    -   Custom params (by [Dakotys](https://github.com/Dakotys)) [see docs](./docs/custom-params.md)
+- 0.7.7
+    - Cloned shader is saved as draft.
+    - Dark theme dialog buttons colors fixed.
 
--   0.14.254 (28-08-2023)
+- 0.7.6
+    - Loop switch fix.
 
-    -   Compilation errors in Monaco Editor
-    -   Zoomable Monaco Editor
+- 0.7.5
+    - Correct value for iFrame uniform.
 
--   0.14.250 (28-06-2023)
+- 0.7.4
+    - Confirm shader cloning when original shader has not been saved.
 
-    -   Monaco code editor added (see [Issue #](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/164))
+- 0.7.2
+    - Cloning own shaders. No more copying uniforms and passes by hand.
+    - Images for Github preview removed. One image added.
 
--   0.14.257
+- 0.7.1
+    - Time looping.
 
-    -   Temporary remove monaco editor
+- 0.7.0
+    - HQ Screenshot
+    - Code cleanup
+    - Minor style changes
 
--   0.14.254 (28-08-2023)
+- 0.6.3
+    - Dark theme updated.
+    - Shaders preview on profile page updated.
 
-    -   Compilation errors in Monaco Editor
-    -   Zoomable Monaco Editor
+- 0.6.2
+    - iMouse uniform sliders fix for paused state.
+    - Sliders initial value.
+    - Change in extension popup appearance.
+    - Dark theme update.
 
--   0.14.250 (28-06-2023)
+- 0.6.0 iMouse uniform sliders.
 
-    -   Monaco code editor added (see [Issue #](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/164))
+- 0.5.1 Minor changes. Nothing new. Mostly code styling.
 
--   0.13.247 (22-02-2022)
+- 0.5.0 Added preview images on profile page.
 
-    -   Fix marking shader as owned.
+- 0.4.1
+    - Changed key bindings.
+    - Changes in popup (show version, ui).
+    - Removed Google Analytics (can not manage how to make it work ;)
+    - Removed open github page when updated.
 
--   0.13.215 (30-11-2020)
+- 0.4.0 Timebar added.
 
-    -   Add code completion and color picker extentions to code editor
+- 0.3.3
+    - Take screenshot in current resolution.
+    - Fullscreen edit mode key changed to SHIFT + SPACE.
+    - Google Analytics added.
+    - Moved preview screens to screenshots folder.
 
--   0.13.201 (28-11-2020)
+- 0.3.2
+    - CSS fix for showing user picture on [Profile page](https://www.shadertoy.com/profile) (both themes).
+    - Extension opens changelog on update/first install.
 
-    -   Temporary fix for resoultion decrease. (doesn't change resolution when entering fullscreen)
+- 0.3.1
+    - Exclude running extension on login page.
+    - Added Chrome rendering mode select.
 
--   0.13.200
+- **0.3.0**
+    - Refactoring.
+    - Switchable dark theme.
+    - Extension styling.
+    - Dark theme fixes.
 
-    -   Fix for render timers
+- 0.2.5
+    - Show plugin popup only when on Shadertoy.com.
 
--   0.13.190 (10-10-2019)
+- 0.2.3
+    - Added sort shaders by views/likes/comments on "My profile" page.
 
-    -   Firefox compatibility fix - **alternative profile page and render mode now works in Firefox**.
+- 0.2.2
+    - Moved to Git.
 
--   0.13.184 (08-10-2019)
+- 0.2.1
+    - Code comments added.
 
-    -   **GPU render timers** based on [shadertoy_gpu_timing.user.js](https://github.com/andrei-drexler/shadertoy-userscripts/blob/master/shadertoy_gpu_timing.user.js).
-    -   Layout fixes + icons.
+- 0.2.0
+    - Basic implementation of fullscreen edit.
 
--   0.12.174 (04-10-2019)
+- 0.1.1
+    - Added pause/restart time in fullscreen mode.
 
-    -   Fix iMouse sliders appearance on firefox.
+- 0.1.0
+    - Added basic **dark theme**.
 
--   0.12.172 (01-10-2019)
-
-    -   Hot fixes for ShaderToy layout update.
-
--   0.12.170 (08-09-2019)
-
-    -   Show shader screenshot.
-
--   0.12.157 (06-09-2019)
-
-    -   Reorganize buttons in shader controls.
-
--   0.12.154 (01-08-2019)
-
-    -   Change versioning strategy (Last number is commit number now).
-    -   Remove resolution info (it has been added to ShaderToy!).
-    -   Update README.
-
--   0.12.0 (01-08-2019)
-
-    -   Continuous Delivery (Auto publish to Chrome Store, Auto release on GitHub).
-
--   0.12.0 (12-04-2019)
-
-    -   Recent shaders.
-    -   Fix displayed shaders count when exporting all.
-
--   0.11.0 (08-04-2019)
-
-    -   Updated controls section appearance.
-    -   Show resolution in control section.
-    -   Fixed render multiplier.
-    -   Moved loop switch from popup to control section.
-
--   0.10.0 (13-03-2019)
-
-    -   Render multiplier (calls draw multiple times).
-
--   0.9.17 (26-05-2018)
-
-    -   Display current canvas resolution on FPS hover.
-    -   Fix auto-links.
-
--   0.9.13 (18-Feb-2018)
-
-    -   Popup background changed.
-
--   0.9.12 (11-Feb-2018)
-
-    -   **First release for Firefox.**
-    -   Multi-language alterative profile page support.
-    -   Fix for confirmation dialog (on profile page) Now it appear on window's center when alternative profile page is active.
-
--   0.9.11
-
-    -   **Export to ZIP** by [Chris White cxw42](https://github.com/cxw42)
-
--   0.9.10 (10-Jan-2018)
-
-    -   Alternative Profile page hot fix.
-
--   0.9.8 (27-Nov-2017)
-
-    -   [issue#40](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/40)
-    -   [issue#41](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/41)
-
--   0.9.7 (24-Nov-2017)
-
-    -   Forked shader's banner. [issue#40](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/40)
-
--   0.9.6 (10-Nov-2017)
-
-    -   Fix for 'draft' -> 'unlisted' change.
-    -   Key bindings change.
-
--   0.9.5 (20-Oct-2017)
-
-    -   Fixed font color for auto-links.
-    -   Fixed shader titles on tiles.
-
--   0.9.4 (7-Oct-2017)
-
-    -   Make links for URLs if not inserted with BBCode in description and comments.
-
--   0.9.3 (6-Oct-2017)
-
-    -   Foldable controls.
-    -   Extension's buttons colorized.
-
--   0.9.2 (2-Sep-2017 at Riverwash party)
-
-    -   **Clone any shader**.
-
--   0.9.1 (13-Aug-2017)
-
-    -   Removed shader preview in shaders list on profile page. (Provided natively in ShaderToy now).
-    -   Removed "tabs" permission (browser history).
-
--   **0.9.0** (06-Aug-2017)
-
-    -   **Export/Import shader** (JSON) by [movAX13h](http://blog.thrill-project.com/)
-    -   Backup all user's shaders (JSON) by [movAX13h](http://blog.thrill-project.com/)
-    -   Bigger shaders list on Profile page.
-    -   Redirect to login page when user visit own profile but is not logged anymore.
-    -   Code style clean up.
-
--   0.8.4 (04-Aug-2017)
-
-    -   Rewind/Forward with arrow keys when shader is active.
-    -   Removed shaders sorting on Profile page (Sorting is provided natively in ShaderToy now).
-    -   Minor fixes.
-
--   0.8.3
-
-    -   On/Off record with CTRL + SHIFT + R (for fullscreen).
-    -   Fixed taking screenshot.
-
--   0.8.2
-
-    -   Clean up.
-
--   0.8.1
-
-    -   Dark theme removed. Dark theme has been implemented in ShaderToy.
-
--   **0.8.0**
-
-    -   **Alternative profile page - new shaders list**.
-    -   New shaders list option added to extension's popup.
-    -   Code structure changed. Dedicated JS module for profile page.\*\*
-
--   0.7.7
-
-    -   Cloned shader is saved as draft.
-    -   Dark theme dialog buttons colors fixed.
-
--   0.7.6
-
-    -   Loop switch fix.
-
--   0.7.5
-
-    -   Correct value for iFrame uniform.
-
--   0.7.4
-
-    -   Confirm shader cloning when original shader has not been saved.
-
--   0.7.2
-
-    -   Cloning own shaders. No more copying uniforms and passes by hand.
-    -   Images for Github preview removed. One image added.
-
--   0.7.1
-
-    -   Time looping.
-
--   **0.7.0**
-
-    -   **HQ Screenshot**
-    -   Code cleanup
-    -   Minor style changes
-
--   0.6.3
-
-    -   Dark theme updated.
-    -   Shaders preview on profile page updated.
-
--   0.6.2
-
-    -   iMouse uniform sliders fix for paused state.
-    -   Sliders initial value.
-    -   Change in extension popup appearance.
-    -   Dark theme update.
-
--   **0.6.0 iMouse uniform sliders.**
-
--   0.5.1 Minor changes. Nothing new. Mostly code styling.
-
--   **0.5.0 Added preview images on profile page.**
-
--   0.4.1
-
-    -   Changed key bindings.
-    -   Changes in popup (show version, ui).
-    -   Removed Google Analytics (can not manage how to make it work ;)
-    -   Removed open github page when updated.
-
--   **0.4.0 Timebar added.**
-
--   0.3.3
-
-    -   Take screenshot in current resolution.
-    -   Fullscreen edit mode key changed to SHIFT + SPACE.
-    -   Google Analytics added.
-    -   Moved preview screens to screenshots folder.
-
--   0.3.2
-
-    -   CSS fix for showing user picture on [Profile page](https://www.shadertoy.com/profile) (both themes).
-    -   Extension opens changelog on update/first install.
-
--   0.3.1
-
-    -   Exclude running extension on login page.
-    -   Added Chrome rendering mode select.
-
--   **0.3.0**
-
-    -   Refactoring.
-    -   Switchable dark theme.
-    -   Extension styling.
-    -   Dark theme fixes.
-
--   0.2.5
-
-    -   Show plugin popup only when on Shadertoy.com.
-
--   0.2.3
-
-    -   Added sort shaders by views/likes/comments on "My profile" page.
-
--   0.2.2
-
-    -   Moved to Git.
-
--   0.2.1
-
-    -   Code comments added.
-
--   0.2.0
-
-    -   Basic implementation of fullscreen edit.
-
--   0.1.1
-
-    -   Added pause/restart time in fullscreen mode.
-
--   0.1.0
-
-    -   Added basic **dark theme**.
-
--   0.0.1
-    -   Change resolution by keys 1...9.
+- 0.0.1
+    - Change resolution by keys 1...9.

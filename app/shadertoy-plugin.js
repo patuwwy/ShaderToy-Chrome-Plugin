@@ -1574,6 +1574,7 @@
             this.sliderInput.step = 20;
 
             this.createRenderTimersTrigger();
+            this.createColorPickerTrigger();
         }
 
         createRenderTimersTrigger() {
@@ -1611,6 +1612,115 @@
                     triggerElement.checked = e.detail.enabled;
                 }
             );
+        }
+
+        createColorPickerTrigger() {
+            if (!('EyeDropper' in window)) {
+                return;
+            }
+
+            let colorPickerButton = document.createElement('button');
+            colorPickerButton.type = 'button';
+            colorPickerButton.classList.add('ste-color-picker-toggle');
+            colorPickerButton.title = 'Pick color from shader canvas (EyeDropper)';
+
+            extensionElements.controlsContainerHeader.appendChild(
+                colorPickerButton
+            );
+
+            colorPickerButton.addEventListener('click', async () => {
+                if (this.isPickingColor) {
+                    return;
+                }
+                this.isPickingColor = true;
+                colorPickerButton.classList.add('active');
+
+                try {
+                    const eyeDropper = new window.EyeDropper();
+                    const result = await eyeDropper.open();
+                    if (result && result.sRGBHex) {
+                        const hex = result.sRGBHex;
+                        const r = parseInt(hex.slice(1, 3), 16);
+                        const g = parseInt(hex.slice(3, 5), 16);
+                        const b = parseInt(hex.slice(5, 7), 16);
+                        const vec3Str = `vec3(${(r / 255).toFixed(3)}, ${(g / 255).toFixed(3)}, ${(b / 255).toFixed(3)})`;
+
+                        if (navigator.clipboard && navigator.clipboard.writeText) {
+                            navigator.clipboard.writeText(hex).catch(() => {});
+                        }
+
+                        colorPickerButton.title = `Pick color (EyeDropper) - Last: ${hex} / ${vec3Str}`;
+                        this.showColorToast(hex, r, g, b, vec3Str);
+                    }
+                } catch (e) {
+                    // Canceled by user (Escape / clicking without selection)
+                } finally {
+                    this.isPickingColor = false;
+                    colorPickerButton.classList.remove('active');
+                }
+            });
+        }
+
+        showColorToast(hex, r, g, b, vec3Str) {
+            let existingToast = document.getElementById('ste-color-picker-toast');
+            if (existingToast) {
+                existingToast.remove();
+            }
+
+            let toast = document.createElement('div');
+            toast.id = 'ste-color-picker-toast';
+            toast.className = 'ste-color-picker-toast';
+
+            let swatch = document.createElement('span');
+            swatch.className = 'ste-toast-swatch';
+            swatch.style.backgroundColor = hex;
+
+            let textContainer = document.createElement('div');
+            textContainer.className = 'ste-toast-text';
+
+            let hexLine = document.createElement('div');
+            hexLine.className = 'ste-toast-hex';
+            hexLine.innerHTML = `<strong>${hex}</strong> <span class="ste-toast-copied">(copied)</span>`;
+
+            let vec3Btn = document.createElement('button');
+            vec3Btn.type = 'button';
+            vec3Btn.className = 'ste-toast-vec3-btn';
+            vec3Btn.textContent = vec3Str;
+            vec3Btn.title = 'Click to copy vec3 to clipboard';
+            vec3Btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(vec3Str).then(() => {
+                        vec3Btn.textContent = 'Copied vec3!';
+                        setTimeout(() => {
+                            if (vec3Btn.parentNode) {
+                                vec3Btn.textContent = vec3Str;
+                            }
+                        }, 1200);
+                    });
+                }
+            });
+
+            textContainer.appendChild(hexLine);
+            textContainer.appendChild(vec3Btn);
+
+            toast.appendChild(swatch);
+            toast.appendChild(textContainer);
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('ste-toast-visible');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.remove('ste-toast-visible');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }, 3500);
         }
 
         onChangeRenderSpeedSelector(e) {
