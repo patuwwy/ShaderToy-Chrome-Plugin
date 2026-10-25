@@ -1,5 +1,11 @@
 ## ShaderToy extension changelog (major changes only):
 
+- 0.15.8 (25-10-2026)
+    - Fix pass tab switching stealing focus and overwriting CodeMirror editor code with stale Monaco cache
+      ([Issue #234](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/234)).
+    - Synchronize editor selection state across Monaco and EditPage instances.
+    - Scope Monaco keyboard shortcuts strictly to the Monaco editor DOM element.
+
 - 0.15.7 (21-10-2026)
     - Add canvas pixel color picker button (EyeDropper API) next to render meters toggle (Chrome/Edge only).
       [Issue #4](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/4)

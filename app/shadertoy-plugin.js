@@ -1350,6 +1350,7 @@
             this.state = this.state || {};
 
             var o_monaco = window.ToyPlug && window.ToyPlug.monaco;
+            var b_was_monaco = !!(this.state && this.state.monaco === true);
 
             if (monaco && this.syncActiveDocToMonaco) {
                 this.syncActiveDocToMonaco();
@@ -1357,13 +1358,19 @@
                 o_monaco.syncActiveDocToMonaco();
             }
 
-            if (!monaco && this.forceSyncMonacoToActiveDoc) {
-                this.forceSyncMonacoToActiveDoc();
-            } else if (!monaco && o_monaco && o_monaco.forceSyncMonacoToActiveDoc) {
-                o_monaco.forceSyncMonacoToActiveDoc();
+            if (!monaco && b_was_monaco) {
+                if (this.forceSyncMonacoToActiveDoc) {
+                    this.forceSyncMonacoToActiveDoc();
+                } else if (o_monaco && o_monaco.forceSyncMonacoToActiveDoc) {
+                    o_monaco.forceSyncMonacoToActiveDoc();
+                }
             }
 
             this.state.monaco = monaco;
+            if (o_monaco) {
+                o_monaco.state = o_monaco.state || {};
+                o_monaco.state.monaco = monaco;
+            }
 
             if (!monaco && gShaderToy.mCodeEditor && gShaderToy.mPass[gShaderToy.mActiveDoc]) {
                 var o_active_doc = gShaderToy.mPass[gShaderToy.mActiveDoc].mDocs;
@@ -1394,13 +1401,23 @@
                 o_target.style.display = 'block';
             }
 
-            if (!monaco && gShaderToy.mCodeEditor && gShaderToy.mCodeEditor.refresh) {
-                gShaderToy.mCodeEditor.refresh();
+            if (!monaco && gShaderToy.mCodeEditor) {
+                if (gShaderToy.mCodeEditor.refresh) {
+                    gShaderToy.mCodeEditor.refresh();
+                }
+                if (gShaderToy.mCodeEditor.focus) {
+                    gShaderToy.mCodeEditor.focus();
+                }
             }
 
             var o_monaco_editor = this.o_editor_monaco || (o_monaco && o_monaco.o_editor_monaco);
-            if (monaco && o_monaco_editor && o_monaco_editor.layout) {
-                o_monaco_editor.layout();
+            if (monaco && o_monaco_editor) {
+                if (o_monaco_editor.layout) {
+                    o_monaco_editor.layout();
+                }
+                if (o_monaco_editor.focus) {
+                    o_monaco_editor.focus();
+                }
             }
 
             window.localStorage.setItem(
