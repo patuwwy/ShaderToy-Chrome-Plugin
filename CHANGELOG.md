@@ -1,6 +1,6 @@
 ## ShaderToy extension changelog (major changes only):
 
-- 0.15.8 (29-10-2026)
+- 0.15.9 (29-10-2026)
     - Revert new ui from controls. Back to not distracting styles.
 
 - 0.15.8 (25-10-2026)
