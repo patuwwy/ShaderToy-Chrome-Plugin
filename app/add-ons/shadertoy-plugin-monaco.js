@@ -2241,16 +2241,24 @@
                 }
 
                 var o_active_model = self.getOrCreateModelForPass(window.gShaderToy.mActiveDoc);
+                var b_is_classic_theme = typeof window.gThemeName !== 'undefined' && window.gThemeName === 'classic';
 
                 self.o_editor_monaco = window.monaco.editor.create(document.getElementById('editor'), {
                     model: o_active_model,
                     language: 'glsl',
-                    theme: 'vs-dark',
+                    theme: b_is_classic_theme ? 'vs' : 'vs-dark',
                     mouseWheelZoom: true,
                     showUnused: true,
                     smoothScrolling: true,
                     bracketPairColorization: true
                 });
+
+                self.syncTheme = function() {
+                    if (window.monaco && window.monaco.editor) {
+                        var isClassic = typeof window.gThemeName !== 'undefined' && window.gThemeName === 'classic';
+                        window.monaco.editor.setTheme(isClassic ? 'vs' : 'vs-dark');
+                    }
+                };
 
                 if (window.ToyPlug && window.ToyPlug.editPage) {
                     window.ToyPlug.editPage.o_editor_monaco = self.o_editor_monaco;

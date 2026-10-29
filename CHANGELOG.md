@@ -1,6 +1,13 @@
 ## ShaderToy extension changelog (major changes only):
 
+- 0.15.8 (29-10-2026)
+    - Revert new ui from controls. Back to not distracting styles.
+
 - 0.15.8 (25-10-2026)
+    - Redesign extension controls and overlays to seamlessly match Shadertoy's native design language with full Dark and Classic (light) theme support
+      ([Issue #235](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/235)).
+    - Add dynamic Light Theme (`vs`) support for Monaco editor when Shadertoy is in Classic theme.
+    - Fix vertical alignment and centering of the 'Open recent...' button in the header bar.
     - Fix pass tab switching stealing focus and overwriting CodeMirror editor code with stale Monaco cache
       ([Issue #234](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/234)).
     - Synchronize editor selection state across Monaco and EditPage instances.

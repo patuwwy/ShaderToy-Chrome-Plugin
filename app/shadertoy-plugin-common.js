@@ -65,7 +65,10 @@
                         targetEl,
                         document.querySelector('#headerBlock2 > *')
                     );
-                targetEl.style.margin = '14px 0';
+                targetEl.style.margin = '0';
+                targetEl.style.display = 'inline-flex';
+                targetEl.style.alignItems = 'center';
+                targetEl.style.alignSelf = 'center';
             }
 
             if (this.recentList) {

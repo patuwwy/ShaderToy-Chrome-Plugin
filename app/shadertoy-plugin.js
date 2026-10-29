@@ -1,4 +1,4 @@
-/* global gShaderToy, window, document, Effect */
+/* global gShaderToy, window, document, Effect, gThemeName */
 
 (function shadertoyPlugin() {
     'use strict';
@@ -113,14 +113,14 @@
          * Inits ToyPlug functionality.
          */
         init() {
-            this.state = JSON.parse(window.localStorage.getItem(STATE_STORAGE_KEY) || "{}");
+            this.syncThemeClass();
+            this.state = JSON.parse(window.localStorage.getItem(STATE_STORAGE_KEY) || '{}');
 
             if (!this.state) {
                 window.localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify({}));
                 this.state = {};
             }
 
-            console.log(this.state)
             this.common = new ToyPlugCommon();
 
             if (this.isEditPage()) {
@@ -131,6 +131,16 @@
 
             if (this.state && this.state.renderMode) {
                 this.setRenderMode(this.state.renderMode);
+            }
+        }
+
+        syncThemeClass() {
+            const isDark = typeof gThemeName !== 'undefined' ? gThemeName === 'dark' : true;
+            document.body.classList.toggle('ste-dark', isDark);
+            document.body.classList.toggle('ste-classic', !isDark);
+
+            if (window.ToyPlug && window.ToyPlug.monaco && window.ToyPlug.monaco.syncTheme) {
+                window.ToyPlug.monaco.syncTheme();
             }
         }
 
@@ -238,9 +248,9 @@
             this.anchorsMaker = new AnchorsMaker();
             this.performanceIndicators = new RenderMeters();
 
-            window.addEventListener("resize", () => {
+            window.addEventListener('resize', () => {
                 this.multiplyRes(this.currentDivider);
-            })
+            });
         }
 
         /**
@@ -253,6 +263,10 @@
                 );
                 extensionElements.controlsContainer.classList.add(
                     'toyplug-controls-container'
+                );
+                const isDark = typeof gThemeName !== 'undefined' ? gThemeName === 'dark' : true;
+                extensionElements.controlsContainer.classList.add(
+                    isDark ? 'ste-theme-dark' : 'ste-theme-classic'
                 );
 
                 extensionElements.controlsContainerHeader = document.createElement(

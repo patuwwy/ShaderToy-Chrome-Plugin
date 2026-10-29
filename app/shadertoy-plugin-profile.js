@@ -286,7 +286,6 @@
             me.button.classList.add('formButtonSmall');
             me.button.classList.add('formButton-extension');
             me.button.style.width = '200px';
-            me.button.style.marginTop = '10px';
             me.button.textContent = me.downloadCaption;
             me.button.onclick = function onDownloadButtonClick() {
                 var ids = 0,
