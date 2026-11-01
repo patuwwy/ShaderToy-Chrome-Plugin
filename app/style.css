@@ -1002,6 +1002,256 @@ body div#header {
     text-align: center;
 }
 
+/* Templates dropdown (reuses .recent-list button and dropdown styles) */
+.templates-list ul {
+    left: auto;
+    right: 0;
+    width: 340px;
+    cursor: default;
+    font-weight: normal;
+    text-align: left;
+}
+
+.templates-list li.ste-template,
+.templates-list li.ste-templates-add {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    border-radius: var(--toyplug-radius-sm);
+    transition: var(--toyplug-transition);
+}
+
+.templates-list li.ste-template:hover,
+.templates-list li.ste-template:focus-within {
+    background: var(--toyplug-dropdown-hover);
+}
+
+.templates-list li.ste-template a,
+.templates-list .ste-templates-add-btn,
+.templates-list .ste-template-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 3px;
+    min-width: 0;
+    padding: 6px 8px;
+    cursor: pointer;
+    outline: none;
+}
+
+.templates-list li.ste-template a {
+    flex-direction: row;
+    align-items: center;
+}
+
+.templates-list li.ste-template a:hover {
+    background: none;
+}
+
+.templates-list .ste-template-text {
+    padding: 0;
+}
+
+/* Same size as .recent-list img, placeholder when template has no thumbnail. */
+.templates-list span.ste-template-thumb {
+    display: block;
+    flex-shrink: 0;
+    width: 64px;
+    height: 36px;
+    margin-right: 10px;
+    border: 1px solid var(--toyplug-subpanel-border);
+    border-radius: var(--toyplug-radius-sm);
+    background: var(--toyplug-subpanel-bg);
+}
+
+@keyframes ste-template-saved {
+    from {
+        background: var(--toyplug-dropdown-hover);
+    }
+}
+
+.templates-list li.ste-template.is-new {
+    animation: ste-template-saved 1.5s ease-out;
+}
+
+.templates-list .ste-templates-add-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    border-radius: var(--toyplug-radius-sm);
+    color: var(--toyplug-dropdown-text);
+    font-family: var(--toyplug-font-family);
+    text-align: left;
+    transition: var(--toyplug-transition);
+}
+
+.templates-list .ste-templates-add-btn:hover,
+.templates-list .ste-templates-add-btn:focus-visible {
+    background: var(--toyplug-dropdown-hover);
+}
+
+.templates-list li.ste-templates-add {
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--toyplug-dropdown-border);
+    border-radius: 0;
+}
+
+.templates-list .ste-template-name,
+.templates-list .ste-template-info {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--toyplug-font-family);
+}
+
+.templates-list .ste-template-name {
+    color: var(--toyplug-dropdown-text);
+    font-size: var(--toyplug-font-size);
+    font-weight: bold;
+}
+
+.templates-list .ste-template-info {
+    color: var(--toyplug-text-muted);
+    font-size: var(--toyplug-font-size-sm);
+    font-weight: normal;
+}
+
+.templates-list li.ste-templates-heading {
+    padding: 6px 8px 2px;
+    color: var(--toyplug-text-muted);
+    font-family: var(--toyplug-font-family);
+    font-size: var(--toyplug-font-size-sm);
+    font-weight: normal;
+}
+
+.templates-list li.ste-templates-message {
+    margin-bottom: 4px;
+    padding: 6px 8px;
+    border-radius: var(--toyplug-radius-sm);
+    background: var(--toyplug-dropdown-hover);
+    color: var(--toyplug-dropdown-text);
+    font-family: var(--toyplug-font-family);
+    font-size: var(--toyplug-font-size);
+    font-weight: normal;
+}
+
+.templates-list li.ste-template {
+    position: relative;
+}
+
+/* Shown over the row end on hover, so template text uses the full width otherwise. */
+.templates-list .ste-template-actions {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0 6px 0 20px;
+    border-radius: var(--toyplug-radius-sm);
+    /* Row hover color over opaque dropdown background, fading in from the left. */
+    background:
+        linear-gradient(to right, transparent, var(--toyplug-dropdown-hover) 16px),
+        linear-gradient(to right, transparent, var(--toyplug-dropdown-bg) 16px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.templates-list li.ste-template:hover .ste-template-actions,
+.templates-list li.ste-template:focus-within .ste-template-actions {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.templates-list .ste-btn {
+    height: 20px;
+    padding: 0 6px;
+    background: none;
+    border: none;
+    border-radius: var(--toyplug-radius-sm);
+    color: var(--toyplug-text-muted);
+    cursor: pointer;
+    font-family: var(--toyplug-font-family);
+    font-size: var(--toyplug-font-size-sm);
+    font-weight: normal;
+    white-space: nowrap;
+    transition: var(--toyplug-transition);
+}
+
+.templates-list .ste-btn:hover,
+.templates-list .ste-btn:focus-visible {
+    background: var(--toyplug-dropdown-hover);
+    color: var(--toyplug-dropdown-text);
+    outline: none;
+}
+
+/* Text color from theme text (primary-text is white also in classic theme, unreadable on light gray). */
+.templates-list .ste-btn.ste-btn-primary {
+    background: var(--toyplug-primary);
+    color: var(--toyplug-text-primary);
+    font-weight: bold;
+}
+
+.templates-list .ste-btn.ste-btn-primary:hover,
+.templates-list .ste-btn.ste-btn-primary:focus-visible {
+    background: var(--toyplug-primary-hover);
+    color: var(--toyplug-text-primary);
+}
+
+.templates-list .ste-template-form,
+.templates-list .ste-template-confirm {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 4px;
+    min-width: 0;
+    padding: 6px 8px;
+}
+
+.templates-list .ste-template-form input {
+    /* Reset .recent-list input (hidden toggle checkbox) styles. */
+    position: static;
+    opacity: 1;
+    flex: 1;
+    width: auto;
+    min-width: 0;
+    height: 22px;
+    margin: 0;
+    padding: 0 6px;
+    background: var(--toyplug-input-bg);
+    border: 1px solid var(--toyplug-input-border);
+    border-radius: var(--toyplug-radius-sm);
+    color: var(--toyplug-input-text);
+    cursor: text;
+    font-family: var(--toyplug-font-family);
+    font-size: var(--toyplug-font-size);
+    font-weight: normal;
+    outline: none;
+}
+
+.templates-list .ste-template-form input:focus {
+    border-color: var(--toyplug-slider-thumb);
+}
+
+.templates-list .ste-template-confirm span {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--toyplug-dropdown-text);
+    font-family: var(--toyplug-font-family);
+    font-size: var(--toyplug-font-size);
+    font-weight: normal;
+}
+
 .toyplug-preview {
     position: fixed;
     top: 50%;

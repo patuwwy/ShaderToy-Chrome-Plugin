@@ -1,6 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
 
 - Unreleased
+    - Add "Templates" button next to "Open recent...": save any shader (all passes and inputs) as a template and start new shaders from it
+      ([Issue #94](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/94)).
     - Fix Monaco editor overwriting loaded code with the previous shader after Fork / Import.
 
 - 0.15.9 (29-10-2026)

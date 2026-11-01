@@ -84,6 +84,7 @@ Download the latest release zip package from the [Releases](https://github.com/p
 - **BBCode Helper Buttons:** Quick formatting toolbar for shader descriptions and comments.
 - **Fork Any Shader:** Fork any public shader directly with one click.
 - **Save as New Draft:** Duplicate owned shaders into fresh drafts without overwriting the original.
+- **Shader Templates:** Save any shader (all passes and inputs) as a template from the header `Templates` menu and start new shaders from it.
 
 ### ⏱️ Profiling & Data Management
 
