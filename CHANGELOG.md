@@ -1,5 +1,8 @@
 ## ShaderToy extension changelog (major changes only):
 
+- Unreleased
+    - Fix Monaco editor overwriting loaded code with the previous shader after Fork / Import.
+
 - 0.15.9 (29-10-2026)
     - Revert new ui from controls. Back to not distracting styles.
 
