@@ -15,6 +15,18 @@
          * @const {string}
          */
         LOCALSTORAGE_SHADER_FORK_KEYNAME = 'forkedShaderStorage',
+        /**
+         * URL hash prefix pointing "new shader" page to the stored shader.
+         *
+         * @const {string}
+         */
+        SHADER_FORK_HASH_PREFIX = 'ste-fork=',
+        /**
+         * Stored shaders not opened within this time (ms) are removed.
+         *
+         * @const {number}
+         */
+        SHADER_FORK_MAX_AGE = 60 * 60 * 1000,
         STATE_STORAGE_KEY = 'STE-state',
         SHADER_PREVIEW_LOCATION = '/media/shaders/',
         /**
@@ -132,6 +144,36 @@
             if (this.state && this.state.renderMode) {
                 this.setRenderMode(this.state.renderMode);
             }
+        }
+
+        /**
+         * Opens "new shader" page and loads given shader data there
+         * (see ShaderDuplicator.finishShaderFork).
+         *
+         * @param {Object} shaderData Shader JSON (gShaderToy.Save() format).
+         * @param {boolean} [inNewTab] Open "new shader" page in a new tab.
+         */
+        openShaderAsNew(shaderData, inNewTab) {
+            // Unique key per opened page, so tabs opened at once don't share data.
+            var token = Date.now() + '_' + Math.random().toString(36).slice(2),
+                url = 'https://www.shadertoy.com/new#' + SHADER_FORK_HASH_PREFIX + token;
+
+            window.localStorage.setItem(
+                LOCALSTORAGE_SHADER_FORK_KEYNAME + ':' + token,
+                JSON.stringify(shaderData)
+            );
+
+            if (inNewTab) {
+                window.open(url, '_blank');
+
+                return;
+            }
+
+            if (window.gShaderToy) {
+                gShaderToy.mNeedsSave = false;
+            }
+
+            window.location.href = url;
         }
 
         syncThemeClass() {
@@ -1969,9 +2011,24 @@
          * Loads shader from LocalStorage if there is is stored one.
          */
         finishShaderFork() {
-            var storedShader = window.localStorage.getItem(
-                    LOCALSTORAGE_SHADER_FORK_KEYNAME
-                );
+            var hashIndex = window.location.hash.indexOf(SHADER_FORK_HASH_PREFIX),
+                token = hashIndex === -1 ? '' : window.location.hash.slice(hashIndex + SHADER_FORK_HASH_PREFIX.length),
+                key = token ? LOCALSTORAGE_SHADER_FORK_KEYNAME + ':' + token : LOCALSTORAGE_SHADER_FORK_KEYNAME,
+                storedShader;
+
+            this.removeStaleForks();
+
+            if (window.location.pathname !== '/new') {
+                return;
+            }
+
+            storedShader = window.localStorage.getItem(key);
+            // Remove before loading, so a failed load won't repeat on next pages.
+            window.localStorage.removeItem(key);
+
+            if (token) {
+                window.history.replaceState(null, '', window.location.pathname + window.location.search);
+            }
 
             if (!storedShader) {
                 return;
@@ -1990,11 +2047,6 @@
 
                     window.iLoadShader([JSON.parse(storedShader)]);
 
-                    window.localStorage.setItem(
-                        LOCALSTORAGE_SHADER_FORK_KEYNAME,
-                        ''
-                    );
-
                     gShaderToy.mInfo.username = 'None';
                     gShaderToy.mInfo.id = '-1';
                     gShaderToy.mNeedsSave = true;
@@ -2004,6 +2056,28 @@
                     }
                 }, 50);
             } catch (ignore) {}
+        }
+
+        /**
+         * Removes stored shaders of pages which were never opened.
+         */
+        removeStaleForks() {
+            var prefix = LOCALSTORAGE_SHADER_FORK_KEYNAME + ':',
+                now = Date.now(),
+                i,
+                key;
+
+            for (i = window.localStorage.length - 1; i >= 0; i--) {
+                key = window.localStorage.key(i);
+
+                if (
+                    key &&
+                    key.indexOf(prefix) === 0 &&
+                    !(now - parseInt(key.slice(prefix.length), 10) < SHADER_FORK_MAX_AGE)
+                ) {
+                    window.localStorage.removeItem(key);
+                }
+            }
         }
 
         /**
@@ -2072,12 +2146,7 @@
                 }
             });
 
-            window.localStorage.setItem(
-                LOCALSTORAGE_SHADER_FORK_KEYNAME,
-                JSON.stringify(shaderData)
-            );
-            gShaderToy.mNeedsSave = false;
-            window.location.href = 'https://www.shadertoy.com/new';
+            window.ToyPlug.openShaderAsNew(shaderData);
         }
     }
 

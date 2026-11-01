@@ -2348,8 +2348,17 @@
             window.ShaderToy.prototype.ChangePass = function(n_id) {
                 var n_prev_active_doc = this.mActiveDoc;
                 var b_monaco_active = self.isMonacoSelected();
+                var o_prev_pass = this.mPass && this.mPass[n_prev_active_doc];
 
-                if (b_monaco_active && self.o_editor_monaco && self.o_editor_monaco.getModel) {
+                // After Load() (fork, import, template) passes are new and the editor still shows the old model,
+                // syncing it would overwrite the loaded code.
+                if (
+                    b_monaco_active &&
+                    self.o_editor_monaco &&
+                    self.o_editor_monaco.getModel &&
+                    o_prev_pass &&
+                    self.o_editor_monaco.getModel() === o_prev_pass.mMonacoModel
+                ) {
                     if (!self.o_view_states) {
                         self.o_view_states = {};
                     }
