@@ -1955,11 +1955,6 @@
                 var currentTime = this.getCurrentTime();
                 this.sliderInput.value = currentTime;
 
-                if (!this.loop && currentTime > parseFloat(this.sliderInput.max)) {
-                    this.maxValueInput.value = Math.ceil(currentTime / 1000);
-                    this.sliderInput.max = parseFloat(this.maxValueInput.value) * 1000;
-                }
-
                 if (this.loop && currentTime > this.maxValueInput.value * 1000) {
                     this.sliderInput.value = this.minValueInput.value * 1000;
                     outsideLoop = true;
