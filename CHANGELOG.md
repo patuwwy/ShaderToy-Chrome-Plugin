@@ -3,6 +3,7 @@
 - 0.15.10 (13-11-2026)
     - Fix timeline slider randomly toggling play/pause and standing still during playback ([Issue #239](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/239)).
     - Guard shader resolution and buffer resizing (`mE.ResizeBuffers`) against missing methods and exceptions.
+    - Respect time loop range during video recording by looping virtual time seamlessly between min and max bounds.
 
 - 0.15.9 (29-10-2026)
     - Revert new ui form controls. Back to not distracting styles.

@@ -708,6 +708,7 @@
         }
 
         startDeterministicRecording(canvas, width, height, targetFps) {
+            var self = this;
             try {
                 var WebMMuxerClass = window.WebMMuxer || (typeof window !== 'undefined' ? window.WebMMuxer : null);
                 if (!WebMMuxerClass) {
@@ -766,18 +767,31 @@
                     setShaderPaused(true);
                 }
 
-                var startTimeMs = (window.gShaderToy && window.gShaderToy.mEffect && typeof window.gShaderToy.mEffect.mTf === 'number')
-                    ? window.gShaderToy.mEffect.mTf
-                    : ((window.gShaderToy && typeof window.gShaderToy.mTf === 'number')
-                        ? window.gShaderToy.mTf
-                        : ((window.gShaderToy && window.gShaderToy.mEffect && typeof window.gShaderToy.mEffect.mTOffset === 'number')
-                            ? window.gShaderToy.mEffect.mTOffset
-                            : 0)),
-                    dtMs = 1000 / targetFps,
+                var isLoop = !!(this.timebar && this.timebar.loop);
+                var loopMinMs = isLoop ? (parseFloat(this.timebar.minValueInput.value) * 1000) : 0;
+                var loopMaxMs = isLoop ? (parseFloat(this.timebar.maxValueInput.value) * 1000) : 0;
+                if (isLoop && (isNaN(loopMinMs) || isNaN(loopMaxMs) || loopMaxMs <= loopMinMs)) {
+                    isLoop = false;
+                }
+                var loopDurationMs = isLoop ? (loopMaxMs - loopMinMs) : 0;
+
+                var startTimeMs;
+                if (isLoop) {
+                    startTimeMs = loopMinMs;
+                } else {
+                    startTimeMs = (window.gShaderToy && window.gShaderToy.mEffect && typeof window.gShaderToy.mEffect.mTf === 'number')
+                        ? window.gShaderToy.mEffect.mTf
+                        : ((window.gShaderToy && typeof window.gShaderToy.mTf === 'number')
+                            ? window.gShaderToy.mTf
+                            : ((window.gShaderToy && window.gShaderToy.mEffect && typeof window.gShaderToy.mEffect.mTOffset === 'number')
+                                ? window.gShaderToy.mEffect.mTOffset
+                                : 0));
+                }
+
+                var dtMs = 1000 / targetFps,
                     dtSec = 1.0 / targetFps,
                     frameIndex = 0,
-                    virtualTimeMs = startTimeMs,
-                    self = this;
+                    virtualTimeMs = startTimeMs;
 
                 // Override getRealTime so any internal Shadertoy timing uses our virtual deterministic time
                 var origGetRealTime = window.getRealTime;
@@ -791,7 +805,10 @@
                         return;
                     }
 
-                    var frameTimeMs = startTimeMs + (frameIndex * dtMs);
+                    var elapsedMs = frameIndex * dtMs;
+                    var frameTimeMs = isLoop
+                        ? (loopMinMs + (elapsedMs % loopDurationMs))
+                        : (startTimeMs + elapsedMs);
                     virtualTimeMs = frameTimeMs;
 
                     if (window.gShaderToy) {
@@ -804,7 +821,15 @@
                         window.gShaderToy.mForceFrame = true;
 
                         if (window.gShaderToy.mEffect) {
+                            window.gShaderToy.mEffect.mTOffset = frameTimeMs;
+                            window.gShaderToy.mEffect.mTo = frameTimeMs - dtMs;
+                            window.gShaderToy.mEffect.mTf = frameTimeMs;
+                            window.gShaderToy.mEffect.mFpsTo = frameTimeMs - dtMs;
+                            window.gShaderToy.mEffect.mFpsFrame = currentFrameNumber;
                             window.gShaderToy.mEffect.mFrame = currentFrameNumber;
+                            window.gShaderToy.mEffect.mRestarted = false;
+                            window.gShaderToy.mEffect.mForceFrame = true;
+
                             if (window.gShaderToy.mEffect.mPasses) {
                                 for (var p = 0; p < window.gShaderToy.mEffect.mPasses.length; p++) {
                                     window.gShaderToy.mEffect.mPasses[p].mFrame = currentFrameNumber;
@@ -831,6 +856,8 @@
                                 console.warn('[ShaderToy Plugin] mEffect.Paint error:', e2);
                             }
                         }
+
+                        updateInputsTime(frameTimeMs);
                     }
 
                     // Update Shadertoy native time display and plugin slider while paused for recording
@@ -1948,7 +1975,7 @@
                 }
             }
 
-            if (this.ToyPlug && this.ToyPlug.isRecording) {
+            if (this.ToyPlug && this.ToyPlug.isRecording && this.ToyPlug.isDeterministic) {
                 setTimeout(this.updateSlider.bind(this), 26);
                 return;
             }
