@@ -325,6 +325,10 @@
          * @param {number} multiplier
          */
         multiplyRes(multiplier) {
+            if (!this.c || !gShaderToy || !gShaderToy.mEffect) {
+                return;
+            }
+
             var b = this.c.getBoundingClientRect(),
                 n = {
                     w: Math.floor(b.width * multiplier * window.devicePixelRatio),
@@ -335,18 +339,52 @@
             var xres = n.w;
             var yres = n.h;
 
-            gShaderToy.mEffect.mRO.unobserve(gShaderToy.mCanvas);
+            if (mE.mRO && typeof mE.mRO.unobserve === 'function' && gShaderToy.mCanvas) {
+                try {
+                    mE.mRO.unobserve(gShaderToy.mCanvas);
+                } catch (ignore) {}
+            }
 
-            mE.mCanvas.setAttribute('width', xres);
-            mE.mCanvas.setAttribute('height', yres);
-            mE.mCanvas.width = xres;
-            mE.mCanvas.height = yres;
+            if (mE.mCanvas) {
+                mE.mCanvas.setAttribute('width', xres);
+                mE.mCanvas.setAttribute('height', yres);
+                mE.mCanvas.width = xres;
+                mE.mCanvas.height = yres;
+            }
             mE.mXres = xres;
             mE.mYres = yres;
 
-            mE.ResizeBuffers(xres, yres);
+            if (typeof mE.ResizeBuffers === 'function') {
+                try {
+                    mE.ResizeBuffers(xres, yres);
+                } catch (e) {
+                    console.warn('[ShaderToy Plugin] mEffect.ResizeBuffers error:', e);
+                }
+            } else if (typeof mE.Resize === 'function') {
+                try {
+                    mE.Resize(xres, yres);
+                } catch (e) {
+                    console.warn('[ShaderToy Plugin] mEffect.Resize error:', e);
+                }
+            } else if (typeof mE.SetSize === 'function') {
+                try {
+                    mE.SetSize(xres, yres);
+                } catch (e) {
+                    console.warn('[ShaderToy Plugin] mEffect.SetSize error:', e);
+                }
+            } else if (typeof gShaderToy.resize === 'function') {
+                try {
+                    gShaderToy.resize(xres, yres);
+                } catch (e) {
+                    console.warn('[ShaderToy Plugin] gShaderToy.resize error:', e);
+                }
+            }
 
-            gShaderToy.iSetResolution(xres, yres);
+            if (typeof gShaderToy.iSetResolution === 'function') {
+                try {
+                    gShaderToy.iSetResolution(xres, yres);
+                } catch (ignore) {}
+            }
             this.currentDivider = multiplier;
         }
 
@@ -356,10 +394,12 @@
          * @param {number} timeshift. Time change value in ms.
          */
         changeTimePosition(timeShift) {
-            var destTime = Math.max(0, gShaderToy.mTf + timeShift);
+            var currentTime = (this.timebar && typeof this.timebar.getCurrentTime === 'function')
+                ? this.timebar.getCurrentTime()
+                : (typeof gShaderToy.mTf === 'number' ? gShaderToy.mTf : 0);
+            var destTime = Math.max(0, currentTime + timeShift);
 
             updateShaderToyTime(destTime);
-            gShaderToy.mTf = destTime;
         }
 
         /**
@@ -569,10 +609,10 @@
         takeScreenShot() {
             var imageData = null,
                 currentDivider = this.currentDivider,
-                paused = gShaderToy.mIsPaused;
+                paused = isShaderPaused();
 
             if (!paused) {
-                gShaderToy.pauseTime();
+                setShaderPaused(true);
             }
 
             this.multiplyRes(currentDivider * 0.25);
@@ -610,7 +650,7 @@
                     this.decreaseRes(currentDivider);
 
                     if (!paused) {
-                        gShaderToy.pauseTime();
+                        setShaderPaused(false);
                     }
                 }.bind(this),
                 1000
@@ -721,14 +761,18 @@
                 this.isDeterministic = true;
                 this.recordedFrameCount = 0;
 
-                this.wasPaused = (window.gShaderToy && window.gShaderToy.mIsPaused);
-                if (window.gShaderToy && !window.gShaderToy.mIsPaused) {
-                    window.gShaderToy.pauseTime();
+                this.wasPaused = isShaderPaused();
+                if (!this.wasPaused) {
+                    setShaderPaused(true);
                 }
 
-                var startTimeMs = (window.gShaderToy && typeof window.gShaderToy.mTf === 'number')
-                    ? window.gShaderToy.mTf
-                    : ((window.gShaderToy && typeof window.gShaderToy.mTOffset === 'number') ? window.gShaderToy.mTOffset : 0),
+                var startTimeMs = (window.gShaderToy && window.gShaderToy.mEffect && typeof window.gShaderToy.mEffect.mTf === 'number')
+                    ? window.gShaderToy.mEffect.mTf
+                    : ((window.gShaderToy && typeof window.gShaderToy.mTf === 'number')
+                        ? window.gShaderToy.mTf
+                        : ((window.gShaderToy && window.gShaderToy.mEffect && typeof window.gShaderToy.mEffect.mTOffset === 'number')
+                            ? window.gShaderToy.mEffect.mTOffset
+                            : 0)),
                     dtMs = 1000 / targetFps,
                     dtSec = 1.0 / targetFps,
                     frameIndex = 0,
@@ -946,8 +990,8 @@
                 this.origGetRealTime = null;
             }
 
-            if (this.wasPaused === false && window.gShaderToy && window.gShaderToy.mIsPaused) {
-                window.gShaderToy.pauseTime();
+            if (this.wasPaused === false && isShaderPaused()) {
+                setShaderPaused(false);
             }
 
             if (this.recordButton) {
@@ -1446,6 +1490,52 @@
     }
 
     /**
+     * Checks if ShaderToy is currently paused.
+     *
+     * @returns {boolean}
+     */
+    function isShaderPaused() {
+        if (!window.gShaderToy) {
+            return false;
+        }
+
+        if (window.gShaderToy.mEffect) {
+            if (typeof window.gShaderToy.mEffect.IsPaused === 'function') {
+                return window.gShaderToy.mEffect.IsPaused();
+            }
+            if (typeof window.gShaderToy.mEffect.mPaused === 'boolean') {
+                return window.gShaderToy.mEffect.mPaused;
+            }
+        }
+
+        if (typeof window.gShaderToy.mIsPaused === 'boolean') {
+            return window.gShaderToy.mIsPaused;
+        }
+
+        var pauseBtn = document.getElementById('myPauseButton');
+        if (pauseBtn && pauseBtn.src) {
+            return pauseBtn.src.indexOf('play.png') !== -1;
+        }
+
+        return false;
+    }
+
+    /**
+     * Sets ShaderToy pause state.
+     *
+     * @param {boolean} paused
+     */
+    function setShaderPaused(paused) {
+        if (!window.gShaderToy || typeof window.gShaderToy.pauseTime !== 'function') {
+            return;
+        }
+
+        if (isShaderPaused() !== paused) {
+            window.gShaderToy.pauseTime();
+        }
+    }
+
+    /**
      * Provides timebar functionality.
      */
     class Timebar {
@@ -1464,11 +1554,21 @@
                 this.sliderOnMouseUp.bind(this)
             );
             this.sliderInput.addEventListener(
-                'input',
-                function() {
-                    updateShaderToyTime(this.sliderInput.value);
-                }.bind(this)
+                'change',
+                this.sliderOnMouseUp.bind(this)
             );
+            window.addEventListener('mouseup', () => {
+                if (this.busy) {
+                    this.sliderOnMouseUp();
+                }
+            });
+            this.sliderInput.addEventListener('input', () => {
+                if (this.busy) {
+                    updateShaderToyTime(this.sliderInput.value, false);
+                } else {
+                    updateShaderToyTime(this.sliderInput.value);
+                }
+            });
             this.minValueInput.addEventListener(
                 'change',
                 this.onChangeMinInput.bind(this)
@@ -1790,34 +1890,67 @@
         }
 
         /**
+         * Returns current shader time in ms.
+         */
+        getCurrentTime() {
+            if (!window.gShaderToy) {
+                return 0;
+            }
+
+            var mE = window.gShaderToy.mEffect;
+
+            if (mE && typeof mE.mTf === 'number') {
+                return mE.mTf;
+            }
+
+            if (typeof window.gShaderToy.mTf === 'number') {
+                return window.gShaderToy.mTf;
+            }
+
+            var myTimeEl = document.getElementById('myTime');
+            if (myTimeEl && myTimeEl.textContent) {
+                var parsedSec = parseFloat(myTimeEl.textContent);
+                if (!isNaN(parsedSec)) {
+                    return parsedSec * 1000;
+                }
+            }
+
+            return 0;
+        }
+
+        /**
          * Sets slider to ShaderToy time.
          */
         updateSlider() {
             var outsideLoop = false;
 
-            //this.loop = window.TimebarLoop;
+            if (window.gShaderToy && !this.busy) {
+                var currentTime = this.getCurrentTime();
+                this.sliderInput.value = currentTime;
 
-            if (gShaderToy && !this.busy) {
-                this.sliderInput.value = gShaderToy.mTf;
+                if (!this.loop && currentTime > parseFloat(this.sliderInput.max)) {
+                    this.maxValueInput.value = Math.ceil(currentTime / 1000);
+                    this.sliderInput.max = parseFloat(this.maxValueInput.value) * 1000;
+                }
+
+                if (this.loop && currentTime > this.maxValueInput.value * 1000) {
+                    this.sliderInput.value = this.minValueInput.value * 1000;
+                    outsideLoop = true;
+                }
+
+                if (this.loop && currentTime < this.minValueInput.value * 1000) {
+                    this.sliderInput.value = this.minValueInput.value * 1000;
+                    outsideLoop = true;
+                }
+
+                if (outsideLoop) {
+                    updateShaderToyTime(this.sliderInput.value);
+                }
             }
 
             if (this.ToyPlug && this.ToyPlug.isRecording) {
                 setTimeout(this.updateSlider.bind(this), 26);
                 return;
-            }
-
-            if (this.loop && gShaderToy.mTf > this.maxValueInput.value * 1000) {
-                this.sliderInput.value = this.minValueInput.value * 1000;
-                outsideLoop = true;
-            }
-
-            if (this.loop && gShaderToy.mTf < this.minValueInput.value * 1000) {
-                this.sliderInput.value = this.minValueInput.value * 1000;
-                outsideLoop = true;
-            }
-
-            if (outsideLoop) {
-                updateShaderToyTime(this.sliderInput.value);
             }
 
             setTimeout(this.updateSlider.bind(this), 26);
@@ -1827,7 +1960,19 @@
          * Handles click on slider.
          */
         sliderOnMouseDown() {
-            this.wasPaused = gShaderToy.mIsPaused;
+            if (!window.gShaderToy) {
+                return false;
+            }
+
+            if (!this.busy) {
+                this.wasPaused = isShaderPaused();
+                this.busy = true;
+
+                if (!this.wasPaused) {
+                    setShaderPaused(true);
+                }
+            }
+
             this.sliderInput.min = parseInt(
                 this.minValueInput.value * 1000,
                 10
@@ -1837,18 +1982,17 @@
                 10
             );
 
-            if (!this.wasPaused) {
-                this.busy = true;
-                gShaderToy.pauseTime();
-            }
-
             return false;
         }
 
         /**
-         * Handles relase slider click.
+         * Handles release slider click.
          */
         sliderOnMouseUp() {
+            if (!this.busy) {
+                return;
+            }
+
             var unpause = !this.wasPaused;
 
             this.busy = false;
@@ -1867,41 +2011,56 @@
      * Updates ShaderToy with provided time value.
      */
     function updateShaderToyTime(time, unpause) {
-        var value = parseInt(time, 10),
-            i = 0,
-            shouldUnpause = typeof unpause === 'boolean' ? unpause : !gShaderToy.mIsPaused;
-
-        gShaderToy.pauseTime();
-
-        gShaderToy.mFpsFrame = ~~(value / 1000 * 60);
-        gShaderToy.mForceFrame = true;
-        gShaderToy.mRestarted = true;
-        gShaderToy.mFpsTo = gShaderToy.mTo;
-        gShaderToy.mEffect.mFrame = gShaderToy.mFpsFrame;
-
-        for (i; i < gShaderToy.mEffect.mPasses.length; i++) {
-            gShaderToy.mEffect.mPasses[i].mFrame = gShaderToy.mFpsFrame;
+        if (!window.gShaderToy) {
+            return;
         }
 
-        window.requestAnimationFrame(function() {
-            gShaderToy.mTOffset = value;
-            gShaderToy.mTo = window.getRealTime();
-            gShaderToy.mTf = value;
+        var value = parseInt(time, 10);
+        if (isNaN(value)) {
+            return;
+        }
 
-            try {
-                gShaderToy.mEffect.mAudioContext.currentTime = value;
-            } catch (ignore) {}
+        var mE = window.gShaderToy.mEffect;
+        var realTime = typeof window.getRealTime === 'function'
+            ? window.getRealTime()
+            : (window.performance ? window.performance.now() : Date.now());
+        var frame = ~~(value / 1000 * 60);
 
-            if (shouldUnpause) {
-                if (gShaderToy.mIsPaused) {
-                    gShaderToy.pauseTime();
+        if (mE) {
+            mE.mTOffset = value;
+            mE.mTo = realTime;
+            mE.mTf = value;
+            mE.mFpsTo = realTime;
+            mE.mFpsFrame = frame;
+            mE.mFrame = frame;
+            mE.mRestarted = true;
+            mE.mForceFrame = true;
+
+            if (mE.mPasses) {
+                for (var i = 0; i < mE.mPasses.length; i++) {
+                    mE.mPasses[i].mFrame = frame;
                 }
-            } else if (!gShaderToy.mIsPaused) {
-                gShaderToy.pauseTime();
             }
+        }
 
-            updateInputsTime(value);
-        });
+        window.gShaderToy.mTOffset = value;
+        window.gShaderToy.mTo = realTime;
+        window.gShaderToy.mTf = value;
+        window.gShaderToy.mFpsTo = realTime;
+        window.gShaderToy.mFpsFrame = frame;
+        window.gShaderToy.mRestarted = true;
+        window.gShaderToy.mForceFrame = true;
+
+        var myTimeEl = document.getElementById('myTime');
+        if (myTimeEl) {
+            myTimeEl.textContent = (value / 1000).toFixed(2);
+        }
+
+        if (typeof unpause === 'boolean') {
+            setShaderPaused(!unpause);
+        }
+
+        updateInputsTime(value);
     }
 
     /**
@@ -1910,7 +2069,11 @@
     function updateInputsTime(value) {
         var timeInSeconds = value / 1000;
 
-        gShaderToy.mEffect.mPasses.forEach(function mPass(pass) {
+        if (!window.gShaderToy || !window.gShaderToy.mEffect || !window.gShaderToy.mEffect.mPasses) {
+            return;
+        }
+
+        window.gShaderToy.mEffect.mPasses.forEach(function mPass(pass) {
             if (pass.mType === 'sound') {
                 if (pass.mBuffer) {
                     if (pass.mPlayNode) {
@@ -1921,7 +2084,7 @@
                         pass.mPlayNode = null;
                     }
 
-                    if (!gShaderToy.mIsPaused && timeInSeconds < pass.mPlayTime) {
+                    if (!isShaderPaused() && timeInSeconds < pass.mPlayTime) {
                         try {
                             var audioCtx = pass.mEffect.mAudioContext,
                                 newSource = audioCtx.createBufferSource();

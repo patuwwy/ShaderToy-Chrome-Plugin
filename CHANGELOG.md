@@ -1,7 +1,11 @@
 ## ShaderToy extension changelog (major changes only):
 
+- 0.15.10 (13-11-2026)
+    - Fix timeline slider randomly toggling play/pause and standing still during playback ([Issue #239](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/239)).
+    - Guard shader resolution and buffer resizing (`mE.ResizeBuffers`) against missing methods and exceptions.
+
 - 0.15.9 (29-10-2026)
-    - Revert new ui from controls. Back to not distracting styles.
+    - Revert new ui form controls. Back to not distracting styles.
 
 - 0.15.8 (25-10-2026)
     - Redesign extension controls and overlays to seamlessly match Shadertoy's native design language with full Dark and Classic (light) theme support

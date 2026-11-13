@@ -76,7 +76,31 @@
 			mE.mXres = xres;
 			mE.mYres = yres;
 
-            mE.ResizeBuffers(xres, yres);
+			if (typeof mE.ResizeBuffers === 'function') {
+				try {
+					mE.ResizeBuffers(xres, yres);
+				} catch (e) {
+					console.warn('[ShaderToy Plugin] mEffect.ResizeBuffers error:', e);
+				}
+			} else if (typeof mE.Resize === 'function') {
+				try {
+					mE.Resize(xres, yres);
+				} catch (e) {
+					console.warn('[ShaderToy Plugin] mEffect.Resize error:', e);
+				}
+			} else if (typeof mE.SetSize === 'function') {
+				try {
+					mE.SetSize(xres, yres);
+				} catch (e) {
+					console.warn('[ShaderToy Plugin] mEffect.SetSize error:', e);
+				}
+			} else if (typeof gShaderToy.resize === 'function') {
+				try {
+					gShaderToy.resize(xres, yres);
+				} catch (e) {
+					console.warn('[ShaderToy Plugin] gShaderToy.resize error:', e);
+				}
+			}
 
 			gShaderToy.iSetResolution(xres, yres);
 
