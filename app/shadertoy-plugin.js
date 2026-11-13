@@ -4,11 +4,11 @@
     'use strict';
 
     /**
-     * Arrow keys time change (ms).
+     * Arrow keys time change (ms). 1 frame at 60fps (~16.67ms).
      *
      * @type {number}
      */
-    var ARROW_KEY_TIMESHIFT = 5000,
+    var ARROW_KEY_TIMESHIFT = 1000 / 60,
         /**
          * Key name to store shader in LocalStorage.
          *
@@ -403,17 +403,21 @@
         }
 
         /**
-         * Increases time position.
+         * Increases time position by one frame (or custom shift).
+         *
+         * @param {number} [shift] Time change value in ms.
          */
-        increaseTimePosition() {
-            this.changeTimePosition(ARROW_KEY_TIMESHIFT);
+        increaseTimePosition(shift) {
+            this.changeTimePosition(typeof shift === 'number' ? shift : ARROW_KEY_TIMESHIFT);
         }
 
         /**
-         * Decrease time position.
+         * Decreases time position by one frame (or custom shift).
+         *
+         * @param {number} [shift] Time change value in ms.
          */
-        decreaseTimePosition() {
-            this.changeTimePosition(-ARROW_KEY_TIMESHIFT);
+        decreaseTimePosition(shift) {
+            this.changeTimePosition(typeof shift === 'number' ? -shift : -ARROW_KEY_TIMESHIFT);
         }
 
         /**
@@ -553,10 +557,14 @@
                             gShaderToy.resetTime();
                         }
                         if (e.key === 'ArrowRight') {
-                            self.increaseTimePosition();
+                            e.preventDefault();
+                            var rightShift = e.shiftKey ? 1000 : ARROW_KEY_TIMESHIFT;
+                            self.increaseTimePosition(rightShift);
                         }
                         if (e.key === 'ArrowLeft') {
-                            self.decreaseTimePosition();
+                            e.preventDefault();
+                            var leftShift = e.shiftKey ? 1000 : ARROW_KEY_TIMESHIFT;
+                            self.decreaseTimePosition(leftShift);
                         }
                     }
 
@@ -1596,6 +1604,20 @@
                     updateShaderToyTime(this.sliderInput.value);
                 }
             });
+            this.sliderInput.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    var frameMs = 1000 / 60;
+                    var step = e.shiftKey ? 1000 : frameMs;
+                    var delta = e.key === 'ArrowRight' ? step : -step;
+                    var current = this.getCurrentTime();
+                    var min = parseFloat(this.sliderInput.min) || 0;
+                    var max = parseFloat(this.sliderInput.max) || (60 * 1000);
+                    var next = Math.max(min, Math.min(max, current + delta));
+                    this.sliderInput.value = next;
+                    updateShaderToyTime(next);
+                }
+            });
             this.minValueInput.addEventListener(
                 'change',
                 this.onChangeMinInput.bind(this)
@@ -1608,7 +1630,7 @@
             var addWheelStep = function(input, callback) {
                 input.addEventListener('wheel', function(e) {
                     e.preventDefault();
-                    var step = e.shiftKey ? 10 : 1;
+                    var step = e.shiftKey ? 1 : 0.01;
                     var delta = e.deltaY < 0 ? step : -step;
                     var cur = parseFloat(input.value) || 0;
                     var min = parseFloat(input.min) || 0;
@@ -1616,7 +1638,7 @@
                     if (input.max) {
                         next = Math.min(parseFloat(input.max), next);
                     }
-                    input.value = next;
+                    input.value = next.toFixed(2);
                     callback();
                 }, { passive: false });
             };
@@ -1720,16 +1742,18 @@
             }
 
             this.minValueInput.type = this.maxValueInput.type = 'number';
-            this.minValueInput.value = 0;
+            this.minValueInput.value = '0.00';
             this.minValueInput.min = 0;
-            this.maxValueInput.value = 60;
-            this.maxValueInput.min = 1;
+            this.minValueInput.step = '0.01';
+            this.maxValueInput.value = '60.00';
+            this.maxValueInput.min = 0.01;
+            this.maxValueInput.step = '0.01';
 
             this.sliderInput.type = 'range';
             this.sliderInput.min = 0;
             this.sliderInput.max = 60 * 1000;
             this.sliderInput.value = 0;
-            this.sliderInput.step = 20;
+            this.sliderInput.step = 'any';
 
             this.createRenderTimersTrigger();
             this.createColorPickerTrigger();
@@ -1897,23 +1921,23 @@
         }
 
         onChangeMinInput() {
-            this.maxValueInput.min = parseFloat(this.minValueInput.value) + 0.1;
-            this.maxValueInput.value = Math.max(
-                parseFloat(this.maxValueInput.value),
-                parseFloat(this.minValueInput.value) + 0.1
-            );
-            this.sliderInput.min =
-                parseFloat(this.minValueInput.value) * 1000;
+            var minVal = parseFloat(this.minValueInput.value) || 0;
+            var maxVal = parseFloat(this.maxValueInput.value) || 60;
+            this.maxValueInput.min = minVal + 0.01;
+            if (maxVal <= minVal) {
+                this.maxValueInput.value = (minVal + 0.01).toFixed(2);
+            }
+            this.sliderInput.min = minVal * 1000;
         }
 
         onChangeMaxInput() {
-            this.minValueInput.max = parseFloat(this.maxValueInput.value);
-            this.minValueInput.value = Math.min(
-                parseFloat(this.maxValueInput.value) - 0.1,
-                parseFloat(this.minValueInput.value)
-            );
-            this.sliderInput.max =
-                parseFloat(this.maxValueInput.value) * 1000;
+            var minVal = parseFloat(this.minValueInput.value) || 0;
+            var maxVal = parseFloat(this.maxValueInput.value) || 60;
+            this.minValueInput.max = maxVal - 0.01;
+            if (minVal >= maxVal) {
+                this.minValueInput.value = Math.max(0, maxVal - 0.01).toFixed(2);
+            }
+            this.sliderInput.max = maxVal * 1000;
         }
 
         /**
@@ -1995,14 +2019,8 @@
                 }
             }
 
-            this.sliderInput.min = parseInt(
-                this.minValueInput.value * 1000,
-                10
-            );
-            this.sliderInput.max = parseInt(
-                this.maxValueInput.value * 1000,
-                10
-            );
+            this.sliderInput.min = parseFloat(this.minValueInput.value) * 1000;
+            this.sliderInput.max = parseFloat(this.maxValueInput.value) * 1000;
 
             return false;
         }
@@ -2037,7 +2055,7 @@
             return;
         }
 
-        var value = parseInt(time, 10);
+        var value = parseFloat(time);
         if (isNaN(value)) {
             return;
         }
@@ -2046,7 +2064,7 @@
         var realTime = typeof window.getRealTime === 'function'
             ? window.getRealTime()
             : (window.performance ? window.performance.now() : Date.now());
-        var frame = ~~(value / 1000 * 60);
+        var frame = Math.round(value / 1000 * 60);
 
         if (mE) {
             mE.mTOffset = value;

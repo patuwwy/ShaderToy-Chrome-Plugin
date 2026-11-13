@@ -4,6 +4,9 @@
     - Fix timeline slider randomly toggling play/pause and standing still during playback ([Issue #239](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/239)).
     - Guard shader resolution and buffer resizing (`mE.ResizeBuffers`) against missing methods and exceptions.
     - Respect time loop range during video recording by looping virtual time seamlessly between min and max bounds.
+    - Prevent timeline slider loop end value from being continuously overwritten by playback time.
+    - Increase timeline slider and loop boundary precision to 0.01s (`parseFloat`), allowing fine sub-second adjustments.
+    - Add frame-by-frame timeline scrubbing with Arrow keys (1 frame at 60fps / ~16.67ms; hold Shift to step by 1s).
 
 - 0.15.9 (29-10-2026)
     - Revert new ui form controls. Back to not distracting styles.
