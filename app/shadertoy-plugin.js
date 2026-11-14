@@ -3,6 +3,12 @@
 (function shadertoyPlugin() {
     'use strict';
 
+    try {
+        if (typeof window !== 'undefined' && !window.gShaderToy && typeof gShaderToy !== 'undefined' && gShaderToy) {
+            window.gShaderToy = gShaderToy;
+        }
+    } catch (ignore) {}
+
     /**
      * Arrow keys time change (ms). 1 frame at 60fps (~16.67ms).
      *
@@ -670,8 +676,9 @@
                 return;
             }
 
-            var canvas = (window.gShaderToy && window.gShaderToy.mEffect && window.gShaderToy.mEffect.mCanvas) ||
-                (window.gShaderToy && window.gShaderToy.mEffect && window.gShaderToy.mEffect.mGLContext && window.gShaderToy.mEffect.mGLContext.canvas) ||
+            var st = getShaderToy();
+            var canvas = (st && st.mEffect && st.mEffect.mCanvas) ||
+                (st && st.mEffect && st.mEffect.mGLContext && st.mEffect.mGLContext.canvas) ||
                 document.getElementById(this.MAIN_SHADERTOY_DEMO_ID) ||
                 this.c;
 
@@ -783,16 +790,17 @@
                 }
                 var loopDurationMs = isLoop ? (loopMaxMs - loopMinMs) : 0;
 
+                var st = getShaderToy();
                 var startTimeMs;
                 if (isLoop) {
                     startTimeMs = loopMinMs;
                 } else {
-                    startTimeMs = (window.gShaderToy && window.gShaderToy.mEffect && typeof window.gShaderToy.mEffect.mTf === 'number')
-                        ? window.gShaderToy.mEffect.mTf
-                        : ((window.gShaderToy && typeof window.gShaderToy.mTf === 'number')
-                            ? window.gShaderToy.mTf
-                            : ((window.gShaderToy && window.gShaderToy.mEffect && typeof window.gShaderToy.mEffect.mTOffset === 'number')
-                                ? window.gShaderToy.mEffect.mTOffset
+                    startTimeMs = (st && st.mEffect && typeof st.mEffect.mTf === 'number')
+                        ? st.mEffect.mTf
+                        : ((st && typeof st.mTf === 'number')
+                            ? st.mTf
+                            : ((st && st.mEffect && typeof st.mEffect.mTOffset === 'number')
+                                ? st.mEffect.mTOffset
                                 : 0));
                 }
 
@@ -819,46 +827,47 @@
                         : (startTimeMs + elapsedMs);
                     virtualTimeMs = frameTimeMs;
 
-                    if (window.gShaderToy) {
+                    var curSt = getShaderToy();
+                    if (curSt) {
                         var currentFrameNumber = Math.round(frameTimeMs / 1000 * targetFps);
-                        window.gShaderToy.mTOffset = frameTimeMs;
-                        window.gShaderToy.mTo = frameTimeMs - dtMs;
-                        window.gShaderToy.mTf = frameTimeMs;
-                        window.gShaderToy.mFpsFrame = currentFrameNumber;
-                        window.gShaderToy.mRestarted = false;
-                        window.gShaderToy.mForceFrame = true;
+                        curSt.mTOffset = frameTimeMs;
+                        curSt.mTo = frameTimeMs - dtMs;
+                        curSt.mTf = frameTimeMs;
+                        curSt.mFpsFrame = currentFrameNumber;
+                        curSt.mRestarted = false;
+                        curSt.mForceFrame = true;
 
-                        if (window.gShaderToy.mEffect) {
-                            window.gShaderToy.mEffect.mTOffset = frameTimeMs;
-                            window.gShaderToy.mEffect.mTo = frameTimeMs - dtMs;
-                            window.gShaderToy.mEffect.mTf = frameTimeMs;
-                            window.gShaderToy.mEffect.mFpsTo = frameTimeMs - dtMs;
-                            window.gShaderToy.mEffect.mFpsFrame = currentFrameNumber;
-                            window.gShaderToy.mEffect.mFrame = currentFrameNumber;
-                            window.gShaderToy.mEffect.mRestarted = false;
-                            window.gShaderToy.mEffect.mForceFrame = true;
+                        if (curSt.mEffect) {
+                            curSt.mEffect.mTOffset = frameTimeMs;
+                            curSt.mEffect.mTo = frameTimeMs - dtMs;
+                            curSt.mEffect.mTf = frameTimeMs;
+                            curSt.mEffect.mFpsTo = frameTimeMs - dtMs;
+                            curSt.mEffect.mFpsFrame = currentFrameNumber;
+                            curSt.mEffect.mFrame = currentFrameNumber;
+                            curSt.mEffect.mRestarted = false;
+                            curSt.mEffect.mForceFrame = true;
 
-                            if (window.gShaderToy.mEffect.mPasses) {
-                                for (var p = 0; p < window.gShaderToy.mEffect.mPasses.length; p++) {
-                                    window.gShaderToy.mEffect.mPasses[p].mFrame = currentFrameNumber;
+                            if (curSt.mEffect.mPasses) {
+                                for (var p = 0; p < curSt.mEffect.mPasses.length; p++) {
+                                    curSt.mEffect.mPasses[p].mFrame = currentFrameNumber;
                                 }
                             }
                         }
 
                         // Explicitly render this frame to canvas
                         var rendered = false;
-                        if (typeof window.gShaderToy.Render === 'function') {
+                        if (typeof curSt.Render === 'function') {
                             try {
-                                window.gShaderToy.Render(true);
+                                curSt.Render(true);
                                 rendered = true;
                             } catch (e) {
                                 console.warn('[ShaderToy Plugin] gShaderToy.Render error:', e);
                             }
                         }
 
-                        if (!rendered && window.gShaderToy.mEffect && typeof window.gShaderToy.mEffect.Paint === 'function') {
+                        if (!rendered && curSt.mEffect && typeof curSt.mEffect.Paint === 'function') {
                             try {
-                                window.gShaderToy.mEffect.Paint(frameTimeMs / 1000, dtSec, targetFps, 0, 0, 0, 0, false);
+                                curSt.mEffect.Paint(frameTimeMs / 1000, dtSec, targetFps, 0, 0, 0, 0, false);
                                 rendered = true;
                             } catch (e2) {
                                 console.warn('[ShaderToy Plugin] mEffect.Paint error:', e2);
@@ -878,7 +887,7 @@
                     }
 
                     // Flush GPU draw queue so the WebGL canvas has finished all pixels
-                    var gl = (window.gShaderToy && window.gShaderToy.mEffect && window.gShaderToy.mEffect.mGLContext) ||
+                    var gl = (curSt && curSt.mEffect && curSt.mEffect.mGLContext) ||
                         (canvas && (canvas.getContext('webgl2') || canvas.getContext('webgl')));
                     if (gl && typeof gl.finish === 'function') {
                         gl.finish();
@@ -887,7 +896,7 @@
                     try {
                         var timestampUs = Math.round(frameIndex * (1000000 / targetFps)),
                             isKey = (frameIndex % (targetFps * 2) === 0),
-                            recCanvas = self.recordingCanvas || (window.gShaderToy && window.gShaderToy.mCanvas) || canvas,
+                            recCanvas = self.recordingCanvas || (curSt && curSt.mCanvas) || canvas,
                             frameOpts = { timestamp: timestampUs };
 
                         if (recCanvas.width !== width || recCanvas.height !== height) {
@@ -958,8 +967,8 @@
                 return;
             }
 
-            if (window.gShaderToy && window.gShaderToy.mIsPaused) {
-                window.gShaderToy.pauseTime();
+            if (isShaderPaused()) {
+                setShaderPaused(false);
             }
 
             var mimeType = '',
@@ -1077,9 +1086,10 @@
         }
 
         downloadRecordingBlob(blob, ext, fps) {
-            var titleElem = document.getElementById('shaderTitle'),
+            var st = getShaderToy(),
+                titleElem = document.getElementById('shaderTitle'),
                 title = (titleElem && titleElem.value ? titleElem.value.trim() : '') ||
-                    (window.gShaderToy && window.gShaderToy.mInfo && (window.gShaderToy.mInfo.name || window.gShaderToy.mInfo.id)) ||
+                    (st && st.mInfo && (st.mInfo.name || st.mInfo.id)) ||
                     'shadertoy',
                 safeTitle = title.replace(/[^a-zA-Z0-9_\-]/g, '_'),
                 now = new Date(),
@@ -1525,26 +1535,47 @@
     }
 
     /**
+     * Safely retrieves ShaderToy instance.
+     *
+     * @returns {Object|null}
+     */
+    function getShaderToy() {
+        if (typeof gShaderToy !== 'undefined' && gShaderToy) {
+            if (typeof window !== 'undefined' && !window.gShaderToy) {
+                window.gShaderToy = gShaderToy;
+            }
+            return gShaderToy;
+        }
+
+        if (typeof window !== 'undefined' && window.gShaderToy) {
+            return window.gShaderToy;
+        }
+
+        return null;
+    }
+
+    /**
      * Checks if ShaderToy is currently paused.
      *
      * @returns {boolean}
      */
     function isShaderPaused() {
-        if (!window.gShaderToy) {
+        var st = getShaderToy();
+        if (!st) {
             return false;
         }
 
-        if (window.gShaderToy.mEffect) {
-            if (typeof window.gShaderToy.mEffect.IsPaused === 'function') {
-                return window.gShaderToy.mEffect.IsPaused();
+        if (st.mEffect) {
+            if (typeof st.mEffect.IsPaused === 'function') {
+                return st.mEffect.IsPaused();
             }
-            if (typeof window.gShaderToy.mEffect.mPaused === 'boolean') {
-                return window.gShaderToy.mEffect.mPaused;
+            if (typeof st.mEffect.mPaused === 'boolean') {
+                return st.mEffect.mPaused;
             }
         }
 
-        if (typeof window.gShaderToy.mIsPaused === 'boolean') {
-            return window.gShaderToy.mIsPaused;
+        if (typeof st.mIsPaused === 'boolean') {
+            return st.mIsPaused;
         }
 
         var pauseBtn = document.getElementById('myPauseButton');
@@ -1561,12 +1592,13 @@
      * @param {boolean} paused
      */
     function setShaderPaused(paused) {
-        if (!window.gShaderToy || typeof window.gShaderToy.pauseTime !== 'function') {
+        var st = getShaderToy();
+        if (!st || typeof st.pauseTime !== 'function') {
             return;
         }
 
         if (isShaderPaused() !== paused) {
-            window.gShaderToy.pauseTime();
+            st.pauseTime();
         }
     }
 
@@ -1588,10 +1620,13 @@
                 'mouseup',
                 this.sliderOnMouseUp.bind(this)
             );
-            this.sliderInput.addEventListener(
-                'change',
-                this.sliderOnMouseUp.bind(this)
-            );
+            this.sliderInput.addEventListener('change', () => {
+                if (this.busy) {
+                    this.sliderOnMouseUp();
+                } else {
+                    updateShaderToyTime(this.sliderInput.value);
+                }
+            });
             window.addEventListener('mouseup', () => {
                 if (this.busy) {
                     this.sliderOnMouseUp();
@@ -1944,18 +1979,23 @@
          * Returns current shader time in ms.
          */
         getCurrentTime() {
-            if (!window.gShaderToy) {
+            var st = getShaderToy();
+            if (!st) {
                 return 0;
             }
 
-            var mE = window.gShaderToy.mEffect;
+            var mE = st.mEffect;
 
             if (mE && typeof mE.mTf === 'number') {
                 return mE.mTf;
             }
 
-            if (typeof window.gShaderToy.mTf === 'number') {
-                return window.gShaderToy.mTf;
+            if (typeof st.mTf === 'number') {
+                return st.mTf;
+            }
+
+            if (mE && typeof mE.mTime === 'number') {
+                return mE.mTime * 1000;
             }
 
             var myTimeEl = document.getElementById('myTime');
@@ -1974,18 +2014,19 @@
          */
         updateSlider() {
             var outsideLoop = false;
+            var st = getShaderToy();
 
-            if (window.gShaderToy && !this.busy) {
+            if (st && !this.busy) {
                 var currentTime = this.getCurrentTime();
                 this.sliderInput.value = currentTime;
 
-                if (this.loop && currentTime > this.maxValueInput.value * 1000) {
-                    this.sliderInput.value = this.minValueInput.value * 1000;
+                if (this.loop && currentTime > parseFloat(this.maxValueInput.value) * 1000) {
+                    this.sliderInput.value = parseFloat(this.minValueInput.value) * 1000;
                     outsideLoop = true;
                 }
 
-                if (this.loop && currentTime < this.minValueInput.value * 1000) {
-                    this.sliderInput.value = this.minValueInput.value * 1000;
+                if (this.loop && currentTime < parseFloat(this.minValueInput.value) * 1000) {
+                    this.sliderInput.value = parseFloat(this.minValueInput.value) * 1000;
                     outsideLoop = true;
                 }
 
@@ -2006,7 +2047,8 @@
          * Handles click on slider.
          */
         sliderOnMouseDown() {
-            if (!window.gShaderToy) {
+            var st = getShaderToy();
+            if (!st) {
                 return false;
             }
 
@@ -2019,8 +2061,8 @@
                 }
             }
 
-            this.sliderInput.min = parseFloat(this.minValueInput.value) * 1000;
-            this.sliderInput.max = parseFloat(this.maxValueInput.value) * 1000;
+            this.sliderInput.min = (parseFloat(this.minValueInput.value) || 0) * 1000;
+            this.sliderInput.max = (parseFloat(this.maxValueInput.value) || 60) * 1000;
 
             return false;
         }
@@ -2051,7 +2093,8 @@
      * Updates ShaderToy with provided time value.
      */
     function updateShaderToyTime(time, unpause) {
-        if (!window.gShaderToy) {
+        var st = getShaderToy();
+        if (!st) {
             return;
         }
 
@@ -2060,7 +2103,7 @@
             return;
         }
 
-        var mE = window.gShaderToy.mEffect;
+        var mE = st.mEffect;
         var realTime = typeof window.getRealTime === 'function'
             ? window.getRealTime()
             : (window.performance ? window.performance.now() : Date.now());
@@ -2075,21 +2118,34 @@
             mE.mFrame = frame;
             mE.mRestarted = true;
             mE.mForceFrame = true;
+            mE.mTime = value / 1000;
 
             if (mE.mPasses) {
                 for (var i = 0; i < mE.mPasses.length; i++) {
                     mE.mPasses[i].mFrame = frame;
                 }
             }
+
+            if (typeof mE.RequestFrame === 'function') {
+                try {
+                    mE.RequestFrame();
+                } catch (ignore) {}
+            }
         }
 
-        window.gShaderToy.mTOffset = value;
-        window.gShaderToy.mTo = realTime;
-        window.gShaderToy.mTf = value;
-        window.gShaderToy.mFpsTo = realTime;
-        window.gShaderToy.mFpsFrame = frame;
-        window.gShaderToy.mRestarted = true;
-        window.gShaderToy.mForceFrame = true;
+        st.mTOffset = value;
+        st.mTo = realTime;
+        st.mTf = value;
+        st.mFpsTo = realTime;
+        st.mFpsFrame = frame;
+        st.mRestarted = true;
+        st.mForceFrame = true;
+
+        if (typeof st.Render === 'function') {
+            try {
+                st.Render(true);
+            } catch (ignore) {}
+        }
 
         var myTimeEl = document.getElementById('myTime');
         if (myTimeEl) {
@@ -2107,13 +2163,14 @@
      * Updates ShaderToy inputs and sound pass playback.
      */
     function updateInputsTime(value) {
-        var timeInSeconds = value / 1000;
-
-        if (!window.gShaderToy || !window.gShaderToy.mEffect || !window.gShaderToy.mEffect.mPasses) {
+        var st = getShaderToy();
+        if (!st || !st.mEffect || !st.mEffect.mPasses) {
             return;
         }
 
-        window.gShaderToy.mEffect.mPasses.forEach(function mPass(pass) {
+        var timeInSeconds = value / 1000;
+
+        st.mEffect.mPasses.forEach(function mPass(pass) {
             if (pass.mType === 'sound') {
                 if (pass.mBuffer) {
                     if (pass.mPlayNode) {

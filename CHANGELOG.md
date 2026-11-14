@@ -1,5 +1,10 @@
 ## ShaderToy extension changelog (major changes only):
 
+- 0.15.11 (14-11-2026)
+    - Fix timeline slider scrubbing and playback synchronization by introducing a safe `getShaderToy()` accessor and ensuring `window.gShaderToy` binding.
+    - Accurately trigger canvas frame redraws (`mEffect.RequestFrame()` and `mTime`) when scrubbing or stepping time while paused.
+    - Fix timeline slider track click and change handling.
+
 - 0.15.10 (13-11-2026)
     - Fix timeline slider randomly toggling play/pause and standing still during playback ([Issue #239](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/239)).
     - Guard shader resolution and buffer resizing (`mE.ResizeBuffers`) against missing methods and exceptions.
