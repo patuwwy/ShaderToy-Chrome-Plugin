@@ -72,3 +72,11 @@ After code changes, validate at least the impacted area:
   - Chrome uses `background.service_worker`
   - Firefox uses `background.scripts`
 - Resources injected by content script must exist and be listed in `web_accessible_resources`.
+
+## Testing and E2E Guidelines
+
+- Automated tests must run in isolation without mutating production data:
+  - **No user accounts**: Tests must NEVER create real accounts on shadertoy.com or log in with credentials in CI/CD.
+  - **No shader creation/saving**: Tests must NEVER publish, save, overwrite, or mutate shaders on live shadertoy.com servers.
+  - **Mock harness for mutations**: Any saving, publishing, or draft creation logic (e.g. *Save as New Draft*, *Fork*) must be tested on local mock harnesses (`tests/fixtures/`) or with mocked network responses (`page.route` in Playwright).
+  - **Live Canary tests are read-only**: Live Canary specs running against `https://www.shadertoy.com/new` or public shaders are strictly read-only checks for DOM contract and extension script injection without console errors.

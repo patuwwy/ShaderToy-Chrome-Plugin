@@ -1,0 +1,15 @@
+{
+    "name": "shadertoy-unofficial-plugin",
+    "version": "0.15.12",
+    "description": "Browser extension for shadertoy.com with Chrome and Firefox builds",
+    "scripts": {
+        "test": "playwright test --project=chromium",
+        "test:regression": "playwright test tests/timebar.spec.js tests/loop.spec.js tests/monaco.spec.js",
+        "test:canary": "playwright test --project=canary",
+        "lint": "npx eslint \"app/*.js\"",
+        "release": "node scripts/release.js"
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.48.0"
+    }
+}

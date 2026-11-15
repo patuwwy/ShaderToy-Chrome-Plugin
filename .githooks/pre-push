@@ -1,0 +1,27 @@
+#!/bin/sh
+# Git pre-push hook to prevent pushing broken releases or tags
+
+echo "🔍 [pre-push] Running linter and regression tests before push..."
+
+# Run linter
+npm run lint
+LINT_EXIT=$?
+if [ $LINT_EXIT -ne 0 ]; then
+    echo "❌ [pre-push] ESLint found errors! Push aborted."
+    echo "Please fix the lint errors before pushing."
+    exit 1
+fi
+
+# Run tests
+npm test
+TEST_EXIT=$?
+if [ $TEST_EXIT -ne 0 ]; then
+    echo "❌ [pre-push] Tests failed! Push aborted."
+    echo "Your local tag was NOT pushed to the remote repository."
+    echo "You can delete your local tag with: git tag -d <tag_name>"
+    echo "Fix the errors, and you will not have to bump the version number!"
+    exit 1
+fi
+
+echo "✅ [pre-push] All checks passed. Proceeding with push."
+exit 0

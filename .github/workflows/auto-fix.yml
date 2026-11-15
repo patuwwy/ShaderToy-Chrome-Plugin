@@ -1,0 +1,72 @@
+name: Automated Bug Fixer
+
+on:
+  issues:
+    types: [opened, labeled]
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Issue number to auto-fix'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  auto-fix:
+    # Security: Only run when triggered by the repository owner/collaborator:
+    # 1. An issue has the 'auto-fix' label added by a maintainer
+    # 2. A maintainer (OWNER, MEMBER, COLLABORATOR) comments '/fix'
+    # 3. Manually dispatched via GitHub Actions UI by the owner
+    if: >
+      (github.event_name == 'workflow_dispatch') ||
+      (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'auto-fix') && 
+        (github.event.sender.login == github.repository_owner || contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.issue.author_association))) ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request == null && startsWith(github.event.comment.body, '/fix') && 
+        (github.event.comment.author_association == 'OWNER' || github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'COLLABORATOR'))
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Install dependencies
+        run: npm ci || npm i
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Resolve Issue Details
+        id: issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ISSUE_NUM="${{ github.event.inputs.issue_number }}"
+          else
+            ISSUE_NUM="${{ github.event.issue.number }}"
+          fi
+          echo "num=$ISSUE_NUM" >> $GITHUB_OUTPUT
+
+      - name: Run Auto-Fix Engine
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          ISSUE_NUMBER: ${{ steps.issue.outputs.num }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          node scripts/auto-fix.js

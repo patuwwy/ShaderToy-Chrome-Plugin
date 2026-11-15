@@ -8,3 +8,7 @@
 ./app/manifest.json
 /output
 TODO.md
+node_modules/
+test-results/
+playwright-report/
+

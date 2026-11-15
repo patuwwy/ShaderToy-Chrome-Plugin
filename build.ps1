@@ -14,6 +14,14 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
+# Run regression tests
+Write-Host "Running regression test suite..."
+npx playwright test tests/timebar.spec.js tests/loop.spec.js tests/monaco.spec.js
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Regression tests failed! Build aborted."
+    exit 1
+}
+
 # Cleanup and prepare output directories
 if (Test-Path ./output) { Remove-Item ./output -Recurse -Force }
 New-Item -ItemType Directory -Path ./output/chrome, ./output/firefox | Out-Null

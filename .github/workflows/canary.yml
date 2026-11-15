@@ -1,0 +1,35 @@
+name: Live Canary Tests
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Install dependencies
+        run: npm ci || npm i
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run live canary test
+        run: npx playwright test tests/canary-live.spec.js
+
+      - name: Upload Canary Report Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: canary-playwright-report
+          path: playwright-report/
+          retention-days: 14

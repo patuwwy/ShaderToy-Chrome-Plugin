@@ -1,5 +1,9 @@
 ## ShaderToy extension changelog (major changes only):
 
+- 0.15.12 (15-11-2026)
+    - Add pass tab switching shortcuts (`Alt + Left/Right` and macOS `Cmd + Alt + Left/Right`) to the Monaco editor ([Issue #240](https://github.com/patuwwy/ShaderToy-Chrome-Plugin/issues/240)).
+    - Trigger frame redraw (`mEffect.RequestFrame()`) on canvas resolution changes and fullscreen transitions while paused without altering pause state.
+
 - 0.15.11 (14-11-2026)
     - Fix timeline slider scrubbing and playback synchronization by introducing a safe `getShaderToy()` accessor and ensuring `window.gShaderToy` binding.
     - Accurately trigger canvas frame redraws (`mEffect.RequestFrame()` and `mTime`) when scrubbing or stepping time while paused.

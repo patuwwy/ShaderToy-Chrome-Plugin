@@ -183,6 +183,98 @@
             }
         },
 
+        switchPassTab: function(direction) {
+            if (!window.gShaderToy) {
+                return;
+            }
+
+            var n_now = Date.now();
+            if (n_now - (this.n_last_pass_switch_time || 0) < 100) {
+                return;
+            }
+            this.n_last_pass_switch_time = n_now;
+
+            var currentPassId = typeof window.gShaderToy.mActiveDoc === 'number'
+                ? window.gShaderToy.mActiveDoc
+                : 0;
+
+            var a_tab_elements = [];
+            var o_current_tab = document.getElementById('tab' + currentPassId);
+            if (o_current_tab && o_current_tab.parentElement) {
+                a_tab_elements = Array.prototype.slice.call(o_current_tab.parentElement.children).filter(function(el) {
+                    return /^tab\d+$/.test(el.id);
+                });
+            }
+
+            if (!a_tab_elements.length) {
+                a_tab_elements = Array.prototype.slice.call(document.querySelectorAll('[id^="tab"]')).filter(function(el) {
+                    return /^tab\d+$/.test(el.id);
+                });
+            }
+
+            if (a_tab_elements.length > 1) {
+                var currentDomIndex = -1;
+                for (var i = 0; i < a_tab_elements.length; i++) {
+                    if (a_tab_elements[i].id === 'tab' + currentPassId) {
+                        currentDomIndex = i;
+                        break;
+                    }
+                }
+
+                if (currentDomIndex !== -1) {
+                    var nextDomIndex = (currentDomIndex + direction + a_tab_elements.length) % a_tab_elements.length;
+                    var o_target_tab = a_tab_elements[nextDomIndex];
+                    var n_target_id = parseInt(o_target_tab.id.replace('tab', ''), 10);
+
+                    if (typeof o_target_tab.click === 'function') {
+                        o_target_tab.click();
+                    }
+                    if (window.gShaderToy && window.gShaderToy.mActiveDoc !== n_target_id && typeof window.gShaderToy.ChangePass === 'function') {
+                        window.gShaderToy.ChangePass(n_target_id);
+                    }
+                    if (this.o_editor_monaco && typeof this.o_editor_monaco.focus === 'function') {
+                        this.o_editor_monaco.focus();
+                    }
+                    return;
+                }
+            }
+
+            var a_valid_ids = [];
+            if (Array.isArray(window.gShaderToy.mPass)) {
+                for (var p = 0; p < window.gShaderToy.mPass.length; p++) {
+                    if (window.gShaderToy.mPass[p]) {
+                        a_valid_ids.push(p);
+                    }
+                }
+            } else if (window.gShaderToy.mEffect && Array.isArray(window.gShaderToy.mEffect.mPasses)) {
+                for (var ep = 0; ep < window.gShaderToy.mEffect.mPasses.length; ep++) {
+                    if (window.gShaderToy.mEffect.mPasses[ep]) {
+                        a_valid_ids.push(ep);
+                    }
+                }
+            }
+
+            if (a_valid_ids.length > 1) {
+                var currentIndex = a_valid_ids.indexOf(currentPassId);
+                if (currentIndex === -1) {
+                    currentIndex = 0;
+                }
+                var nextIndex = (currentIndex + direction + a_valid_ids.length) % a_valid_ids.length;
+                var n_fallback_target_id = a_valid_ids[nextIndex];
+
+                var o_fallback_tab = document.getElementById('tab' + n_fallback_target_id);
+                if (o_fallback_tab && typeof o_fallback_tab.click === 'function') {
+                    o_fallback_tab.click();
+                }
+                if (window.gShaderToy && window.gShaderToy.mActiveDoc !== n_fallback_target_id && typeof window.gShaderToy.ChangePass === 'function') {
+                    window.gShaderToy.ChangePass(n_fallback_target_id);
+                }
+                if (this.o_editor_monaco && typeof this.o_editor_monaco.focus === 'function') {
+                    this.o_editor_monaco.focus();
+                }
+            }
+        },
+
         setupGlslLanguage: function(monaco) {
             if (this.b_glsl_language_registered) {
                 return;
@@ -2265,6 +2357,7 @@
                     window.ToyPlug.editPage.syncActiveDocToMonaco = function() { self.syncActiveDocToMonaco(); };
                     window.ToyPlug.editPage.forceSyncMonacoToActiveDoc = function() { self.forceSyncMonacoToActiveDoc(); };
                     window.ToyPlug.editPage.compileShader = function() { self.compileShader(); };
+                    window.ToyPlug.editPage.switchPassTab = function(direction) { self.switchPassTab(direction); };
                 }
 
                 window.onresize = function() {
@@ -2311,6 +2404,35 @@
                     }
                 });
 
+                var a_prev_tab_keys = [
+                    window.monaco.KeyMod.Alt | window.monaco.KeyCode.LeftArrow
+                ];
+                var a_next_tab_keys = [
+                    window.monaco.KeyMod.Alt | window.monaco.KeyCode.RightArrow
+                ];
+                if (navigator.platform.match('Mac')) {
+                    a_prev_tab_keys.push(window.monaco.KeyMod.CtrlCmd | window.monaco.KeyMod.Alt | window.monaco.KeyCode.LeftArrow);
+                    a_next_tab_keys.push(window.monaco.KeyMod.CtrlCmd | window.monaco.KeyMod.Alt | window.monaco.KeyCode.RightArrow);
+                }
+
+                self.o_editor_monaco.addAction({
+                    id: 'shadertoy-prev-pass-tab',
+                    label: 'Previous Pass Tab',
+                    keybindings: a_prev_tab_keys,
+                    run: function() {
+                        self.switchPassTab(-1);
+                    }
+                });
+
+                self.o_editor_monaco.addAction({
+                    id: 'shadertoy-next-pass-tab',
+                    label: 'Next Pass Tab',
+                    keybindings: a_next_tab_keys,
+                    run: function() {
+                        self.switchPassTab(1);
+                    }
+                });
+
                 var o_monaco_el = document.querySelector('#editor .monaco-editor') || document.querySelector('.monaco-editor');
                 if (o_monaco_el) {
                     o_monaco_el.addEventListener('keydown', function(e) {
@@ -2324,6 +2446,16 @@
                         if (e.key === 'Enter' && (navigator.platform.match('Mac') ? (e.metaKey || e.altKey) : e.altKey)) {
                             e.preventDefault();
                             self.compileShader();
+                        }
+                        var isArrowLeft = e.key === 'ArrowLeft' || e.key === 'Left' || e.code === 'ArrowLeft';
+                        var isArrowRight = e.key === 'ArrowRight' || e.key === 'Right' || e.code === 'ArrowRight';
+                        if (!e.shiftKey && (isArrowLeft || isArrowRight)) {
+                            var isMac = !!navigator.platform.match('Mac');
+                            var isSwitchKey = (e.altKey && !e.ctrlKey && !e.metaKey) || (isMac && e.altKey && e.metaKey);
+                            if (isSwitchKey) {
+                                e.preventDefault();
+                                self.switchPassTab(isArrowLeft ? -1 : 1);
+                            }
                         }
                     }, false);
                 }
@@ -2452,6 +2584,7 @@
                 '            <div class="msm-grid">',
                 '                <div class="msm-item"><span>Compile & Run</span><kbd>' + altKey + ' + Enter</kbd></div>',
                 '                <div class="msm-item"><span>Save shader</span><kbd>' + cmdKey + ' + S</kbd></div>',
+                '                <div class="msm-item"><span>Switch Pass Tabs</span><kbd>' + (isMac ? 'Alt / Cmd + Alt + ← / →' : 'Alt + ← / →') + '</kbd></div>',
                 '                <div class="msm-item"><span>Go to Definition</span><kbd>F12 / ' + cmdKey + ' + Click</kbd></div>',
                 '                <div class="msm-item"><span>Symbol Outline</span><kbd>' + cmdKey + ' + Shift + O</kbd></div>',
                 '                <div class="msm-item"><span>Autocomplete</span><kbd>' + cmdKey + ' + Space</kbd></div>',

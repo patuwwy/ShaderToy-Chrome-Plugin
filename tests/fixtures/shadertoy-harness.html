@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>ShaderToy Test Harness</title>
+    <script>
+        // Ensure location matches ToyPlug.isEditPage() regexp: /(.com\/view|.com\/new)/
+        if (!window.location.href.match(/(.com\/view|.com\/new)/)) {
+            try {
+                history.replaceState(null, '', window.location.pathname + '#.com/view');
+            } catch (e) {
+                try {
+                    window.location.hash = '.com/view';
+                } catch (ignore) {}
+            }
+        }
+
+        // Global mocks expected by shadertoy-plugin.js and related modules
+        var gShaderToy = null;
+        window.gThemeName = 'dark';
+        window.gShaderID = 'test_shader_id';
+        window.getRealTime = function() {
+            return window.performance ? window.performance.now() : Date.now();
+        };
+
+        // Effect constructor mock
+        function Effect() {}
+        Effect.prototype.Paint = function(time, dt, fps) {
+            if (window.gShaderToy && window.gShaderToy.mEffect) {
+                window.gShaderToy.mEffect.Paint(time, dt, fps);
+            }
+        };
+        Effect.prototype.RequestFrame = function() {
+            if (window.gShaderToy && window.gShaderToy.mEffect) {
+                window.gShaderToy.mEffect.RequestFrame();
+            }
+        };
+        Effect.prototype.Resize = function(xres, yres) {};
+        Effect.prototype.ResizeBuffers = function(xres, yres) {};
+        Effect.prototype.SetSize = function(xres, yres) {};
+        window.Effect = Effect;
+
+        // EffectPass constructor mock
+        function EffectPass() {}
+        EffectPass.prototype.Paint = function() {};
+        EffectPass.prototype.Create = function() {};
+        window.EffectPass = EffectPass;
+
+        // ShaderToy constructor mock
+        function ShaderToy() {}
+        ShaderToy.prototype.ChangePass = function(id) {
+            this.mActiveDoc = id;
+            var tabs = document.querySelectorAll('#passTabs > .tab, [id^="tab"]');
+            tabs.forEach(function(t, idx) {
+                if (t.id === 'tab' + id || idx === id) {
+                    t.classList.add('selected');
+                } else {
+                    t.classList.remove('selected');
+                }
+            });
+            if (typeof this._dispatch === 'function') {
+                this._dispatch('shadertoy:tabChange', { activeDoc: id });
+            }
+        };
+        window.ShaderToy = ShaderToy;
+
+        // RequireJS mock for Monaco loader
+        window.require = function(deps, cb) {
+            if (typeof cb === 'function') {
+                setTimeout(cb, 0);
+            }
+        };
+        window.require.config = function() {};
+
+        // Lightweight Monaco mock for monaco-related tests
+        if (typeof window.monaco === 'undefined') {
+            window.monaco = {
+                Uri: {
+                    parse: function(uri) {
+                        return {
+                            toString: function() {
+                                return uri;
+                            }
+                        };
+                    }
+                },
+                KeyMod: {
+                    Alt: 512,
+                    CtrlCmd: 2048,
+                    Shift: 1024
+                },
+                KeyCode: {
+                    Enter: 3,
+                    LeftArrow: 15,
+                    RightArrow: 17
+                },
+                languages: {
+                    CompletionItemKind: {
+                        Method: 0, Function: 1, Constructor: 2, Field: 3, Variable: 4, Class: 5,
+                        Struct: 6, Interface: 7, Module: 8, Property: 9, Event: 10, Operator: 11,
+                        Unit: 12, Value: 13, Constant: 14, Enum: 15, EnumMember: 16, Keyword: 17,
+                        Text: 18, Color: 19, File: 20, Reference: 21, Customcolor: 22, Folder: 23,
+                        TypeParameter: 24, User: 25, Issue: 26, Snippet: 27
+                    },
+                    CompletionItemInsertTextRule: {
+                        None: 0,
+                        InsertAsSnippet: 4
+                    },
+                    SymbolKind: {
+                        File: 0, Module: 1, Namespace: 2, Package: 3, Class: 4, Method: 5, Property: 6, Field: 7,
+                        Constructor: 8, Enum: 9, Interface: 10, Function: 11, Variable: 12, Constant: 13, String: 14,
+                        Number: 15, Boolean: 16, Array: 17, Object: 18, Key: 19, Null: 20, EnumMember: 21, Struct: 22,
+                        Event: 23, Operator: 24, TypeParameter: 25
+                    },
+                    register: function() {},
+                    setLanguageConfiguration: function() {},
+                    setMonarchTokensProvider: function() {},
+                    registerCompletionItemProvider: function() {},
+                    registerHoverProvider: function() {},
+                    registerDefinitionProvider: function() {},
+                    registerDocumentSymbolProvider: function() {},
+                    registerDocumentFormattingEditProvider: function() {},
+                    registerDocumentRangeFormattingEditProvider: function() {},
+                    registerSignatureHelpProvider: function() {}
+                },
+                editor: {
+                    create: function(container, options) {
+                        var el = container.querySelector('.monaco-editor');
+                        if (!el) {
+                            el = document.createElement('div');
+                            el.className = 'monaco-editor';
+                            container.appendChild(el);
+                        }
+                        return {
+                            layout: function() {},
+                            focus: function() {},
+                            getValue: function() {
+                                return (options && options.value) || '';
+                            },
+                            setValue: function(v) {
+                                if (options) {
+                                    options.value = v;
+                                }
+                            },
+                            getModel: function() {
+                                return options && options.model;
+                            },
+                            setModel: function(m) {
+                                if (options) {
+                                    options.model = m;
+                                }
+                            },
+                            addCommand: function(key, handler) {},
+                            addAction: function(action) {},
+                            onDidChangeModelContent: function(cb) {},
+                            saveViewState: function() {
+                                return {};
+                            },
+                            restoreViewState: function(state) {},
+                            dispose: function() {}
+                        };
+                    },
+                    createModel: function(value, language, uri) {
+                        var text = value || '';
+                        var listeners = [];
+                        return {
+                            getValue: function() {
+                                return text;
+                            },
+                            setValue: function(v) {
+                                text = v;
+                                listeners.forEach(function(l) { l(); });
+                            },
+                            onDidChangeContent: function(cb) {
+                                listeners.push(cb);
+                                return {
+                                    dispose: function() {
+                                        var idx = listeners.indexOf(cb);
+                                        if (idx !== -1) {
+                                            listeners.splice(idx, 1);
+                                        }
+                                    }
+                                };
+                            },
+                            uri: uri,
+                            isDisposed: function() {
+                                return false;
+                            },
+                            dispose: function() {}
+                        };
+                    },
+                    getModel: function(uri) {
+                        return null;
+                    },
+                    setTheme: function(theme) {},
+                    setModelMarkers: function(model, owner, markers) {}
+                }
+            };
+        }
+
+        // Respond to Monaco asset requests
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'RequestMonacoAssetsData') {
+                window.postMessage({
+                    type: 'MonacoAssetsData',
+                    cfg: {
+                        monacoLoader: 'data:text/javascript;charset=utf-8,//loader',
+                        monacoEditorVSPath: '',
+                        paths: {
+                            vs: '/add-ons/monaco/min/vs'
+                        }
+                    }
+                }, '*');
+            }
+        });
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #111;
+            color: #eee;
+        }
+        .container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+        .block0 {
+            width: 800px;
+            flex-shrink: 0;
+        }
+        .block1 {
+            flex: 1;
+            min-width: 400px;
+        }
+        #player {
+            position: relative;
+            width: 800px;
+            height: 450px;
+            background: #000;
+        }
+        #demogl, .playerCanvas {
+            width: 800px;
+            height: 450px;
+            display: block;
+            background: #181818;
+            outline: none;
+        }
+        body.fullscreen-edit #demogl,
+        body.fullscreen-edit .playerCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9;
+        }
+        #playerControls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            background: #222;
+            border-top: 1px solid #333;
+        }
+        .formButton {
+            cursor: pointer;
+            padding: 4px 8px;
+            user-select: none;
+            background: #333;
+            color: #eee;
+            border: 1px solid #444;
+            border-radius: 3px;
+        }
+        .formButton:hover {
+            background: #444;
+        }
+        #shaderInfo {
+            margin-top: 15px;
+            padding: 10px;
+            background: #1c1c1c;
+            border: 1px solid #333;
+        }
+        #shaderTitle {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        #shaderAuthor {
+            font-size: 13px;
+            color: #aaa;
+            margin-bottom: 10px;
+        }
+        #shaderTags {
+            width: 100%;
+            margin-bottom: 10px;
+            background: #2a2a2a;
+            color: #eee;
+            border: 1px solid #444;
+            padding: 4px;
+        }
+        #shaderDescription {
+            font-size: 14px;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+        #shaderPublished {
+            margin-bottom: 10px;
+        }
+        #editorManager, #passTabs {
+            display: flex;
+            gap: 4px;
+            border-bottom: 1px solid #444;
+            margin-bottom: 8px;
+        }
+        #editorManager .tab, #passTabs .tab {
+            padding: 6px 14px;
+            cursor: pointer;
+            background: #252525;
+            border-radius: 4px 4px 0 0;
+            user-select: none;
+        }
+        #editorManager .tab.selected, #passTabs .tab.selected {
+            background: #383838;
+            font-weight: bold;
+            border-bottom: 2px solid #00aaff;
+        }
+        #editor {
+            width: 100%;
+            height: 320px;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+        .CodeMirror, .monaco-editor {
+            width: 100%;
+            height: 100%;
+        }
+        #editorControls {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+        }
+        #myComments {
+            margin-top: 15px;
+            border-top: 1px solid #333;
+            padding-top: 10px;
+        }
+        .commentContent {
+            font-size: 13px;
+            color: #ccc;
+        }
+        .toyplug-controls-container {
+            border: 1px solid #333;
+            background: #181818;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <div id="headerBlock2">
+            <span></span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="block0">
+            <div id="player">
+                <canvas id="demogl" class="playerCanvas" width="800" height="450" tabindex="0"></canvas>
+                <div id="playerControls" class="playerControls">
+                    <img id="myPauseButton" class="formButton" src="/img/pause.png" alt="Pause">
+                    <img id="myResetButton" class="formButton" src="/img/reset.png" alt="Reset">
+                    <span id="myTime">0.00</span>
+                    <span id="myFps">60.0 fps</span>
+                    <span id="myResolution">800x450</span>
+                </div>
+            </div>
+            <div id="shaderInfo">
+                <div id="shaderTitle" class="shaderTitle">Test Mock Shader</div>
+                <div id="shaderAuthor" class="shaderAuthor">by <a href="/user/mockuser">mockuser</a></div>
+                <input id="shaderTags" class="shaderTags" type="text" value="test, webgl, mock">
+                <div id="shaderDescription" class="shaderDescription">Mock shader description with https://www.shadertoy.com link</div>
+                <div id="shaderPublished">
+                    <select id="published">
+                        <option value="0">Private</option>
+                        <option value="1">Unlisted</option>
+                        <option value="3" selected>Public</option>
+                    </select>
+                </div>
+                <div id="shaderButtons">
+                    <input type="button" id="saveButton" class="formButton" value="Save">
+                    <input type="button" id="forkButton" class="formButton" value="Fork">
+                </div>
+            </div>
+        </div>
+
+        <div class="block1">
+            <div id="editorManager" style="margin-bottom: 5px;">
+                <div class="tab selected"><label>Orginal Shadertoy Editor</label></div>
+                <div class="tab monaco">
+                    <label>Monaco</label>
+                    <button id="monaco-keys-btn" type="button" class="monaco-help-btn" title="Monaco Shortcuts & Features">?</button>
+                </div>
+            </div>
+            <div id="passTabs" class="passTabs">
+                <div id="tab0" class="tab selected" data-pass="0">Image</div>
+                <div id="tab1" class="tab" data-pass="1">Common</div>
+                <div id="tab2" class="tab" data-pass="2">Buffer A</div>
+            </div>
+            <div id="editor">
+                <div class="CodeMirror">/* Native Editor Content */</div>
+                <div class="monaco-editor" style="display: none;">/* Monaco Editor Content */</div>
+            </div>
+            <div id="editorControls">
+                <div id="compileButton" class="formButton">Compile</div>
+            </div>
+            <div id="myComments">
+                <div class="commentContent">Great shader! Check https://shadertoy.com for details.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function initShadertoyHarness() {
+            'use strict';
+
+            var canvas = document.getElementById('demogl');
+            var gl = null;
+            try {
+                gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+            } catch (ignore) {}
+
+            if (!gl) {
+                gl = {
+                    canvas: canvas,
+                    getParameter: function() {
+                        return 'Mock WebGL';
+                    },
+                    getExtension: function() {
+                        return null;
+                    },
+                    createQuery: function() {
+                        return {};
+                    },
+                    deleteQuery: function() {},
+                    beginQuery: function() {},
+                    endQuery: function() {},
+                    getQueryParameter: function() {
+                        return 0;
+                    }
+                };
+            }
+
+            var _time = 0.0;
+
+            var gShaderToy = {
+                mCanvas: canvas,
+                get mTime() {
+                    return this.mEffect ? this.mEffect.mTime : _time;
+                },
+                set mTime(val) {
+                    _time = val;
+                    if (this.mEffect) {
+                        this.mEffect._mTime = val;
+                    }
+                },
+                mIsPaused: false,
+                mToPause: false,
+                mFps: 60.0,
+                mFpsTo: 0,
+                mFpsFrame: 0,
+                mFrame: 0,
+                mRestarted: false,
+                mForceFrame: false,
+                mTOffset: 0,
+                mTo: 0,
+                mTf: 0,
+                mNeedsSave: false,
+                mActiveDoc: 0,
+                mMousePosX: 0,
+                mMousePosY: 0,
+                mMouseOriX: 0,
+                mMouseOriY: 0,
+                _requestFrameCount: 0,
+                _paintCount: 0,
+
+                Save: function() {
+                    return {
+                        info: Object.assign({}, this.mInfo),
+                        renderpass: (this.mPass || []).map(function(p, idx) {
+                            return {
+                                name: idx === 0 ? 'Image' : (idx === 1 ? 'Common' : 'Buffer A'),
+                                type: idx === 0 ? 'image' : (idx === 1 ? 'common' : 'buffer'),
+                                code: p.mDocs ? p.mDocs.getValue() : (p.mSource || '')
+                            };
+                        })
+                    };
+                },
+
+                mInfo: {
+                    id: 'test_shader_id',
+                    name: 'Test Mock Shader',
+                    username: 'mockuser',
+                    description: 'Mock shader description with https://www.shadertoy.com link',
+                    tags: ['test', 'webgl', 'mock'],
+                    published: 3
+                },
+
+                mPass: [
+                    {
+                        mHeader: '',
+                        mSource: 'void mainImage(out vec4 fragColor, in vec2 fragCoord) {\n    fragColor = vec4(1.0, 0.0, 0.0, 1.0);\n}',
+                        mDocs: {
+                            text: 'void mainImage(out vec4 fragColor, in vec2 fragCoord) {\n    fragColor = vec4(1.0, 0.0, 0.0, 1.0);\n}',
+                            getValue: function() {
+                                return this.text;
+                            },
+                            setValue: function(val) {
+                                this.text = val;
+                            }
+                        }
+                    },
+                    {
+                        mHeader: '',
+                        mSource: '// Common pass code\n#define PI 3.14159265359',
+                        mDocs: {
+                            text: '// Common pass code\n#define PI 3.14159265359',
+                            getValue: function() {
+                                return this.text;
+                            },
+                            setValue: function(val) {
+                                this.text = val;
+                            }
+                        }
+                    },
+                    {
+                        mHeader: '',
+                        mSource: 'void mainImage(out vec4 fragColor, in vec2 fragCoord) {\n    fragColor = vec4(0.0);\n}',
+                        mDocs: {
+                            text: 'void mainImage(out vec4 fragColor, in vec2 fragCoord) {\n    fragColor = vec4(0.0);\n}',
+                            getValue: function() {
+                                return this.text;
+                            },
+                            setValue: function(val) {
+                                this.text = val;
+                            }
+                        }
+                    }
+                ],
+
+                mCodeEditor: {
+                    hasFocus: function() {
+                        return false;
+                    },
+                    execCommand: function(cmd) {
+                        window.gShaderToy._dispatch('shadertoy:execCommand', { command: cmd });
+                    },
+                    focus: function() {},
+                    refresh: function() {},
+                    getDoc: function() {
+                        return window.gShaderToy.mPass[window.gShaderToy.mActiveDoc].mDocs;
+                    },
+                    swapDoc: function(newDoc) {
+                        window.gShaderToy.mPass[window.gShaderToy.mActiveDoc].mDocs = newDoc;
+                    },
+                    getValue: function() {
+                        return window.gShaderToy.mPass[window.gShaderToy.mActiveDoc].mDocs.getValue();
+                    },
+                    setValue: function(val) {
+                        window.gShaderToy.mPass[window.gShaderToy.mActiveDoc].mDocs.setValue(val);
+                    }
+                },
+
+                mEffect: {
+                    mGLContext: gl,
+                    mCanvas: canvas,
+                    mXres: canvas.width || 800,
+                    mYres: canvas.height || 450,
+                    mPaused: false,
+                    _mTime: 0.0,
+                    get mTime() {
+                        return typeof this._mTime === 'number' ? this._mTime : _time;
+                    },
+                    set mTime(val) {
+                        this._mTime = val;
+                        _time = val;
+                    },
+                    mTOffset: 0,
+                    mTo: 0,
+                    mTf: 0,
+                    mFpsTo: 0,
+                    mFpsFrame: 0,
+                    mFrame: 0,
+                    mRestarted: false,
+                    mForceFrame: false,
+                    mAudioContext: null,
+
+                    IsPaused: function() {
+                        return this.mPaused;
+                    },
+                    RequestFrame: function() {
+                        window.gShaderToy._requestFrameCount++;
+                        window.gShaderToy.Render(false);
+                        window.gShaderToy._dispatch('shadertoy:requestFrame', {
+                            count: window.gShaderToy._requestFrameCount
+                        });
+                    },
+                    Paint: function(time, dt, fps, x, y, z, w, force) {
+                        window.gShaderToy._paintCount++;
+                        window.gShaderToy._dispatch('shadertoy:paint', {
+                            time: time,
+                            dt: dt,
+                            fps: fps,
+                            force: Boolean(force)
+                        });
+                    },
+                    Resize: function(xres, yres) {
+                        window.gShaderToy._dispatch('shadertoy:resize', {
+                            width: xres,
+                            height: yres
+                        });
+                    },
+                    ResizeBuffers: function(xres, yres) {
+                        if (this.mCanvas) {
+                            this.mCanvas.width = xres;
+                            this.mCanvas.height = yres;
+                        }
+                    },
+                    SetSize: function(xres, yres) {},
+                    DestroyPass: function(index) {
+                        if (this.mPasses && this.mPasses.length > index) {
+                            this.mPasses.splice(index, 1);
+                        }
+                    },
+                    mPasses: [
+                        {
+                            mType: 'image',
+                            mFrame: 0,
+                            mTiming: {
+                                accumTime: 16.6,
+                                accumSamples: 1,
+                                average: 16.6
+                            },
+                            mInputs: [],
+                            mSource: 'void mainImage(out vec4 fragColor, in vec2 fragCoord) { fragColor = vec4(1.0); }'
+                        },
+                        {
+                            mType: 'common',
+                            mFrame: 0,
+                            mTiming: {
+                                accumTime: 1.0,
+                                accumSamples: 1,
+                                average: 1.0
+                            },
+                            mInputs: [],
+                            mSource: '// Common code'
+                        },
+                        {
+                            mType: 'buffer',
+                            mFrame: 0,
+                            mTiming: {
+                                accumTime: 2.1,
+                                accumSamples: 1,
+                                average: 2.1
+                            },
+                            mInputs: [],
+                            mSource: 'void mainImage(out vec4 fragColor, in vec2 fragCoord) { fragColor = vec4(0.0); }'
+                        }
+                    ]
+                },
+
+                Pause: function() {
+                    this.pauseTime();
+                },
+
+                pauseTime: function() {
+                    this.mIsPaused = !this.mIsPaused;
+                    this.mToPause = this.mIsPaused;
+                    if (this.mEffect) {
+                        this.mEffect.mPaused = this.mIsPaused;
+                    }
+                    var pauseBtn = document.getElementById('myPauseButton');
+                    if (pauseBtn) {
+                        pauseBtn.src = this.mIsPaused ? '/img/play.png' : '/img/pause.png';
+                    }
+                    this._dispatch('shadertoy:pause', {
+                        paused: this.mIsPaused
+                    });
+                },
+
+                resetTime: function() {
+                    this.SetTime(0);
+                    this._dispatch('shadertoy:reset');
+                },
+
+                SetTime: function(timeInSeconds) {
+                    var t = parseFloat(timeInSeconds) || 0;
+                    this.mTime = t;
+                    this.mTf = t * 1000;
+                    this.mTOffset = t * 1000;
+                    var frame = Math.round(t * 60);
+                    this.mFrame = frame;
+                    this.mFpsFrame = frame;
+
+                    if (this.mEffect) {
+                        this.mEffect.mTime = t;
+                        this.mEffect.mTf = t * 1000;
+                        this.mEffect.mTOffset = t * 1000;
+                        this.mEffect.mFrame = frame;
+                        this.mEffect.mFpsFrame = frame;
+                        if (this.mEffect.mPasses) {
+                            for (var i = 0; i < this.mEffect.mPasses.length; i++) {
+                                this.mEffect.mPasses[i].mFrame = frame;
+                            }
+                        }
+                    }
+
+                    var myTimeEl = document.getElementById('myTime');
+                    if (myTimeEl) {
+                        myTimeEl.textContent = t.toFixed(2);
+                    }
+
+                    this._dispatch('shadertoy:time', {
+                        time: t,
+                        frame: frame
+                    });
+                },
+
+                Render: function(force) {
+                    if (this.mEffect && typeof this.mEffect.Paint === 'function') {
+                        this.mEffect.Paint(this.mTime, 1 / 60, this.mFps, 0, 0, 0, 0, Boolean(force));
+                    }
+                    this._dispatch('shadertoy:render', {
+                        time: this.mTime,
+                        frame: this.mFrame,
+                        force: Boolean(force)
+                    });
+                },
+
+                resize: function(xres, yres) {
+                    if (this.mCanvas) {
+                        this.mCanvas.width = xres;
+                        this.mCanvas.height = yres;
+                    }
+                    if (this.mEffect && typeof this.mEffect.Resize === 'function') {
+                        this.mEffect.Resize(xres, yres);
+                    }
+                    this._dispatch('shadertoy:resize', {
+                        width: xres,
+                        height: yres
+                    });
+                },
+
+                iSetResolution: function(xres, yres) {
+                    this.resize(xres, yres);
+                },
+
+                _dispatch: function(name, detail) {
+                    var event = new CustomEvent(name, {
+                        detail: detail || {}
+                    });
+                    document.dispatchEvent(event);
+                    window.dispatchEvent(event);
+                },
+
+                simulateTimeAdvance: function(seconds) {
+                    var next = this.mTime + (parseFloat(seconds) || 0);
+                    this.SetTime(next);
+                },
+
+                simulateFrame: function() {
+                    var dt = 1 / 60;
+                    this.SetTime(this.mTime + dt);
+                    this.Render(false);
+                }
+            };
+
+            Object.setPrototypeOf(gShaderToy, ShaderToy.prototype);
+            window.gShaderToy = gShaderToy;
+            try {
+                window['gShaderToy'] = gShaderToy;
+            } catch (ignore) {}
+
+            // Wire up UI buttons
+            var pauseBtn = document.getElementById('myPauseButton');
+            if (pauseBtn) {
+                pauseBtn.addEventListener('click', function() {
+                    window.gShaderToy.pauseTime();
+                });
+            }
+
+            var resetBtn = document.getElementById('myResetButton');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function() {
+                    window.gShaderToy.resetTime();
+                });
+            }
+
+            var compileBtn = document.getElementById('compileButton');
+            if (compileBtn) {
+                compileBtn.addEventListener('click', function() {
+                    window.gShaderToy.Render(true);
+                    if (typeof window.gShaderToy._dispatch === 'function') {
+                        window.gShaderToy._dispatch('shadertoy:compile');
+                    }
+                    window.dispatchEvent(new CustomEvent('shadertoy:compile'));
+                });
+            }
+
+            // Wire up editor choice switching
+            var editorTabs = document.querySelectorAll('#editorManager > .tab');
+            if (editorTabs.length >= 2) {
+                editorTabs[0].addEventListener('click', function() {
+                    if (window.ToyPlug && window.ToyPlug.editPage && window.ToyPlug.editPage.f_display_editor) {
+                        window.ToyPlug.editPage.f_display_editor('#editor .CodeMirror', false);
+                    }
+                });
+                editorTabs[1].addEventListener('click', function() {
+                    if (window.ToyPlug && window.ToyPlug.editPage && window.ToyPlug.editPage.f_display_editor) {
+                        window.ToyPlug.editPage.f_display_editor('#editor .monaco-editor', true);
+                    }
+                });
+            }
+
+            // Wire up native pass tab switching
+            var passTabs = document.querySelectorAll('#passTabs > .tab');
+            passTabs.forEach(function(tab, index) {
+                tab.addEventListener('click', function() {
+                    var passId = parseInt(tab.id.replace('tab', ''), 10);
+                    if (isNaN(passId)) {
+                        passId = index;
+                    }
+                    window.gShaderToy.ChangePass(passId);
+                });
+            });
+
+            // Listen for simulation events dispatched from tests
+            window.addEventListener('shadertoy:simulateTime', function(e) {
+                if (e.detail && typeof e.detail.time === 'number') {
+                    window.gShaderToy.SetTime(e.detail.time);
+                }
+            });
+
+            window.addEventListener('shadertoy:simulatePause', function(e) {
+                var target = e.detail && typeof e.detail.paused === 'boolean'
+                    ? e.detail.paused
+                    : !window.gShaderToy.mIsPaused;
+                if (window.gShaderToy.mIsPaused !== target) {
+                    window.gShaderToy.pauseTime();
+                }
+            });
+
+            window.addEventListener('shadertoy:simulateRender', function() {
+                window.gShaderToy.Render(true);
+            });
+        })();
+    </script>
+
+    <!-- Auto-load extension scripts synchronously like contentscript.js -->
+    <script src="../../app/scripts/webm-muxer.js"></script>
+    <script>
+        if (!window.location.search.includes('no-plugin')) {
+            var pluginScript = document.createElement('script');
+            pluginScript.src = '../../app/shadertoy-plugin.js';
+            pluginScript.async = false;
+            document.body.appendChild(pluginScript);
+        }
+        if (!window.location.search.includes('no-monaco') && document.getElementById('editorManager')) {
+            var monacoScript = document.createElement('script');
+            monacoScript.src = '../../app/add-ons/shadertoy-plugin-monaco.js';
+            monacoScript.async = false;
+            document.body.appendChild(monacoScript);
+        }
+    </script>
+</body>
+</html>

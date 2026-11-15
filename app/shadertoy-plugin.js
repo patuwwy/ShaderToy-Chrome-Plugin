@@ -257,6 +257,12 @@
             window.addEventListener('resize', () => {
                 this.multiplyRes(this.currentDivider);
             });
+            document.addEventListener('fullscreenchange', () => {
+                this.multiplyRes(this.currentDivider);
+            });
+            document.addEventListener('webkitfullscreenchange', () => {
+                this.multiplyRes(this.currentDivider);
+            });
         }
 
         /**
@@ -392,6 +398,19 @@
                 } catch (ignore) {}
             }
             this.currentDivider = multiplier;
+
+            if (isShaderPaused()) {
+                mE.mForceFrame = true;
+                if (typeof mE.RequestFrame === 'function') {
+                    try {
+                        mE.RequestFrame();
+                    } catch (ignore) {}
+                } else if (typeof gShaderToy.Render === 'function') {
+                    try {
+                        gShaderToy.Render(false);
+                    } catch (ignore) {}
+                }
+            }
         }
 
         /**
@@ -2780,5 +2799,11 @@
         }
     }
 
-    window.ToyPlug = window.ToyPlug || new ToyPlug();
+    if (window.ToyPlug && !(window.ToyPlug instanceof ToyPlug)) {
+        var existingToyPlugProps = window.ToyPlug;
+        window.ToyPlug = new ToyPlug();
+        Object.assign(window.ToyPlug, existingToyPlugProps);
+    } else if (!window.ToyPlug) {
+        window.ToyPlug = new ToyPlug();
+    }
 })(document, window);
