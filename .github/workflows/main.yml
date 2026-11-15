@@ -38,7 +38,7 @@ jobs:
         run: npm ci || npm i
 
       - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
 
       - name: Run regression test suite
         run: npx playwright test --project=chromium

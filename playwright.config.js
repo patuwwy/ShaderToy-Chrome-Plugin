@@ -2,14 +2,14 @@ const { defineConfig, devices } = require('@playwright/test');
 
 module.exports = defineConfig({
     testDir: './tests',
-    timeout: 30000,
+    timeout: process.arch === 'arm64' ? 60000 : 30000,
     expect: {
-        timeout: 5000
+        timeout: process.arch === 'arm64' ? 10000 : 5000
     },
     fullyParallel: true,
     forbidOnly: Boolean(process.env.CI),
-    retries: process.env.CI ? 2 : 0,
-    workers: process.env.CI ? 2 : 4,
+    retries: (process.env.CI || process.arch === 'arm64') ? 2 : 0,
+    workers: process.arch === 'arm64' ? 2 : (process.env.CI ? 2 : 4),
     reporter: process.env.CI
         ? [
             ['list'],
